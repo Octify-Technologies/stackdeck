@@ -22,9 +22,9 @@ Initial public release.
 - Live editor at `/` with markdown source and rendered preview, plus theme toolbar.
 - PDF export via `window.print()` and a 16:9 `@page` print stylesheet.
 - Deterministic test suite: 40 tests across schema, parser, planner, and theme resolver.
-- ESLint flat config, TypeScript strict mode, Vitest with v8 coverage.
-- GitHub Actions CI: typecheck, lint, test, build on Node 20 and 22.
-- Vercel deploy workflows: preview on PR, production on `main`.
+- ESLint flat config, Prettier, Knip, TypeScript strict mode, Vitest with v8 coverage.
+- GitHub Actions CI: typecheck, format-check, lint, knip, test, build on Node 20 and 22.
+- Continuous deploys via Vercel git integration (production on `main`, preview on PRs).
 
-[Unreleased]: https://github.com/OWNER/stackdeck/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/OWNER/stackdeck/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Octify-Technologies/stackdeck/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Octify-Technologies/stackdeck/releases/tag/v0.1.0

@@ -6,12 +6,13 @@
 **Switch themes instantly. Export to PDF. No backend, no accounts, no lock-in.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![CI](https://github.com/OWNER/stackdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/stackdeck/actions/workflows/ci.yml)
+[![CI](https://github.com/Octify-Technologies/stackdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/Octify-Technologies/stackdeck/actions/workflows/ci.yml)
 [![Made with Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://stackdeck-seven.vercel.app)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-[Live demo](https://stackdeck.dev) · [Grammar reference](docs/GRAMMAR.md) · [Architecture](docs/ARCHITECTURE.md) · [Changelog](CHANGELOG.md)
+[Live demo](https://stackdeck-seven.vercel.app) · [Grammar reference](docs/GRAMMAR.md) · [Architecture](docs/ARCHITECTURE.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -64,7 +65,7 @@ That markdown becomes a 3-slide deck with a cover, a 3-stat grid, and a takeover
 Requires Node 22 (see [.nvmrc](.nvmrc)) and pnpm 10+.
 
 ```bash
-git clone https://github.com/OWNER/stackdeck.git
+git clone https://github.com/Octify-Technologies/stackdeck.git
 cd stackdeck
 pnpm install
 pnpm dev
@@ -179,6 +180,6 @@ The architectural boundary is firm: the renderer never sees pattern directives. 
 
 <div align="center">
 
-If stackdeck saved you time, [drop a star ⭐](https://github.com/OWNER/stackdeck) — it helps others find the project.
+If stackdeck saved you time, [drop a star ⭐](https://github.com/Octify-Technologies/stackdeck) — it helps others find the project.
 
 </div>
