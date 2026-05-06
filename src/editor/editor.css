@@ -870,6 +870,15 @@
   background: transparent;
 }
 
+.thumb-strip__item--dragging {
+  opacity: 0.4;
+}
+
+.thumb-strip__item--over .thumb-strip__frame {
+  outline: 2px dashed var(--accent, #6ee7b7);
+  outline-offset: 2px;
+}
+
 .thumb-strip__item {
   flex-shrink: 0;
   display: flex;
