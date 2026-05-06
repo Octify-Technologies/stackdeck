@@ -1,0 +1,122 @@
+import type { Density, Mode } from '@/ir/schema';
+
+export type TemplatePreset = {
+  id: string;
+  name: string;
+  vibe: string;
+  styleId: string;
+  paletteId: string;
+  density: Density;
+  mode: Mode;
+};
+
+export const TEMPLATE_PRESETS: TemplatePreset[] = [
+  {
+    id: 'modern-electric-light',
+    name: 'Pitch Deck',
+    vibe: 'Sales & investor decks',
+    styleId: 'modern',
+    paletteId: 'electric',
+    density: 'comfortable',
+    mode: 'light',
+  },
+  {
+    id: 'modern-mono-light',
+    name: 'Linear Lite',
+    vibe: 'Product update, monochrome',
+    styleId: 'modern',
+    paletteId: 'mono',
+    density: 'comfortable',
+    mode: 'light',
+  },
+  {
+    id: 'modern-electric-dark',
+    name: 'Midnight Pitch',
+    vibe: 'Dark mode investor deck',
+    styleId: 'modern',
+    paletteId: 'electric',
+    density: 'comfortable',
+    mode: 'dark',
+  },
+  {
+    id: 'editorial-mono-light',
+    name: 'Editorial',
+    vibe: 'Magazine-style narrative',
+    styleId: 'editorial',
+    paletteId: 'mono',
+    density: 'airy',
+    mode: 'light',
+  },
+  {
+    id: 'editorial-sunset-light',
+    name: 'Year in Review',
+    vibe: 'Warm, retrospective, serif',
+    styleId: 'editorial',
+    paletteId: 'sunset',
+    density: 'airy',
+    mode: 'light',
+  },
+  {
+    id: 'editorial-forest-dark',
+    name: 'Late Night Edition',
+    vibe: 'Editorial in the dark',
+    styleId: 'editorial',
+    paletteId: 'forest',
+    density: 'comfortable',
+    mode: 'dark',
+  },
+  {
+    id: 'brutalist-mono-light',
+    name: 'Manifesto',
+    vibe: 'Loud, opinionated, indie',
+    styleId: 'brutalist',
+    paletteId: 'mono',
+    density: 'comfortable',
+    mode: 'light',
+  },
+  {
+    id: 'brutalist-sunset-light',
+    name: 'Block Party',
+    vibe: 'Brutalist with a hot accent',
+    styleId: 'brutalist',
+    paletteId: 'sunset',
+    density: 'dense',
+    mode: 'light',
+  },
+  {
+    id: 'brutalist-mono-dark',
+    name: 'After Hours',
+    vibe: 'Dark brutalist takeover',
+    styleId: 'brutalist',
+    paletteId: 'mono',
+    density: 'dense',
+    mode: 'dark',
+  },
+  {
+    id: 'modern-forest-airy',
+    name: 'Quarterly Review',
+    vibe: 'Calm, spacious, executive',
+    styleId: 'modern',
+    paletteId: 'forest',
+    density: 'spacious',
+    mode: 'light',
+  },
+  {
+    id: 'modern-sunset-comfortable',
+    name: 'Workshop',
+    vibe: 'Warm, friendly, instructional',
+    styleId: 'modern',
+    paletteId: 'sunset',
+    density: 'comfortable',
+    mode: 'light',
+  },
+  {
+    id: 'editorial-electric-dense',
+    name: 'Annual Report',
+    vibe: 'Information-dense editorial',
+    styleId: 'editorial',
+    paletteId: 'electric',
+    density: 'dense',
+    mode: 'light',
+  },
+];

@@ -1,66 +1,126 @@
+/* ==========================================================================
+   Block primitives. All visual treatment is driven by CSS custom properties
+   set by the active theme. No hardcoded colors, spacing, fonts, or radii.
+   ========================================================================== */
+
 .block {
   margin: 0;
+  min-width: 0;
 }
+
+/* ─── Headings ─────────────────────────────────────────────────────────── */
 
 .block-heading {
   font-family: var(--font-display);
   font-weight: var(--weight-display);
   line-height: var(--leading-display);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display, -0.02em);
   color: var(--color-text);
+  text-wrap: balance;
 }
 
 .block-h1 {
-  font-size: clamp(2.5rem, 4.5vw, 4rem);
+  font-size: clamp(2.75rem, 5vw, 4.75rem);
+  font-weight: var(--weight-display);
 }
+
 .block-h2 {
-  font-size: clamp(1.875rem, 3.2vw, 2.75rem);
+  font-size: clamp(2rem, 3.6vw, 3rem);
 }
+
 .block-h3 {
-  font-size: clamp(1.375rem, 2.2vw, 1.875rem);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
 }
+
 .block-h4 {
   font-size: clamp(1.125rem, 1.6vw, 1.375rem);
   font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
+
+/* ─── Text ──────────────────────────────────────────────────────────────── */
 
 .block-text {
   font-family: var(--font-body);
   font-weight: var(--weight-body);
   line-height: var(--leading-body);
   color: var(--color-text);
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  text-wrap: pretty;
+  max-width: var(--measure-max);
 }
 
 .block-text-lead {
-  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  font-size: clamp(1.25rem, 1.9vw, 1.625rem);
   color: var(--color-text-muted);
   line-height: 1.4;
+  font-weight: 400;
+  max-width: 50ch;
 }
 
 .block-text-caption {
   font-size: clamp(0.875rem, 1vw, 1rem);
   color: var(--color-text-muted);
+  letter-spacing: 0.01em;
 }
+
+/* ─── Lists ─────────────────────────────────────────────────────────────── */
 
 .block-list {
   font-family: var(--font-body);
   font-weight: var(--weight-body);
   line-height: var(--leading-body);
   color: var(--color-text);
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
-  padding-left: var(--space-lg);
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  list-style: none;
+  padding-left: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
+  max-width: var(--measure-max);
 }
 
-.block-list li {
-  padding-left: var(--space-xs);
+.block-list > li {
+  position: relative;
+  padding-left: var(--space-lg);
+}
+
+.block-list-unordered > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
+.block-list-ordered {
+  counter-reset: stackdeck-list;
+}
+
+.block-list-ordered > li {
+  counter-increment: stackdeck-list;
+}
+
+.block-list-ordered > li::before {
+  content: counter(stackdeck-list, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85em;
+  color: var(--color-accent);
+  letter-spacing: 0.02em;
 }
 
 .block-list ul,
 .block-list ol {
+  list-style: none;
   margin-top: var(--space-sm);
   padding-left: var(--space-lg);
   display: flex;
@@ -68,94 +128,157 @@
   gap: var(--space-xs);
 }
 
+/* ─── Quote ─────────────────────────────────────────────────────────────── */
+
 .block-quote {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  border-left: 3px solid var(--color-accent);
+  gap: var(--space-md);
   padding-left: var(--space-lg);
+  border-left: 3px solid var(--color-accent);
   font-family: var(--font-display);
+  max-width: var(--measure-max);
 }
 
 .block-quote blockquote {
   margin: 0;
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  line-height: 1.3;
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  line-height: 1.25;
   color: var(--color-text);
   font-weight: 500;
+  text-wrap: balance;
+  letter-spacing: -0.01em;
 }
 
 .block-quote-attribution {
   color: var(--color-text-muted);
   font-family: var(--font-body);
   font-size: clamp(0.875rem, 1.1vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .block-quote-big {
+  align-items: center;
   border-left: none;
   padding: 0;
   text-align: center;
-  align-items: center;
+  gap: var(--space-lg);
+  max-width: none;
 }
 
 .block-quote-big blockquote {
-  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-size: clamp(2.25rem, 5vw, 4rem);
   font-weight: 600;
-  line-height: 1.15;
-  max-width: 24ch;
+  line-height: 1.1;
+  max-width: 22ch;
+  letter-spacing: -0.025em;
 }
+
+.block-quote-big blockquote::before {
+  content: '\201C';
+  display: block;
+  font-size: 0.85em;
+  line-height: 0.5;
+  color: var(--color-accent);
+  margin-bottom: 0.15em;
+}
+
+/* ─── Stat ──────────────────────────────────────────────────────────────── */
 
 .block-stat {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-  padding: var(--space-md);
+  gap: var(--space-sm);
+  padding: var(--space-lg);
   background: var(--color-surface-muted);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   text-align: left;
   min-width: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.block-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-brand) 6%, transparent),
+    transparent 60%
+  );
+  z-index: -1;
 }
 
 .block-stat-value {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  line-height: 1.05;
+  font-weight: var(--weight-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1;
   color: var(--color-brand);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 
 .block-stat-label {
   font-family: var(--font-body);
   color: var(--color-text-muted);
   font-size: clamp(0.875rem, 1.1vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .block-stat-delta {
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  width: fit-content;
 }
 
 .block-stat-delta-up {
   color: var(--color-success);
+  background: color-mix(in oklab, var(--color-success) 12%, transparent);
 }
+
+.block-stat-delta-up::before {
+  content: '\2197';
+}
+
 .block-stat-delta-down {
   color: var(--color-danger);
+  background: color-mix(in oklab, var(--color-danger) 12%, transparent);
 }
+
+.block-stat-delta-down::before {
+  content: '\2198';
+}
+
 .block-stat-delta-flat {
   color: var(--color-text-muted);
+  background: var(--color-surface-muted);
 }
+
+/* ─── Code ──────────────────────────────────────────────────────────────── */
 
 .block-code {
   background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
   overflow: auto;
   font-family: var(--font-mono);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--color-text);
+  max-width: 100%;
 }
 
 .block-code code {
@@ -164,28 +287,42 @@
   font-family: inherit;
 }
 
+/* ─── Box (callout / generic container) ────────────────────────────────── */
+
 .block-box {
-  padding: var(--space-md);
+  padding: var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--color-surface-muted);
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
+  position: relative;
 }
 
 .block-box-info {
-  background: color-mix(in oklab, var(--color-brand) 8%, var(--color-surface));
+  background: color-mix(in oklab, var(--color-brand) 7%, var(--color-surface));
   border-color: color-mix(in oklab, var(--color-brand) 30%, var(--color-border));
 }
 
+.block-box-info::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--space-lg);
+  bottom: var(--space-lg);
+  width: 3px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--color-brand);
+}
+
 .block-box-warn {
-  background: color-mix(in oklab, var(--color-warn) 8%, var(--color-surface));
+  background: color-mix(in oklab, var(--color-warn) 7%, var(--color-surface));
   border-color: color-mix(in oklab, var(--color-warn) 30%, var(--color-border));
 }
 
 .block-box-success {
-  background: color-mix(in oklab, var(--color-success) 8%, var(--color-surface));
+  background: color-mix(in oklab, var(--color-success) 7%, var(--color-surface));
   border-color: color-mix(in oklab, var(--color-success) 30%, var(--color-border));
 }
 
@@ -194,14 +331,17 @@
   border-color: var(--color-border);
 }
 
+/* ─── Columns / Grid ────────────────────────────────────────────────────── */
+
 .block-columns {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 .block-columns[data-cols='2'] {
   grid-template-columns: 1fr 1fr;
 }
+
 .block-columns[data-cols='3'] {
   grid-template-columns: 1fr 1fr 1fr;
 }
@@ -215,15 +355,18 @@
 
 .block-grid {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  width: 100%;
 }
 
 .block-grid[data-cols='2'] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 .block-grid[data-cols='3'] {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
 .block-grid[data-cols='4'] {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -231,9 +374,35 @@
 .block-grid[data-rows='1'] {
   grid-template-rows: minmax(0, 1fr);
 }
+
 .block-grid[data-rows='2'] {
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
+
 .block-grid[data-rows='3'] {
   grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+/* Brutalist-specific overrides applied via deck-root scope. */
+[data-style='brutalist'] .block-stat {
+  border-width: 3px;
+  box-shadow: var(--shadow-md);
+}
+
+[data-style='brutalist'] .block-stat::before {
+  display: none;
+}
+
+[data-style='brutalist'] .block-h1,
+[data-style='brutalist'] .block-h2 {
+  text-transform: uppercase;
+}
+
+[data-style='brutalist'] .block-quote {
+  border-left-width: 6px;
+}
+
+/* Editorial drop-cap on big quotes. */
+[data-style='editorial'] .block-quote-big blockquote {
+  font-style: italic;
 }

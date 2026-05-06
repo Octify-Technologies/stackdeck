@@ -1,0 +1,145 @@
+.templates-page {
+  min-height: 100vh;
+  background: #fafafa;
+  color: #0a0a0a;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  padding: 40px 32px 80px;
+}
+
+.templates-page__header {
+  max-width: 1280px;
+  margin: 0 auto 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.templates-page__back {
+  font-size: 13px;
+  color: #525252;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.templates-page__back:hover {
+  color: #0a0a0a;
+}
+
+.templates-page__title {
+  margin: 0 0 6px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.templates-page__subtitle {
+  margin: 0;
+  font-size: 15px;
+  color: #525252;
+  max-width: 60ch;
+}
+
+.templates-page__grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.template-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -8px rgba(10, 10, 10, 0.12);
+  border-color: #d4d4d4;
+}
+
+.template-card__preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #f5f5f5;
+  overflow: hidden;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.template-card__scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1280px;
+  height: 720px;
+  transform: scale(calc(360 / 1280));
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.template-card__scaler .deck {
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+}
+
+.template-card__scaler .slide-frame {
+  width: 1280px;
+  max-width: 1280px;
+  height: 720px;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.template-card__meta {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.template-card__name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.template-card__vibe {
+  margin: 0;
+  font-size: 13px;
+  color: #525252;
+}
+
+.template-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.template-card__tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  background: #f5f5f5;
+  color: #525252;
+  border-radius: 999px;
+}

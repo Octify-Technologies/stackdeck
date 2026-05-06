@@ -314,12 +314,41 @@ const ThemeRefSchema: z.ZodType<ThemeRef> = z.object({
   mode: z.enum(MODES),
 });
 
+export const LOGO_POSITIONS = [
+  'cover-only',
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+] as const;
+
+type LogoPosition = (typeof LOGO_POSITIONS)[number];
+
+export type Brand = {
+  name?: string;
+  logoUrl?: string;
+  logoDarkUrl?: string;
+  logoPosition?: LogoPosition;
+  brandColor?: string;
+  accentColor?: string;
+};
+
+const BrandSchema: z.ZodType<Brand> = z.object({
+  name: z.string().min(1).optional(),
+  logoUrl: z.string().url().optional(),
+  logoDarkUrl: z.string().url().optional(),
+  logoPosition: z.enum(LOGO_POSITIONS).optional(),
+  brandColor: HexColorSchema.optional(),
+  accentColor: HexColorSchema.optional(),
+});
+
 export type Deck = {
   version: typeof IR_VERSION;
   id: string;
   title: string;
   aspectRatio: AspectRatio;
   theme: ThemeRef;
+  brand?: Brand;
   slides: Slide[];
   createdAt: string;
   updatedAt: string;
@@ -331,6 +360,7 @@ const DeckSchema: z.ZodType<Deck> = z.object({
   title: z.string().min(1),
   aspectRatio: z.enum(ASPECT_RATIOS),
   theme: ThemeRefSchema,
+  brand: BrandSchema.optional(),
   slides: z.array(SlideSchema),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

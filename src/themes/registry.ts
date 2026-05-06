@@ -1,5 +1,7 @@
 import type { Palette, Style } from '@/ir/schema';
 
+import { brutalist } from './styles/brutalist';
+import { editorial } from './styles/editorial';
 import { modern } from './styles/modern';
 import { electric } from './palettes/electric';
 import { forest } from './palettes/forest';
@@ -8,6 +10,8 @@ import { sunset } from './palettes/sunset';
 
 const styles: Record<string, Style> = {
   [modern.id]: modern,
+  [editorial.id]: editorial,
+  [brutalist.id]: brutalist,
 };
 
 const palettes: Record<string, Palette> = {

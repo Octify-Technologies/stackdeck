@@ -63,6 +63,21 @@ describe('resolveTheme', () => {
     expect(r.cssVars['--color-surface']).toBe('#fefefe');
   });
 
+  it('applies brand color overrides on top of the palette', () => {
+    const r = resolveTheme(baseTheme, modern, electric, {
+      brandColor: '#ff0066',
+      accentColor: '#00ffaa',
+    });
+    expect(r.cssVars['--color-brand']).toBe('#ff0066');
+    expect(r.cssVars['--color-accent']).toBe('#00ffaa');
+  });
+
+  it('falls back to palette colors when brand overrides are absent', () => {
+    const r = resolveTheme(baseTheme, modern, electric, { name: 'Acme' });
+    expect(r.cssVars['--color-brand']).toBe(electric.brand);
+    expect(r.cssVars['--color-accent']).toBe(electric.accent);
+  });
+
   it('picks shadow tokens for the active mode', () => {
     const light = resolveTheme(baseTheme, modern, electric);
     const dark = resolveTheme({ ...baseTheme, mode: 'dark' }, modern, electric);

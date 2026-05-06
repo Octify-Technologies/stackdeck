@@ -5,6 +5,7 @@ import { marked } from 'marked';
 import {
   type Block,
   type Box,
+  type Brand,
   type Code,
   type Deck,
   type Heading,
@@ -435,6 +436,7 @@ function inferLayout(blocks: Block[], index: number, totalSlides: number): Layou
 
 type ParseOptions = {
   theme?: Partial<ThemeRef>;
+  brand?: Brand;
   deckId?: string;
   title?: string;
 };
@@ -466,6 +468,9 @@ export function parseDeck(source: string, options: ParseOptions = {}): Deck {
     ...options.theme,
   };
 
+  const fmBrand = (fm.data?.brand ?? undefined) as Brand | undefined;
+  const brand: Brand | undefined = options.brand ?? fmBrand;
+
   const now = new Date().toISOString();
   const headingTitle = slides[0]?.blocks.find(
     (b): b is Heading => b.type === 'heading' && b.level === 1,
@@ -482,6 +487,7 @@ export function parseDeck(source: string, options: ParseOptions = {}): Deck {
     title,
     aspectRatio: '16:9',
     theme,
+    ...(brand ? { brand } : {}),
     slides,
     createdAt: now,
     updatedAt: now,
