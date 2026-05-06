@@ -34,11 +34,30 @@ export function DeckLibrary() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('recent');
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   useEffect(() => {
-    listDecks().then(setDecks);
+    listDecks()
+      .then((d) => {
+        setDecks(d);
+        setLoadError(null);
+      })
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : 'Could not load decks';
+        setLoadError(message);
+        setDecks([]);
+      });
   }, []);
 
-  const refresh = async () => setDecks(await listDecks());
+  const refresh = async () => {
+    try {
+      setDecks(await listDecks());
+      setLoadError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not load decks';
+      setLoadError(message);
+    }
+  };
 
   const visibleDecks = useMemo(() => {
     if (!decks) return null;
@@ -83,7 +102,11 @@ export function DeckLibrary() {
       />
 
       <PageMain className="library__main">
-        {decks === null ? (
+        {loadError ? (
+          <Mono as="div" className="library__loading" role="alert">
+            {loadError}
+          </Mono>
+        ) : decks === null ? (
           <Mono as="div" className="library__loading">
             Loading decks
           </Mono>
