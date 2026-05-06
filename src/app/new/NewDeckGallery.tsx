@@ -10,22 +10,63 @@ import { createDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 
 import { SAMPLE_MARKDOWN } from '@/editor/sample-deck';
+import { TEMPLATE_PRESETS, type TemplatePreset } from '@/app/templates/template-presets';
 
-import { TEMPLATE_PRESETS, type TemplatePreset } from './template-presets';
+const STARTER_MARKDOWN = `---
+title: New deck
+---
 
-export function TemplatesGallery() {
+::cover
+# A new beginning.
+Replace this with your own title.
+::
+
+::slide
+
+# Highlights
+
+- First key point
+- Second key point
+- Third key point
+
+::slide
+
+::stats
+::stat{value="100%" label="Awesome"}
+::stat{value="Now" label="Time to ship"}
+::
+
+::slide
+
+::quote.big
+> The best way to predict the future is to invent it.
+> -- Alan Kay
+::
+`;
+
+const BLANK_TEMPLATE: TemplatePreset = {
+  id: 'blank',
+  name: 'Blank',
+  vibe: 'Start from scratch',
+  styleId: 'modern',
+  paletteId: 'electric',
+  density: 'comfortable',
+  mode: 'light',
+};
+
+export function NewDeckGallery() {
   const router = useRouter();
 
-  const applyTemplate = async (preset: TemplatePreset) => {
+  const create = async (preset: TemplatePreset) => {
     const deck = await createDeck({
-      source: SAMPLE_MARKDOWN,
+      source: STARTER_MARKDOWN,
       theme: {
         styleId: preset.styleId,
         paletteId: preset.paletteId,
         density: preset.density,
         mode: preset.mode,
       },
-      templateName: preset.name,
+      templateName: preset.id === 'blank' ? undefined : preset.name,
     });
     router.push(`/d/${deck.id}/edit`);
   };
@@ -33,24 +74,39 @@ export function TemplatesGallery() {
   return (
     <div className="templates-page">
       <header className="templates-page__header">
-        <Link href="/" className="templates-page__back" aria-label="Back to library">
+        <Link href="/" className="templates-page__back">
           ← Library
         </Link>
         <div>
-          <h1 className="templates-page__title">Templates</h1>
+          <h1 className="templates-page__title">Pick a template</h1>
           <p className="templates-page__subtitle">
-            {TEMPLATE_PRESETS.length} hand-crafted theme combinations. Click one to create a new
-            deck with that theme.
+            Each template is a starter deck plus a theme. You can change colors, fonts, and content
+            after.
           </p>
         </div>
       </header>
 
       <div className="templates-page__grid">
+        <BlankCard onClick={() => create(BLANK_TEMPLATE)} />
         {TEMPLATE_PRESETS.map((preset) => (
-          <TemplateCard key={preset.id} preset={preset} onClick={() => applyTemplate(preset)} />
+          <TemplateCard key={preset.id} preset={preset} onClick={() => create(preset)} />
         ))}
       </div>
     </div>
+  );
+}
+
+function BlankCard({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="template-card template-card--blank" onClick={onClick}>
+      <div className="template-card__preview template-card__preview--blank">
+        <span aria-hidden>+</span>
+      </div>
+      <div className="template-card__meta">
+        <h3 className="template-card__name">Blank deck</h3>
+        <p className="template-card__vibe">Start from scratch with the Modern style</p>
+      </div>
+    </button>
   );
 }
 

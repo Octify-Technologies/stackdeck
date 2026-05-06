@@ -1,16 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import type { Brand, Density, Mode, ThemeRef } from '@/ir/schema';
-import { loadLastTheme, saveLastTheme } from '@/lib/storage';
+import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 import { ExportPdf } from '@/render/ExportPdf';
 import { allPalettes, allStyles } from '@/themes/registry';
 
+import { InsertMenu } from './InsertMenu';
 import { SAMPLE_MARKDOWN } from './sample-deck';
 import { SlideThumbnailList } from './SlideThumbnailList';
 import { ThemeDrawer } from './ThemeDrawer';
@@ -31,24 +33,78 @@ const DEFAULT_STATE: EditorState = {
   brand: {},
 };
 
-export function Editor() {
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+type Props = {
+  deckId?: string;
+};
+
+export function Editor({ deckId }: Props) {
+  const router = useRouter();
   const [source, setSource] = useState(SAMPLE_MARKDOWN);
   const [state, setState] = useState<EditorState>(DEFAULT_STATE);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedSlide, setSelectedSlide] = useState(0);
+  const [loaded, setLoaded] = useState(!deckId);
+  const [storedDeck, setStoredDeck] = useState<StoredDeck | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   const sourceRef = useRef<HTMLTextAreaElement>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Restore last-used theme from localStorage on mount.
+  // Load deck from IndexedDB if a deckId is provided.
   useEffect(() => {
-    const restored = loadLastTheme<EditorState>();
-    if (restored) setState((prev) => ({ ...prev, ...restored }));
-  }, []);
+    if (!deckId) return;
+    let cancelled = false;
+    getDeck(deckId).then((deck) => {
+      if (cancelled) return;
+      if (!deck) {
+        router.replace('/');
+        return;
+      }
+      setStoredDeck(deck);
+      setSource(deck.source);
+      setState({
+        styleId: deck.theme.styleId,
+        paletteId: deck.theme.paletteId,
+        density: deck.theme.density,
+        mode: deck.theme.mode,
+        brand: deck.brand ?? {},
+      });
+      setLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [deckId, router]);
 
-  // Persist whenever theme state changes.
+  // Debounced auto-save when source or state changes (only after loaded).
   useEffect(() => {
-    saveLastTheme(state);
-  }, [state]);
+    if (!deckId || !loaded) return;
+    setSaveStatus('saving');
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(async () => {
+      try {
+        const next = await updateDeck(deckId, {
+          source,
+          theme: {
+            styleId: state.styleId,
+            paletteId: state.paletteId,
+            density: state.density,
+            mode: state.mode,
+          },
+          brand: state.brand,
+        });
+        if (next) setStoredDeck(next);
+        setSaveStatus('saved');
+      } catch {
+        setSaveStatus('error');
+      }
+    }, 500);
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [deckId, loaded, source, state]);
 
   const theme: ThemeRef = useMemo(
     () => ({
@@ -78,19 +134,50 @@ export function Editor() {
     if (frame) frame.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, []);
 
+  const handleInsert = useCallback(
+    (snippet: string) => {
+      const textarea = sourceRef.current;
+      if (!textarea) {
+        setSource((s) => s + snippet);
+        return;
+      }
+      const pos = textarea.selectionStart;
+      const before = source.slice(0, pos);
+      const after = source.slice(pos);
+      const next = before + snippet + after;
+      setSource(next);
+      setTimeout(() => {
+        if (sourceRef.current) {
+          const cursorPos = pos + snippet.length;
+          sourceRef.current.focus();
+          sourceRef.current.setSelectionRange(cursorPos, cursorPos);
+        }
+      }, 0);
+    },
+    [source],
+  );
+
   const updateBrand = useCallback((brand: Brand) => setState((s) => ({ ...s, brand })), []);
+
+  if (!loaded) {
+    return <div className="editor editor--loading">Loading…</div>;
+  }
 
   return (
     <div className="editor">
       <header className="editor__topbar no-print">
         <div className="editor__brand">
-          <Link href="/" className="editor__brand-link">
-            stackdeck
+          <Link href="/" className="editor__back" title="Back to library">
+            ←
           </Link>
-          <span className="editor__brand-pill">v0.2</span>
+          <span className="editor__deck-title" title={storedDeck?.title ?? 'Untitled Deck'}>
+            {storedDeck?.title ?? 'Untitled Deck'}
+          </span>
+          <SaveIndicator status={saveStatus} />
         </div>
 
         <div className="editor__topbar-actions">
+          <InsertMenu onInsert={handleInsert} />
           <Link href="/templates" className="editor__nav-link">
             Templates
           </Link>
@@ -160,5 +247,22 @@ export function Editor() {
 
       <div className="print-only">{result.ok ? <DeckRenderer deck={result.deck} /> : null}</div>
     </div>
+  );
+}
+
+function SaveIndicator({ status }: { status: SaveStatus }) {
+  const map: Record<SaveStatus, { dot: string; text: string }> = {
+    idle: { dot: '○', text: '' },
+    saving: { dot: '●', text: 'Saving…' },
+    saved: { dot: '●', text: 'Saved' },
+    error: { dot: '●', text: 'Save failed' },
+  };
+  const { dot, text } = map[status];
+  if (!text) return null;
+  return (
+    <span className={`save-indicator save-indicator--${status}`} aria-live="polite">
+      <span className="save-indicator__dot">{dot}</span>
+      <span className="save-indicator__text">{text}</span>
+    </span>
   );
 }

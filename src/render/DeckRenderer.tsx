@@ -21,7 +21,13 @@ export function DeckRenderer({ deck, className }: Props) {
       <div className={['deck', className].filter(Boolean).join(' ')}>
         {deck.slides.map((slide, i) => (
           <div key={slide.id} className="slide-frame" data-aspect={deck.aspectRatio}>
-            <SlideRenderer slide={slide} index={i} brand={deck.brand} mode={deck.theme.mode} />
+            <SlideRenderer
+              slide={slide}
+              index={i}
+              totalSlides={deck.slides.length}
+              brand={deck.brand}
+              mode={deck.theme.mode}
+            />
           </div>
         ))}
       </div>

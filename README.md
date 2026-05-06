@@ -154,12 +154,13 @@ CI runs typecheck, format-check, lint, knip, test, and build on every PR across 
 ## Roadmap
 
 - [x] v0.1 — IR, parser, planner, theme system, 9 atomic blocks, 8 layouts, editor, PDF export
-- [ ] v0.2 — IndexedDB persistence with auto-save, deck list page
-- [ ] v0.3 — CodeMirror editor with `/` directive palette and live syntax highlighting
-- [ ] v0.4 — More Styles (Editorial, Brutalist, Soft, Mono, Magazine)
-- [ ] v0.5 — Image support (compressed-on-import, blob storage)
-- [ ] v0.6 — Charts and tables as native primitives
-- [ ] v1.0 — Public stable grammar, theme marketplace via static JSON registry
+- [x] v0.2 — Brand kit, three-pane editor, templates gallery, Editorial + Brutalist Styles
+- [x] v1.0 — Deck library at `/`, IndexedDB persistence with auto-save, `/d/[id]/edit` editor, Insert menu for directives, Soft Style, premium per-Style cover treatments
+- [ ] v1.1 — CodeMirror editor with `/` directive palette and live syntax highlighting
+- [ ] v1.2 — Image support (compressed-on-import, blob storage in IndexedDB)
+- [ ] v1.3 — Charts and tables as native primitives
+- [ ] v1.4 — Folders / collections; named brand profiles with logo + color presets
+- [ ] v1.5 — Theme marketplace via static JSON registry, public stable grammar
 
 ## Contributing
 
