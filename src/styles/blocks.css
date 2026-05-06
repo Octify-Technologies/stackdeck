@@ -460,6 +460,81 @@
   border: none;
 }
 
+/* B&W: pure desaturation */
+.block-image[data-treatment='bw'] .block-image__frame > img {
+  filter: grayscale(1) contrast(1.05);
+}
+
+/* Duotone: blend brand + dark using mix-blend-mode on the image */
+.block-image[data-treatment='duotone'] .block-image__frame {
+  background: var(--color-brand);
+  position: relative;
+}
+
+.block-image[data-treatment='duotone'] .block-image__frame > img {
+  filter: grayscale(1) contrast(1.1);
+  mix-blend-mode: lighten;
+}
+
+.block-image[data-treatment='duotone'] .block-image__frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-text);
+  mix-blend-mode: darken;
+  pointer-events: none;
+}
+
+/* Polaroid: thick white frame with extra-thick bottom; caption strip */
+.block-image[data-treatment='polaroid'] {
+  background: #fff;
+  padding: 14px 14px 56px;
+  border-radius: 4px;
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.18),
+    0 16px 32px -16px rgba(0, 0, 0, 0.25);
+  transform: rotate(-1.5deg);
+}
+
+.block-image[data-treatment='polaroid'] .block-image__frame {
+  border-radius: 0;
+  border: none;
+  background: #f5f4ef;
+}
+
+.block-image[data-treatment='polaroid'] > figcaption {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  text-align: center;
+  font-family: var(--font-display, ui-serif);
+  font-size: 13px;
+  color: #1a1a1a;
+  letter-spacing: 0;
+}
+
+.block-image[data-treatment='polaroid'][data-has-caption=''] {
+  position: relative;
+}
+
+/* Hard-frame: thick brand-colored border, no shadow, sharp corners */
+.block-image[data-treatment='hard-frame'] .block-image__frame {
+  border-radius: 0;
+  border: 6px solid var(--color-brand);
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Mask: rounded blob mask */
+.block-image[data-treatment='mask'] .block-image__frame {
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%);
+}
+
 .block-image__frame > img {
   display: block;
   width: 100%;

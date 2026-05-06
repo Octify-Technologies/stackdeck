@@ -269,10 +269,22 @@ function inferTrend(options: Record<string, string>): Stat['trend'] {
   return undefined;
 }
 
+const VALID_TREATMENTS = new Set([
+  'plain',
+  'frame',
+  'bleed',
+  'duotone',
+  'bw',
+  'polaroid',
+  'hard-frame',
+  'mask',
+]);
+
 function buildImage(options: Record<string, string>): Image | null {
   if (!options.src) return null;
-  const treatment =
-    options.treatment === 'frame' || options.treatment === 'bleed' ? options.treatment : 'plain';
+  const treatment = VALID_TREATMENTS.has(options.treatment)
+    ? (options.treatment as Image['treatment'])
+    : 'plain';
   const img: Image = { type: 'image', src: options.src, treatment };
   if (options.alt) img.alt = options.alt;
   if (options.caption) img.caption = options.caption;
