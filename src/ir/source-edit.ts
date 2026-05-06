@@ -1,9 +1,12 @@
 import matter from 'gray-matter';
 
+const SLIDE_MARKER_RE = /^::slide(\{[^}]*\})?\s*$/;
+
 /**
- * Split the markdown source into slide sections without losing frontmatter.
- * Returns the frontmatter prefix plus an array of slide-section strings, each
- * including its leading `::slide` line if present.
+ * Split markdown into a frontmatter prefix and a list of marker-less slide
+ * chunks. The first slide implicitly has no `::slide` marker; subsequent
+ * slides start with one. We strip the marker from every chunk so reordering
+ * can shuffle slides freely; `joinSlides` re-emits markers between them.
  */
 function splitSourceIntoSlides(source: string): { prefix: string; slides: string[] } {
   const fm = matter(source);
@@ -11,30 +14,35 @@ function splitSourceIntoSlides(source: string): { prefix: string; slides: string
   const lines = body.split('\n');
   const sections: string[][] = [[]];
   for (const line of lines) {
-    if (/^::slide(\{[^}]*\})?\s*$/.test(line)) {
-      sections.push([line]);
+    if (SLIDE_MARKER_RE.test(line)) {
+      sections.push([]);
       continue;
     }
     sections[sections.length - 1].push(line);
   }
-  const slides = sections.map((chunk) => chunk.join('\n'));
-  // The first chunk may be empty if the very first line is ::slide; that is
-  // still a slide. Filter out an empty leading chunk only when there is no
-  // body content at all, otherwise preserve.
+  // If the body started with `::slide` (or only blank lines before one),
+  // the leading empty section is just whitespace — drop it so we don't
+  // turn it into a phantom slide.
+  if (sections.length > 1 && sections[0].every((l) => l.trim() === '')) {
+    sections.shift();
+  }
+  const slides = sections.map((chunk) => chunk.join('\n').trim());
   const fmPrefix = source.slice(0, source.length - body.length);
   return { prefix: fmPrefix, slides };
 }
 
 function joinSlides(prefix: string, slides: string[]): string {
-  // Reassemble with the original frontmatter prefix plus the slide chunks
-  // joined back with newlines. Each chunk that started with ::slide already
-  // carries that marker; the very first chunk does not, so we just join.
-  return prefix + slides.join('\n').replace(/\n+$/, '\n');
+  if (slides.length === 0) return prefix;
+  const body = slides.filter((s) => s.length > 0).join('\n\n::slide\n\n');
+  let out = prefix;
+  if (out.length > 0 && !out.endsWith('\n')) out += '\n';
+  if (out.length > 0) out += '\n';
+  return out + body + '\n';
 }
 
 /**
- * Move slide at `from` index so it appears at `to` index. Pure: same input,
- * same output. Returns the new source string. Out-of-range indices are no-ops.
+ * Move slide at `from` to position `to`. Out-of-range indices and `from === to`
+ * are no-ops. Pure: same input, same output.
  */
 export function reorderSlide(source: string, from: number, to: number): string {
   if (from === to) return source;

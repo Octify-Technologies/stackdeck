@@ -48,10 +48,10 @@ export function AssetsDrawer({ onInsert, onClose, onUpload }: Props) {
   };
 
   return (
-    <aside className="assets-drawer" role="dialog" aria-label="Asset library">
-      <header className="assets-drawer__head">
-        <h2>Assets</h2>
-        <button type="button" className="assets-drawer__close" onClick={onClose} aria-label="Close">
+    <aside className="drawer assets-drawer" role="dialog" aria-label="Asset library">
+      <header className="drawer__header">
+        <h2 className="drawer__title">Assets</h2>
+        <button type="button" className="drawer__close" onClick={onClose} aria-label="Close">
           ×
         </button>
       </header>

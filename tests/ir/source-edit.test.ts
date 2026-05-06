@@ -48,4 +48,24 @@ title: Demo
     const next = reorderSlide(sample, 0, 2);
     expect(next).toMatch(/^---\ntitle: Demo\n---/);
   });
+
+  it('preserves slide count after a reorder (no merge, no phantom slide)', () => {
+    const moves: [number, number][] = [
+      [0, 2],
+      [2, 0],
+      [1, 0],
+      [0, 1],
+    ];
+    for (const [from, to] of moves) {
+      const next = reorderSlide(sample, from, to);
+      expect(countSlides(next)).toBe(3);
+    }
+  });
+
+  it('handles a body that starts with ::slide marker without phantom slide', () => {
+    const src = '::slide\n\n# A\n\n::slide\n\n# B\n';
+    expect(countSlides(src)).toBe(2);
+    const next = reorderSlide(src, 0, 1);
+    expect(countSlides(next)).toBe(2);
+  });
 });
