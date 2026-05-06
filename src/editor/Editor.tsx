@@ -288,7 +288,10 @@ export function Editor({ deckId }: Props) {
             className={`editor__nav-link editor__nav-link--button ${
               assetsOpen ? 'editor__nav-link--active' : ''
             }`}
-            onClick={() => setAssetsOpen((v) => !v)}
+            onClick={() => {
+              setAssetsOpen((v) => !v);
+              setDrawerOpen(false);
+            }}
             aria-pressed={assetsOpen}
           >
             Assets
@@ -298,7 +301,10 @@ export function Editor({ deckId }: Props) {
             className={`editor__nav-link editor__nav-link--button ${
               drawerOpen ? 'editor__nav-link--active' : ''
             }`}
-            onClick={() => setDrawerOpen((v) => !v)}
+            onClick={() => {
+              setDrawerOpen((v) => !v);
+              setAssetsOpen(false);
+            }}
             aria-pressed={drawerOpen}
           >
             Design
