@@ -1,17 +1,11 @@
 import type { Palette } from '@/ir/schema';
 
-import { electric } from './palettes/electric';
-import { forest } from './palettes/forest';
-import { mono } from './palettes/mono';
+import { midnight } from './palettes/midnight';
 import { obsidian } from './palettes/obsidian';
-import { sunset } from './palettes/sunset';
 
 const palettes: Record<string, Palette> = {
   [obsidian.id]: obsidian,
-  [electric.id]: electric,
-  [sunset.id]: sunset,
-  [forest.id]: forest,
-  [mono.id]: mono,
+  [midnight.id]: midnight,
 };
 
 export const allPalettes = Object.values(palettes);

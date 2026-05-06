@@ -36,8 +36,7 @@ export function TemplatesGallery() {
         theme: {
           presetId: preset.id,
           paletteId: preset.paletteId,
-          density: preset.density,
-          mode: preset.defaultMode,
+          fontId: preset.fontId,
         },
         templateName: template.name,
       });
@@ -84,8 +83,7 @@ function TemplateCard({ template, onApply }: { template: Template; onApply: () =
         theme: {
           presetId: preset.id,
           paletteId: preset.paletteId,
-          density: preset.density,
-          mode: preset.defaultMode,
+          fontId: preset.fontId,
         },
       });
       const planned = planDeck(parsed);

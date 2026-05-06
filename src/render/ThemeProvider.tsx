@@ -18,11 +18,10 @@ type Props = {
 
 /**
  * Wraps a deck and emits CSS custom properties on a `.deck-root` element,
- * derived from the active Preset + Palette + Density + Mode (and optional
- * Brand overrides). Block components read these variables; switching theme
- * is a CSS variable swap with no React reconciliation. Also publishes the
- * active preset id as `data-preset` so per-preset CSS files can scope their
- * rules.
+ * derived from the active Preset + Palette (+ optional Brand overrides).
+ * Block components read these variables; switching theme is a CSS variable
+ * swap with no React reconciliation. The visual design itself is locked in
+ * `src/styles/dossier.css` and applies to every `.deck-root`.
  */
 export function ThemeProvider({ theme, preset, palette, brand, children, className }: Props) {
   const resolved = useMemo(
@@ -36,10 +35,7 @@ export function ThemeProvider({ theme, preset, palette, brand, children, classNa
     <div
       className={['deck-root', className].filter(Boolean).join(' ')}
       style={styleObject}
-      data-mode={theme.mode}
-      data-density={theme.density}
-      data-preset={theme.presetId}
-      data-palette={theme.paletteId}
+      data-palette={theme.paletteId ?? preset.paletteId}
     >
       {children}
     </div>

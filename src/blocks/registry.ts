@@ -25,9 +25,9 @@ type Registry = {
 };
 
 /**
- * One default renderer per block type. Visual variation across presets is
- * delivered via CSS scoped to `[data-preset='<id>']`, not via React component
- * swaps. The renderer never branches on preset.
+ * One default renderer per block type. The deck design is locked in
+ * `src/styles/dossier.css` and reads from CSS color/font tokens; the
+ * renderer never branches on preset.
  */
 const blockRegistry: Registry = {
   heading: Heading,

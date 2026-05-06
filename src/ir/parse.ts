@@ -33,9 +33,6 @@ import {
 
 const DEFAULT_THEME: ThemeRef = {
   presetId: 'dossier-noir',
-  paletteId: 'obsidian',
-  density: 'airy',
-  mode: 'dark',
 };
 
 const VOID_DIRECTIVES = new Set(['stat', 'slide', 'image']);

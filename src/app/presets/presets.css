@@ -88,48 +88,6 @@
   box-shadow: none;
 }
 
-/* Light/Dark mode toggle in the preview corner (top-left).
-   Sits above the scaled deck preview and lets users flip the
-   preview palette without opening the deck. */
-.preset-card__mode-toggle {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: inline-flex;
-  gap: 2px;
-  padding: 2px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  border-radius: 999px;
-  z-index: 2;
-}
-
-.preset-card__mode-btn {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  padding: 3px 9px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition:
-    background 120ms ease,
-    color 120ms ease;
-}
-
-.preset-card__mode-btn:hover {
-  color: #fff;
-}
-
-.preset-card__mode-btn[data-active='true'] {
-  background: #fff;
-  color: #0a0a0a;
-}
-
 /* Slide-count badge in the preview corner */
 .preset-card__count {
   position: absolute;

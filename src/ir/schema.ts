@@ -18,12 +18,8 @@ export const LAYOUT_IDS = [
   'fullBleed',
 ] as const;
 
-export const DENSITIES = ['dense', 'comfortable', 'airy', 'spacious'] as const;
-export const MODES = ['light', 'dark'] as const;
 const ASPECT_RATIOS = ['16:9'] as const;
 
-export type Density = (typeof DENSITIES)[number];
-export type Mode = (typeof MODES)[number];
 type AspectRatio = (typeof ASPECT_RATIOS)[number];
 export type LayoutId = (typeof LAYOUT_IDS)[number];
 export type Tone = (typeof TONES)[number];
@@ -366,54 +362,38 @@ const ColorTokensSchema: z.ZodType<ColorTokens> = z.object({
 });
 
 /**
- * A Palette is the full color theme — light and dark color tokens. It is the
- * only color source. Presets pick a default Palette, and decks may override it.
+ * A Palette is the color theme. The product is dark-only by design, so each
+ * palette ships a single set of color tokens, no mode split.
  */
 export type Palette = {
   id: string;
   name: string;
-  light: ColorTokens;
-  dark: ColorTokens;
+  tokens: ColorTokens;
 };
 
 const PaletteSchema: z.ZodType<Palette> = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  light: ColorTokensSchema,
-  dark: ColorTokensSchema,
+  tokens: ColorTokensSchema,
 });
 
 /**
- * Per-deck font overrides. Each slot points at an entry in the font catalog
- * (`src/themes/fonts.ts`). When a slot is omitted, the resolver falls back
- * to the preset's default.
+ * A deck's design choices. The visual design itself is locked: only the
+ * palette (colors) and font are user-controllable. `presetId` names the
+ * starting combination from the gallery; `paletteId` and `fontId` are user
+ * overrides on top of it. When omitted, they fall back to the preset's
+ * defaults at resolve time.
  */
-export type FontOverrides = {
-  display?: string;
-  body?: string;
-  mono?: string;
-};
-
 export type ThemeRef = {
   presetId: string;
-  paletteId: string;
-  density: Density;
-  mode: Mode;
-  fonts?: FontOverrides;
+  paletteId?: string;
+  fontId?: string;
 };
-
-const FontOverridesSchema: z.ZodType<FontOverrides> = z.object({
-  display: z.string().min(1).optional(),
-  body: z.string().min(1).optional(),
-  mono: z.string().min(1).optional(),
-});
 
 const ThemeRefSchema: z.ZodType<ThemeRef> = z.object({
   presetId: z.string().min(1),
-  paletteId: z.string().min(1),
-  density: z.enum(DENSITIES),
-  mode: z.enum(MODES),
-  fonts: FontOverridesSchema.optional(),
+  paletteId: z.string().min(1).optional(),
+  fontId: z.string().min(1).optional(),
 });
 
 export const LOGO_POSITIONS = [

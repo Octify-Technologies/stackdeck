@@ -1,16 +1,18 @@
 /* ============================================================
-   DOSSIER · premium editorial preset for client case studies.
-   All rules scoped to [data-preset='dossier-noir']. Print-safe.
+   DECK DESIGN · the single, locked editorial design system.
+   These rules apply to every deck. Color and font tokens are
+   the only customization surface; the layout/typography
+   signature is fixed. Print-safe.
    ============================================================ */
 
-[data-preset='dossier-noir'] {
+.deck-root {
   --dossier-rule: color-mix(in oklab, var(--color-accent) 80%, transparent);
   --dossier-hairline: color-mix(in oklab, var(--color-text) 18%, transparent);
 }
 
 /* Body slides: warm paper grain on dark, faint paper grain on light.
    Mode-agnostic via opacity layered onto the surface color. */
-[data-preset='dossier-noir'] .slide-bg {
+.deck-root .slide-bg {
   background-color: transparent;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.78 0 0 0 0 0.66 0 0 0 0 0.47 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");
   opacity: 0.85;
@@ -18,7 +20,7 @@
 
 /* Cover: asymmetric editorial layout with hairline gold rule
    running edge-to-edge under a numbered eyebrow. */
-[data-preset='dossier-noir'] .layout-cover {
+.deck-root .layout-cover {
   background: var(--color-surface);
   padding: calc(var(--slide-padding) * 1.4) calc(var(--slide-padding) * 1.6);
   display: flex;
@@ -26,7 +28,7 @@
   justify-content: flex-end;
 }
 
-[data-preset='dossier-noir'] .layout-cover .slide-bg {
+.deck-root .layout-cover .slide-bg {
   background-image:
     radial-gradient(
       ellipse at 18% 12%,
@@ -37,7 +39,7 @@
 }
 
 /* Numbered case-study eyebrow above the title. */
-[data-preset='dossier-noir'] .layout-cover::before {
+.deck-root .layout-cover::before {
   content: 'CASE STUDY · Nº 01';
   position: absolute;
   top: var(--slide-padding);
@@ -52,7 +54,7 @@
 }
 
 /* Hairline gold rule under the eyebrow that runs the full slide width. */
-[data-preset='dossier-noir'] .layout-cover::after {
+.deck-root .layout-cover::after {
   content: '';
   position: absolute;
   top: calc(var(--slide-padding) + 24px);
@@ -64,7 +66,7 @@
 }
 
 /* Cover headline: italic display serif, tight leading, generous size. */
-[data-preset='dossier-noir'] .layout-cover > .block-h1 {
+.deck-root .layout-cover > .block-h1 {
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -74,7 +76,7 @@
 }
 
 /* Cover lede: small caps mono kicker feel via tracking. */
-[data-preset='dossier-noir'] .layout-cover > .block-text-lead {
+.deck-root .layout-cover > .block-text-lead {
   font-family: var(--font-body);
   font-style: normal;
   color: var(--color-text-muted);
@@ -85,12 +87,12 @@
 }
 
 /* Section slides: numbered chapter mark "01 / Section" */
-[data-preset='dossier-noir'] .layout-section {
+.deck-root .layout-section {
   background: var(--color-surface);
   padding-left: calc(var(--slide-padding) * 2);
 }
 
-[data-preset='dossier-noir'] .layout-section::before {
+.deck-root .layout-section::before {
   content: 'CHAPTER';
   position: absolute;
   top: var(--slide-padding);
@@ -102,7 +104,7 @@
   color: var(--color-accent);
 }
 
-[data-preset='dossier-noir'] .layout-section > .block-h2 {
+.deck-root .layout-section > .block-h2 {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -114,21 +116,21 @@
 }
 
 /* Body headings: italicize H1/H2 to keep editorial signature consistent. */
-[data-preset='dossier-noir'] .block-h1,
-[data-preset='dossier-noir'] .block-h2 {
+.deck-root .block-h1,
+.deck-root .block-h2 {
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.015em;
 }
 
 /* Hairline gold underline on H2 in body slides only. */
-[data-preset='dossier-noir'] .slide:not(.layout-cover):not(.layout-section) .block-h2 {
+.deck-root .slide:not(.layout-cover):not(.layout-section) .block-h2 {
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--dossier-rule);
 }
 
 /* Page badge becomes "Nº 02" in mono gold. */
-[data-preset='dossier-noir'] .slide:not(.layout-cover):not(.layout-section)::after {
+.deck-root .slide:not(.layout-cover):not(.layout-section)::after {
   content: 'Nº ' attr(data-page);
   color: var(--color-accent);
   opacity: 0.7;
@@ -136,7 +138,7 @@
 }
 
 /* Stats: oversized italic serif numerals with mono labels under. */
-[data-preset='dossier-noir'] .block-stat {
+.deck-root .block-stat {
   background: transparent;
   border: none;
   border-top: 1px solid var(--color-accent);
@@ -144,7 +146,7 @@
   padding: var(--space-md) 0 0 0;
 }
 
-[data-preset='dossier-noir'] .block-stat-value {
+.deck-root .block-stat-value {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -154,7 +156,7 @@
   font-feature-settings: 'lnum', 'tnum';
 }
 
-[data-preset='dossier-noir'] .block-stat-label {
+.deck-root .block-stat-label {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
@@ -163,7 +165,7 @@
   color: var(--color-text-muted);
 }
 
-[data-preset='dossier-noir'] .block-stat-delta {
+.deck-root .block-stat-delta {
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.06em;
@@ -171,7 +173,7 @@
 }
 
 /* Boxes / callouts: ink-on-paper card with hairline gold edge. */
-[data-preset='dossier-noir'] .block-box {
+.deck-root .block-box {
   background: color-mix(in oklab, var(--color-surface-muted) 70%, transparent);
   border: 1px solid var(--dossier-hairline);
   border-left: 2px solid var(--color-accent);
@@ -179,12 +181,12 @@
 }
 
 /* Quotes: oversized italic pull-quote, hairline gold rule on the left. */
-[data-preset='dossier-noir'] .block-quote {
+.deck-root .block-quote {
   border-left: 1px solid var(--color-accent);
   padding-left: var(--space-lg);
 }
 
-[data-preset='dossier-noir'] .block-quote blockquote {
+.deck-root .block-quote blockquote {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -192,24 +194,24 @@
   line-height: 1.15;
 }
 
-[data-preset='dossier-noir'] .block-quote-big {
+.deck-root .block-quote-big {
   border-left: none;
   padding-left: 0;
 }
 
-[data-preset='dossier-noir'] .block-quote-big blockquote {
+.deck-root .block-quote-big blockquote {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.02em;
 }
 
-[data-preset='dossier-noir'] .block-quote-big blockquote::before {
+.deck-root .block-quote-big blockquote::before {
   color: var(--color-accent);
   font-style: italic;
 }
 
-[data-preset='dossier-noir'] .block-quote-attribution {
+.deck-root .block-quote-attribution {
   font-family: var(--font-mono);
   font-style: normal;
   font-size: 12px;
@@ -219,11 +221,11 @@
 }
 
 /* Tables: editorial financial-report look with hairlines, no row stripes. */
-[data-preset='dossier-noir'] .block-table {
+.deck-root .block-table {
   font-feature-settings: 'tnum', 'lnum';
 }
 
-[data-preset='dossier-noir'] .block-table thead th {
+.deck-root .block-table thead th {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -235,12 +237,12 @@
   padding-bottom: var(--space-sm);
 }
 
-[data-preset='dossier-noir'] .block-table tbody td {
+.deck-root .block-table tbody td {
   border-bottom: 1px solid var(--dossier-hairline);
   padding: var(--space-sm) var(--space-md);
 }
 
-[data-preset='dossier-noir'] .block-table [data-emphasize='true'] {
+.deck-root .block-table [data-emphasize='true'] {
   font-family: var(--font-display);
   font-style: italic;
   font-size: 1.15em;
@@ -248,31 +250,31 @@
 }
 
 /* Charts: monochrome-with-gold-accent treatment. */
-[data-preset='dossier-noir'] .chart__bar-track {
+.deck-root .chart__bar-track {
   background: color-mix(in oklab, var(--color-text) 6%, transparent);
 }
 
-[data-preset='dossier-noir'] .chart__bar-fill {
+.deck-root .chart__bar-fill {
   background: var(--color-accent);
 }
 
-[data-preset='dossier-noir'] .chart__line-stroke {
+.deck-root .chart__line-stroke {
   stroke: var(--color-accent);
   stroke-width: 1.5;
 }
 
-[data-preset='dossier-noir'] .chart__line-area {
+.deck-root .chart__line-area {
   fill: color-mix(in oklab, var(--color-accent) 12%, transparent);
 }
 
-[data-preset='dossier-noir'] .chart__line-dot {
+.deck-root .chart__line-dot {
   fill: var(--color-surface);
   stroke: var(--color-accent);
   stroke-width: 1.5;
 }
 
 /* Slide kicker uses the gold accent. */
-[data-preset='dossier-noir'] .slide-kicker {
+.deck-root .slide-kicker {
   color: var(--color-accent);
   letter-spacing: 0.22em;
 }

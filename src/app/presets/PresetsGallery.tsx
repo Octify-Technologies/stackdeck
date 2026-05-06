@@ -1,9 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import type { Mode } from '@/ir/schema';
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import { createDeck } from '@/storage/deck-store';
@@ -25,7 +24,7 @@ import { getTemplate } from '@/app/templates/templates';
 export function PresetsGallery() {
   const router = useRouter();
 
-  const applyPreset = async (preset: Preset, mode: Mode) => {
+  const applyPreset = async (preset: Preset) => {
     const tpl = getTemplate(preset.previewTemplateId);
     try {
       const deck = await createDeck({
@@ -33,8 +32,7 @@ export function PresetsGallery() {
         theme: {
           presetId: preset.id,
           paletteId: preset.paletteId,
-          density: preset.density,
-          mode,
+          fontId: preset.fontId,
         },
         templateName: preset.name,
       });
@@ -59,11 +57,7 @@ export function PresetsGallery() {
       <PageMain>
         <GalleryGrid>
           {PRESETS.map((preset) => (
-            <PresetCard
-              key={preset.id}
-              preset={preset}
-              onApply={(mode) => applyPreset(preset, mode)}
-            />
+            <PresetCard key={preset.id} preset={preset} onApply={() => applyPreset(preset)} />
           ))}
         </GalleryGrid>
       </PageMain>
@@ -71,8 +65,7 @@ export function PresetsGallery() {
   );
 }
 
-function PresetCard({ preset, onApply }: { preset: Preset; onApply: (mode: Mode) => void }) {
-  const [previewMode, setPreviewMode] = useState<Mode>(preset.defaultMode);
+function PresetCard({ preset, onApply }: { preset: Preset; onApply: () => void }) {
   const previewTemplate = getTemplate(preset.previewTemplateId);
 
   const previewDeck = useMemo(() => {
@@ -82,8 +75,7 @@ function PresetCard({ preset, onApply }: { preset: Preset; onApply: (mode: Mode)
         theme: {
           presetId: preset.id,
           paletteId: preset.paletteId,
-          density: preset.density,
-          mode: previewMode,
+          fontId: preset.fontId,
         },
       });
       const planned = planDeck(parsed);
@@ -92,57 +84,20 @@ function PresetCard({ preset, onApply }: { preset: Preset; onApply: (mode: Mode)
       const message = e instanceof ParseError ? e.message : (e as Error).message;
       return { ok: false as const, error: message };
     }
-  }, [preset, previewMode, previewTemplate]);
-
-  const presetAttr = preset.id;
-  const stop = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-  };
+  }, [preset, previewTemplate]);
 
   return (
     <button
       type="button"
       className="surface-card preset-card preset-card--multi"
-      data-preset={presetAttr}
-      onClick={() => onApply(previewMode)}
+      data-preset={preset.id}
+      onClick={onApply}
     >
       <div className="preset-card__preview preset-card__preview--multi">
         <div className="preset-card__scaler preset-card__scaler--multi">
           {previewDeck.ok ? <DeckRenderer deck={previewDeck.deck} /> : null}
         </div>
-        <div
-          className="preset-card__mode-toggle"
-          onClick={stop}
-          role="group"
-          aria-label="Preview mode"
-        >
-          <button
-            type="button"
-            className="preset-card__mode-btn"
-            data-active={previewMode === 'light'}
-            onClick={(e) => {
-              stop(e);
-              setPreviewMode('light');
-            }}
-            aria-pressed={previewMode === 'light'}
-          >
-            Light
-          </button>
-          <button
-            type="button"
-            className="preset-card__mode-btn"
-            data-active={previewMode === 'dark'}
-            onClick={(e) => {
-              stop(e);
-              setPreviewMode('dark');
-            }}
-            aria-pressed={previewMode === 'dark'}
-          >
-            Dark
-          </button>
-        </div>
-        <span className="preset-card__chip" data-preset={presetAttr}>
+        <span className="preset-card__chip" data-preset={preset.id}>
           design
         </span>
       </div>
@@ -153,8 +108,7 @@ function PresetCard({ preset, onApply }: { preset: Preset; onApply: (mode: Mode)
         <Caption>{preset.vibe}</Caption>
         <div className="preset-card__tags">
           <Label className="preset-card__tag">{preset.paletteId}</Label>
-          <Label className="preset-card__tag">{preset.density}</Label>
-          <Label className="preset-card__tag">{previewMode}</Label>
+          <Label className="preset-card__tag">{preset.fontId}</Label>
         </div>
       </div>
     </button>

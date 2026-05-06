@@ -8,17 +8,22 @@ import { DEFAULT_PRESET_ID } from '@/app/presets/presets';
 import { dbDelete, dbGet, dbGetAll, dbPut, STORE_DECKS } from './db';
 
 /**
- * Migrate legacy deck records. The schema previously stored a `styleId` on
- * `theme`; that field is gone, replaced by `presetId`. Any record missing
- * `presetId` is mapped to the default preset so old decks keep rendering.
+ * Migrate legacy deck records onto the current ThemeRef shape. Older records
+ * may carry `styleId`, `density`, or a `fonts.font` triple; today's ThemeRef
+ * is just `{ presetId, paletteId?, fontId? }`. Unknown ids fall back at
+ * render time via `getPreset` / `getPalette`.
  */
-function migrateTheme(
-  theme: ThemeRef | (Omit<ThemeRef, 'presetId'> & { styleId?: string }),
-): ThemeRef {
-  const t = theme as ThemeRef & { styleId?: string };
-  if (t.presetId)
-    return { presetId: t.presetId, paletteId: t.paletteId, density: t.density, mode: t.mode };
-  return { presetId: DEFAULT_PRESET_ID, paletteId: t.paletteId, density: t.density, mode: t.mode };
+function migrateTheme(theme: unknown): ThemeRef {
+  const t = (theme ?? {}) as Partial<ThemeRef> & {
+    styleId?: string;
+    density?: string;
+    fonts?: { font?: string };
+  };
+  return {
+    presetId: t.presetId ?? DEFAULT_PRESET_ID,
+    paletteId: t.paletteId,
+    fontId: t.fontId ?? t.fonts?.font,
+  };
 }
 
 function migrateDeck<T extends { theme: ThemeRef }>(deck: T): T {

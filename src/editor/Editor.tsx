@@ -9,7 +9,7 @@ import { planDeck } from '@/ir/plan';
 import { reorderSlide } from '@/ir/source-edit';
 import { lintColors } from '@/render/lint';
 import { resolveTheme } from '@/render/theme-resolver';
-import type { Brand, Deck, Density, FontOverrides, Mode, ThemeRef } from '@/ir/schema';
+import type { Brand, Deck, ThemeRef } from '@/ir/schema';
 import { createAsset, assetSrc } from '@/storage/asset-store';
 import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
@@ -26,18 +26,14 @@ import { ThemeDrawer } from './ThemeDrawer';
 type EditorState = {
   presetId: string;
   paletteId: string;
-  density: Density;
-  mode: Mode;
-  fonts: FontOverrides;
+  fontId?: string;
   brand: Brand;
 };
 
 const DEFAULT_STATE: EditorState = {
   presetId: DEFAULT_PRESET_ID,
   paletteId: PRESETS[0].paletteId,
-  density: PRESETS[0].density,
-  mode: PRESETS[0].defaultMode,
-  fonts: {},
+  fontId: undefined,
   brand: {},
 };
 
@@ -99,12 +95,11 @@ export function Editor({ deckId }: Props) {
       skipNextSaveRef.current = true;
       setStoredDeck(deck);
       setSource(deck.source);
+      const presetForDeck = getPreset(deck.theme.presetId);
       setState({
         presetId: deck.theme.presetId,
-        paletteId: deck.theme.paletteId,
-        density: deck.theme.density,
-        mode: deck.theme.mode,
-        fonts: deck.theme.fonts ?? {},
+        paletteId: deck.theme.paletteId ?? presetForDeck.paletteId,
+        fontId: deck.theme.fontId,
         brand: deck.brand ?? {},
       });
       setSaveStatus('idle');
@@ -130,9 +125,7 @@ export function Editor({ deckId }: Props) {
           theme: {
             presetId: state.presetId,
             paletteId: state.paletteId,
-            density: state.density,
-            mode: state.mode,
-            fonts: state.fonts,
+            fontId: state.fontId,
           },
           brand: state.brand,
         });
@@ -151,11 +144,9 @@ export function Editor({ deckId }: Props) {
     () => ({
       presetId: state.presetId,
       paletteId: state.paletteId,
-      density: state.density,
-      mode: state.mode,
-      fonts: state.fonts,
+      fontId: state.fontId,
     }),
-    [state.presetId, state.paletteId, state.density, state.mode, state.fonts],
+    [state.presetId, state.paletteId, state.fontId],
   );
 
   const lintWarnings = useMemo(() => {
@@ -380,14 +371,10 @@ export function Editor({ deckId }: Props) {
           <ThemeDrawer
             presetId={state.presetId}
             paletteId={state.paletteId}
-            density={state.density}
-            mode={state.mode}
-            fonts={state.fonts}
+            fontId={state.fontId}
             brand={state.brand}
             onPaletteChange={(paletteId) => setState((s) => ({ ...s, paletteId }))}
-            onDensityChange={(density) => setState((s) => ({ ...s, density }))}
-            onModeChange={(mode) => setState((s) => ({ ...s, mode }))}
-            onFontsChange={(fonts) => setState((s) => ({ ...s, fonts }))}
+            onFontChange={(fontId) => setState((s) => ({ ...s, fontId }))}
             onBrandChange={updateBrand}
             onClose={() => setDrawerOpen(false)}
           />

@@ -1,37 +1,27 @@
-import type { Brand, ColorTokens, Density, Mode, Palette, ThemeRef } from '@/ir/schema';
+import type { Brand, ColorTokens, Palette, ThemeRef } from '@/ir/schema';
 import type { Preset } from '@/app/presets/presets';
 import { getFont } from '@/themes/fonts';
 
 import { ensureContrast } from './contrast';
 
-const DENSITY_MULTIPLIER: Record<Density, number> = {
-  dense: 0.75,
-  comfortable: 1.0,
-  airy: 1.35,
-  spacious: 1.7,
-};
-
 /**
- * Sensible defaults for radius / shadow / motion / spacing that every preset
- * inherits. A preset that wants different values overrides them in its scoped
- * CSS file (`[data-preset='<id>']`).
+ * The deck design owns spacing, radius, shadows, and the mono font as
+ * fixed system constants. Only color tokens and the display+body font
+ * vary per deck (palette + fontId). Density was removed: one airy scale
+ * for everyone keeps the editorial signature consistent.
  */
-const DEFAULT_SPACING_BASE = 8;
+const SPACING_BASE = 8;
+const SPACING_MULTIPLIER = 1.35;
 
 const DEFAULT_RADIUS = { sm: '4px', md: '8px', lg: '16px' };
 
 const DEFAULT_SHADOW = {
-  light: {
-    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
-    md: '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
-    lg: '0 24px 48px -12px rgba(0, 0, 0, 0.16)',
-  },
-  dark: {
-    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.5)',
-    md: '0 8px 24px -4px rgba(0, 0, 0, 0.6)',
-    lg: '0 24px 48px -12px rgba(0, 0, 0, 0.8)',
-  },
+  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.5)',
+  md: '0 8px 24px -4px rgba(0, 0, 0, 0.6)',
+  lg: '0 24px 48px -12px rgba(0, 0, 0, 0.8)',
 };
+
+const MONO_FAMILY = 'var(--font-jetbrains), JetBrains Mono, ui-monospace, monospace';
 
 type ResolvedTheme = {
   ref: ThemeRef;
@@ -40,8 +30,8 @@ type ResolvedTheme = {
 };
 
 /**
- * Compose a Preset + Palette + Density + Mode (+ optional Brand overrides) into
- * a flat token map ready to apply as CSS custom properties.
+ * Compose a Preset + Palette (+ optional Brand overrides) into a flat
+ * token map ready to apply as CSS custom properties.
  */
 export function resolveTheme(
   ref: ThemeRef,
@@ -49,20 +39,17 @@ export function resolveTheme(
   palette: Palette,
   brand?: Brand,
 ): ResolvedTheme {
-  const colors = mergeColors(palette[ref.mode], brand);
-  const fonts = mergeFonts(preset, ref.fonts);
-  const cssVars = buildCssVars(colors, fonts, ref.density, ref.mode);
+  const colors = mergeColors(palette.tokens, brand);
+  const fontFamily = resolveFontFamily(preset, ref);
+  const cssVars = buildCssVars(colors, fontFamily);
   return { ref, colors, cssVars };
 }
 
-type ResolvedFonts = { display: string; body: string; mono: string };
-
-function mergeFonts(preset: Preset, overrides?: ThemeRef['fonts']): ResolvedFonts {
-  return {
-    display: getFont(overrides?.display)?.family ?? preset.fonts.display,
-    body: getFont(overrides?.body)?.family ?? preset.fonts.body,
-    mono: getFont(overrides?.mono)?.family ?? preset.fonts.mono,
-  };
+function resolveFontFamily(preset: Preset, ref: ThemeRef): string {
+  const overrideId = ref.fontId;
+  const override = overrideId ? getFont(overrideId) : undefined;
+  const fallback = getFont(preset.fontId) ?? getFont('geist');
+  return (override ?? fallback)?.family ?? 'system-ui, sans-serif';
 }
 
 function mergeColors(base: ColorTokens, brand?: Brand): ColorTokens {
@@ -81,16 +68,8 @@ function mergeColors(base: ColorTokens, brand?: Brand): ColorTokens {
   };
 }
 
-function buildCssVars(
-  c: ColorTokens,
-  fonts: ResolvedFonts,
-  density: Density,
-  mode: Mode,
-): Record<string, string> {
-  const multiplier = DENSITY_MULTIPLIER[density];
-  const scale = (n: number) => `${n * DEFAULT_SPACING_BASE * multiplier}px`;
-
-  const shadow = DEFAULT_SHADOW[mode];
+function buildCssVars(c: ColorTokens, fontFamily: string): Record<string, string> {
+  const scale = (n: number) => `${n * SPACING_BASE * SPACING_MULTIPLIER}px`;
 
   return {
     '--color-brand': c.brand,
@@ -104,9 +83,9 @@ function buildCssVars(
     '--color-warn': c.warn,
     '--color-danger': c.danger,
 
-    '--font-display': fonts.display,
-    '--font-body': fonts.body,
-    '--font-mono': fonts.mono,
+    '--font-display': fontFamily,
+    '--font-body': fontFamily,
+    '--font-mono': MONO_FAMILY,
 
     '--space-xs': scale(0.25),
     '--space-sm': scale(0.5),
@@ -122,8 +101,8 @@ function buildCssVars(
     '--radius-md': DEFAULT_RADIUS.md,
     '--radius-lg': DEFAULT_RADIUS.lg,
 
-    '--shadow-sm': shadow.sm,
-    '--shadow-md': shadow.md,
-    '--shadow-lg': shadow.lg,
+    '--shadow-sm': DEFAULT_SHADOW.sm,
+    '--shadow-md': DEFAULT_SHADOW.md,
+    '--shadow-lg': DEFAULT_SHADOW.lg,
   };
 }

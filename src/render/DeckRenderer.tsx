@@ -30,7 +30,7 @@ function computeSectionContext(slides: Slide[]): (string | undefined)[] {
 
 export function DeckRenderer({ deck, className }: Props) {
   const preset = getPreset(deck.theme.presetId);
-  const palette = getPalette(deck.theme.paletteId);
+  const palette = getPalette(deck.theme.paletteId ?? preset.paletteId);
   const sectionContext = computeSectionContext(deck.slides);
 
   return (
@@ -43,7 +43,6 @@ export function DeckRenderer({ deck, className }: Props) {
               index={i}
               totalSlides={deck.slides.length}
               brand={deck.brand}
-              mode={deck.theme.mode}
               footer={deck.footer}
               section={sectionContext[i]}
             />

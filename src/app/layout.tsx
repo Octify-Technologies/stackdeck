@@ -1,31 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import {
-  Inter,
-  Geist,
-  Fraunces,
-  Instrument_Serif,
-  Space_Grotesk,
-  JetBrains_Mono,
-} from 'next/font/google';
+import { DM_Sans, Geist, Inter, JetBrains_Mono, Manrope, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
-// Inter and Space Grotesk are consumed by slide themes (themes/styles/*.ts),
-// not by app chrome. Don't remove them.
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+// Five user-pickable modern sans faces plus the project's mono. Every
+// entry must have a matching definition in `src/themes/fonts.ts` for the
+// font picker to surface it.
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
-const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
-const instrument = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  variable: '--font-instrument',
-  display: 'swap',
-});
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-space-grotesk',
   display: 'swap',
 });
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
+const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains',
@@ -134,7 +122,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geist.variable} ${fraunces.variable} ${instrument.variable} ${spaceGrotesk.variable} ${jetbrains.variable}`}
+      className={`${geist.variable} ${inter.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${manrope.variable} ${jetbrains.variable}`}
     >
       <body>
         <script

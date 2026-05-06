@@ -1,24 +1,13 @@
 import type { Palette } from '@/ir/schema';
 
 /**
- * Obsidian: ink-and-champagne. The default Dossier palette.
+ * Obsidian: ink and champagne. Deep blue-black surface with a warm
+ * gold accent. The default Dossier palette.
  */
 export const obsidian: Palette = {
   id: 'obsidian',
   name: 'Obsidian',
-  light: {
-    brand: '#0b0d12',
-    accent: '#a07842',
-    surface: '#f4ede1',
-    surfaceMuted: '#ebe2d2',
-    text: '#0b0d12',
-    textMuted: '#5a5448',
-    border: '#d8cdb8',
-    success: '#3f6b46',
-    warn: '#9a6b1f',
-    danger: '#a23a2a',
-  },
-  dark: {
+  tokens: {
     brand: '#f4ede1',
     accent: '#c9a878',
     surface: '#0b0d12',

@@ -88,7 +88,7 @@
 
   /* Fonts (UI only; slide themes use their own) */
   --ui: var(--font-geist), Geist, ui-sans-serif, system-ui, sans-serif;
-  --display: var(--font-fraunces), 'Fraunces', Georgia, serif;
+  --display: var(--font-geist), Geist, ui-sans-serif, system-ui, sans-serif;
   --mono: var(--font-jetbrains), ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
 
   /* Back-compat alias for older selectors */
