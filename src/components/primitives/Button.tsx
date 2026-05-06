@@ -8,8 +8,8 @@ import type {
 
 import './button.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link' | 'danger';
-export type ButtonSize = 'md' | 'sm' | 'xs';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link' | 'danger';
+type ButtonSize = 'md' | 'sm' | 'xs';
 
 type SharedProps = {
   variant?: ButtonVariant;
@@ -36,7 +36,7 @@ type ButtonAsLink = SharedProps &
     href: ComponentPropsWithoutRef<typeof Link>['href'];
   };
 
-export type ButtonProps = ButtonAsButton | ButtonAsAnchor | ButtonAsLink;
+type ButtonProps = ButtonAsButton | ButtonAsAnchor | ButtonAsLink;
 
 export function Button(props: ButtonProps) {
   const { variant = 'secondary', size = 'md', iconOnly = false, className, children } = props;
