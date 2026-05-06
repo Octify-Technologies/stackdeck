@@ -82,6 +82,30 @@ const INSERT_ITEMS: InsertItem[] = [
     description: 'Fenced code with syntax',
     snippet: '\n\n```ts\nconst x = 1;\n```\n',
   },
+  {
+    label: 'Bar chart',
+    description: 'Horizontal bars with labels and values',
+    snippet:
+      '\n\n::chart{kind=bar title="Revenue by quarter"}\nQ1: 120\nQ2: 165\nQ3: 210\nQ4: 280\n::\n',
+  },
+  {
+    label: 'Line chart',
+    description: 'Trend over time',
+    snippet:
+      '\n\n::chart{kind=line title="Active users"}\nJan: 1200\nFeb: 1450\nMar: 1820\nApr: 2240\nMay: 2810\nJun: 3380\n::\n',
+  },
+  {
+    label: 'Donut chart',
+    description: 'Share / breakdown',
+    snippet:
+      '\n\n::chart{kind=donut title="Revenue mix"}\nProduct: 45\nServices: 30\nLicensing: 15\nOther: 10\n::\n',
+  },
+  {
+    label: 'Table',
+    description: 'Headered grid of rows and columns',
+    snippet:
+      '\n\n::table{emphasize=2}\n| Plan | Seats | Price |\n| Starter | 1 | $0 |\n| Pro | 5 | $20 |\n| Team | 25 | $80 |\n| Enterprise | unlimited | Contact us |\n::\n',
+  },
 ];
 
 type Props = {

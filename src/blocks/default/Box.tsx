@@ -1,6 +1,6 @@
 import type { Box as BoxBlock } from '@/ir/schema';
 
-import { BlockRenderer } from './BlockRenderer';
+import { BlockRenderer } from '../BlockRenderer';
 
 export function Box({ block }: { block: BoxBlock }) {
   return (

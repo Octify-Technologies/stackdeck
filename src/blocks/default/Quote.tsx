@@ -1,6 +1,6 @@
 import type { Quote as QuoteBlock } from '@/ir/schema';
 
-import { InlineText } from './InlineText';
+import { InlineText } from '../InlineText';
 
 export function Quote({ block }: { block: QuoteBlock }) {
   return (

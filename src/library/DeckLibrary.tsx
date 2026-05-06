@@ -27,7 +27,9 @@ export function DeckLibrary() {
     <div className="library">
       <header className="library__topbar">
         <Link href="/" className="library__brand">
-          <span className="library__brand-mark">◐</span>
+          <span className="library__brand-mark" aria-hidden>
+            S
+          </span>
           <span className="library__brand-name">stackdeck</span>
         </Link>
         <div className="library__topbar-actions">

@@ -6,6 +6,9 @@ import {
   type Block,
   type Box,
   type Brand,
+  type Chart,
+  type ChartDatum,
+  type ChartKind,
   type Code,
   type Deck,
   type Heading,
@@ -15,6 +18,7 @@ import {
   type Quote,
   type Slide,
   type Stat,
+  type Table,
   type Text,
   type ThemeRef,
   type Tone,
@@ -153,6 +157,86 @@ function parseChildren(tokens: LineToken[], cursor: Cursor, untilCloseOrColsep: 
   return blocks;
 }
 
+function collectRawLines(tokens: LineToken[], cursor: Cursor): string[] {
+  const out: string[] = [];
+  while (cursor.i < tokens.length) {
+    const t = tokens[cursor.i];
+    if (t.kind === 'close') {
+      cursor.i++;
+      return out;
+    }
+    if (t.kind === 'colsep') {
+      cursor.i++;
+      continue;
+    }
+    if (t.kind === 'text') {
+      out.push(t.content);
+    }
+    cursor.i++;
+  }
+  return out;
+}
+
+function parseChartContent(
+  _name: string,
+  options: Record<string, string>,
+  lines: string[],
+): Chart | null {
+  const kind: ChartKind =
+    options.kind === 'line' || options.kind === 'donut' ? options.kind : 'bar';
+  const format =
+    options.format === 'percent' || options.format === 'currency' ? options.format : 'number';
+
+  const data: ChartDatum[] = [];
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    const match = /^([^:]+?):\s*(-?\d+(?:\.\d+)?)\s*$/.exec(line);
+    if (!match) continue;
+    data.push({ label: match[1].trim(), value: Number(match[2]) });
+  }
+
+  if (data.length === 0) return null;
+
+  return {
+    type: 'chart',
+    kind,
+    title: options.title,
+    data,
+    format,
+    prefix: options.prefix,
+    suffix: options.suffix,
+  };
+}
+
+function parseTableContent(lines: string[], options: Record<string, string>): Table | null {
+  const rows = lines
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('|'))
+    .map((line) =>
+      line
+        .replace(/^\|/, '')
+        .replace(/\|$/, '')
+        .split('|')
+        .map((cell) => cell.trim()),
+    )
+    .filter((row) => !row.every((cell) => /^-+$/.test(cell)));
+
+  if (rows.length < 2) return null;
+
+  const [headers, ...body] = rows;
+  const emphasizeRaw = options.emphasize ?? options.emphasizeColumn;
+  const emphasizeColumn =
+    emphasizeRaw !== undefined && /^\d+$/.test(emphasizeRaw) ? Number(emphasizeRaw) : undefined;
+
+  return {
+    type: 'table',
+    headers,
+    rows: body,
+    emphasizeColumn,
+  };
+}
+
 function collectColumnGroups(tokens: LineToken[], cursor: Cursor, count: number): Block[][] {
   const cols: Block[][] = [];
   while (cursor.i < tokens.length) {
@@ -267,6 +351,18 @@ function expandBlockDirective(
   if (name === 'timeline') {
     const children = parseChildren(tokens, cursor, true);
     return children;
+  }
+
+  if (name === 'chart') {
+    const lines = collectRawLines(tokens, cursor);
+    const chart = parseChartContent(name, options, lines);
+    return chart ? [chart] : [];
+  }
+
+  if (name === 'table') {
+    const lines = collectRawLines(tokens, cursor);
+    const table = parseTableContent(lines, options);
+    return table ? [table] : [];
   }
 
   if (name === 'agenda') {

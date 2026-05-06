@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseDeck } from '@/ir/parse';
-import type { Box, Columns, Grid, Heading, Quote, Stat } from '@/ir/schema';
+import type { Box, Chart, Columns, Grid, Heading, Quote, Stat, Table } from '@/ir/schema';
 
 describe('parseDeck', () => {
   it('parses a minimal deck with one slide', () => {
@@ -159,5 +159,67 @@ Note.
     const deck = parseDeck('::section\n# Mid Deck\n::');
     expect(deck.slides[0].layout).toBe('section');
     expect((deck.slides[0].blocks[0] as Heading).text).toBe('Mid Deck');
+  });
+
+  it('parses a bar chart directive', () => {
+    const md = `::chart{kind=bar title="Revenue"}
+Q1: 100
+Q2: 145
+Q3: 190
+Q4: 220
+::`;
+    const deck = parseDeck(md);
+    const chart = deck.slides[0].blocks[0] as Chart;
+    expect(chart.type).toBe('chart');
+    expect(chart.kind).toBe('bar');
+    expect(chart.title).toBe('Revenue');
+    expect(chart.data).toEqual([
+      { label: 'Q1', value: 100 },
+      { label: 'Q2', value: 145 },
+      { label: 'Q3', value: 190 },
+      { label: 'Q4', value: 220 },
+    ]);
+  });
+
+  it('defaults chart kind to bar when unspecified', () => {
+    const deck = parseDeck('::chart\nA: 1\nB: 2\n::');
+    const chart = deck.slides[0].blocks[0] as Chart;
+    expect(chart.kind).toBe('bar');
+  });
+
+  it('parses line and donut chart kinds', () => {
+    const line = parseDeck('::chart{kind=line}\nA: 1\nB: 2\n::').slides[0].blocks[0] as Chart;
+    const donut = parseDeck('::chart{kind=donut}\nA: 1\nB: 2\n::').slides[0].blocks[0] as Chart;
+    expect(line.kind).toBe('line');
+    expect(donut.kind).toBe('donut');
+  });
+
+  it('parses a table directive', () => {
+    const md = `::table{emphasize=1}
+| Plan | Price | Seats |
+| Starter | $0 | 1 |
+| Pro | $20 | 5 |
+::`;
+    const deck = parseDeck(md);
+    const table = deck.slides[0].blocks[0] as Table;
+    expect(table.type).toBe('table');
+    expect(table.headers).toEqual(['Plan', 'Price', 'Seats']);
+    expect(table.rows).toEqual([
+      ['Starter', '$0', '1'],
+      ['Pro', '$20', '5'],
+    ]);
+    expect(table.emphasizeColumn).toBe(1);
+  });
+
+  it('skips a markdown alignment row in tables', () => {
+    const md = `::table
+| H1 | H2 |
+| -- | -- |
+| a | b |
+::`;
+    const deck = parseDeck(md);
+    const table = deck.slides[0].blocks[0] as Table;
+    expect(table.headers).toEqual(['H1', 'H2']);
+    expect(table.rows).toEqual([['a', 'b']]);
   });
 });

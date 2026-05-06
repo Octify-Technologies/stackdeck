@@ -1,6 +1,6 @@
 import type { List as ListBlock, ListItem } from '@/ir/schema';
 
-import { InlineText } from './InlineText';
+import { InlineText } from '../InlineText';
 
 function ListItems({ items }: { items: ListItem[] }) {
   return (
