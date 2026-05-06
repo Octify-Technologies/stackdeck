@@ -6,11 +6,13 @@ import {
   type Block,
   type Box,
   type Brand,
+  type Cell,
   type Chart,
   type ChartDatum,
   type ChartKind,
   type Code,
   type Deck,
+  type Grid,
   type Heading,
   type LayoutId,
   type List,
@@ -308,13 +310,25 @@ function expandBlockDirective(
 
   if (name === 'grid') {
     const cols = (
-      options.cols && [2, 3, 4].includes(Number(options.cols)) ? Number(options.cols) : 2
-    ) as 2 | 3 | 4;
+      options.cols && [2, 3, 4, 6, 12].includes(Number(options.cols)) ? Number(options.cols) : 2
+    ) as Grid['cols'];
     const rows = (
-      options.rows && [1, 2, 3].includes(Number(options.rows)) ? Number(options.rows) : 2
-    ) as 1 | 2 | 3;
+      options.rows && [1, 2, 3, 4].includes(Number(options.rows)) ? Number(options.rows) : 2
+    ) as Grid['rows'];
     const children = parseChildren(tokens, cursor, true);
     return [{ type: 'grid', cols, rows, children }];
+  }
+
+  if (name === 'cell') {
+    const children = parseChildren(tokens, cursor, true);
+    const spanRaw = Number(options.span);
+    const rowRaw = Number(options.row ?? options.rowSpan);
+    const span = spanRaw && spanRaw >= 1 && spanRaw <= 12 ? (spanRaw as Cell['span']) : undefined;
+    const rowSpan = rowRaw && rowRaw >= 1 && rowRaw <= 4 ? (rowRaw as Cell['rowSpan']) : undefined;
+    const cell: Cell = { type: 'cell', children };
+    if (span !== undefined) cell.span = span;
+    if (rowSpan !== undefined) cell.rowSpan = rowSpan;
+    return [cell];
   }
 
   if (name === 'lead' || name === 'caption') {

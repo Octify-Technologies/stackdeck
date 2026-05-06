@@ -64,6 +64,10 @@ export function BlockRenderer({ block }: { block: Block }) {
       const Comp = resolveBlockComponent('grid', styleId);
       return <Comp block={block} />;
     }
+    case 'cell': {
+      const Comp = resolveBlockComponent('cell', styleId);
+      return <Comp block={block} />;
+    }
     default: {
       const _exhaustive: never = block;
       void _exhaustive;
