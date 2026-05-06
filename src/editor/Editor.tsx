@@ -7,11 +7,13 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import type { Brand, Deck, Density, Mode, ThemeRef } from '@/ir/schema';
+import { createAsset, assetSrc } from '@/storage/asset-store';
 import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 import { ExportPdf } from '@/render/ExportPdf';
 import { allPalettes, allStyles } from '@/themes/registry';
 
+import { AssetsDrawer } from './AssetsDrawer';
 import { InsertMenu } from './InsertMenu';
 import { SAMPLE_MARKDOWN } from './sample-deck';
 import { SourceEditor } from './SourceEditor';
@@ -49,6 +51,7 @@ export function Editor({ deckId }: Props) {
   const [source, setSource] = useState(SAMPLE_MARKDOWN);
   const [state, setState] = useState<EditorState>(DEFAULT_STATE);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [assetsOpen, setAssetsOpen] = useState(false);
   const [selectedSlide, setSelectedSlide] = useState(0);
   const [loaded, setLoaded] = useState(!deckId);
   const [storedDeck, setStoredDeck] = useState<StoredDeck | null>(null);
@@ -165,6 +168,48 @@ export function Editor({ deckId }: Props) {
     insertRef.current?.(snippet);
   }, []);
 
+  const handleImageFiles = useCallback(async (files: FileList | File[]) => {
+    const list = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    for (const file of list) {
+      const asset = await createAsset({ blob: file, name: file.name });
+      const safeAlt = (file.name || 'image').replace(/"/g, "'");
+      insertRef.current?.(`\n::image{src="${assetSrc(asset.id)}" alt="${safeAlt}"}\n`);
+    }
+  }, []);
+
+  const onPreviewDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (e.dataTransfer.files?.length) void handleImageFiles(e.dataTransfer.files);
+    },
+    [handleImageFiles],
+  );
+
+  const onPreviewDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    if (Array.from(e.dataTransfer.items).some((i) => i.kind === 'file')) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    }
+  }, []);
+
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      if (!e.clipboardData) return;
+      const files: File[] = [];
+      for (const item of Array.from(e.clipboardData.items)) {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const f = item.getAsFile();
+          if (f) files.push(f);
+        }
+      }
+      if (files.length === 0) return;
+      e.preventDefault();
+      void handleImageFiles(files);
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, [handleImageFiles]);
+
   const onEditorReady = useCallback((insert: (s: string) => void) => {
     insertRef.current = insert;
   }, []);
@@ -217,6 +262,16 @@ export function Editor({ deckId }: Props) {
           <button
             type="button"
             className={`editor__nav-link editor__nav-link--button ${
+              assetsOpen ? 'editor__nav-link--active' : ''
+            }`}
+            onClick={() => setAssetsOpen((v) => !v)}
+            aria-pressed={assetsOpen}
+          >
+            Assets
+          </button>
+          <button
+            type="button"
+            className={`editor__nav-link editor__nav-link--button ${
               drawerOpen ? 'editor__nav-link--active' : ''
             }`}
             onClick={() => setDrawerOpen((v) => !v)}
@@ -245,7 +300,7 @@ export function Editor({ deckId }: Props) {
           onCommit={commitSourceWidth}
         />
 
-        <div className="editor__preview-pane">
+        <div className="editor__preview-pane" onDrop={onPreviewDrop} onDragOver={onPreviewDragOver}>
           {result.ok ? (
             <PreviewStage
               deck={result.deck}
@@ -259,6 +314,14 @@ export function Editor({ deckId }: Props) {
             </div>
           )}
         </div>
+
+        {assetsOpen ? (
+          <AssetsDrawer
+            onInsert={(snippet) => insertRef.current?.(snippet)}
+            onClose={() => setAssetsOpen(false)}
+            onUpload={(files) => handleImageFiles(files)}
+          />
+        ) : null}
 
         {drawerOpen ? (
           <ThemeDrawer

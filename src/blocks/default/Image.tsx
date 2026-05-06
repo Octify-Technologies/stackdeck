@@ -1,4 +1,9 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 import type { Image as ImageBlock } from '@/ir/schema';
+import { assetIdFromSrc, getAssetUrl, isAssetSrc } from '@/storage/asset-store';
 
 function parseAspect(ratio: string | undefined): string | undefined {
   if (!ratio) return undefined;
@@ -8,10 +13,31 @@ function parseAspect(ratio: string | undefined): string | undefined {
   return undefined;
 }
 
+function useResolvedSrc(src: string): string {
+  const [resolved, setResolved] = useState<string>(() => (isAssetSrc(src) ? '' : src));
+  useEffect(() => {
+    if (!isAssetSrc(src)) {
+      setResolved(src);
+      return;
+    }
+    const id = assetIdFromSrc(src);
+    if (!id) return;
+    let alive = true;
+    void getAssetUrl(id).then((url) => {
+      if (alive && url) setResolved(url);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [src]);
+  return resolved;
+}
+
 export function Image({ block }: { block: ImageBlock }) {
   const treatment = block.treatment ?? 'plain';
   const aspect = parseAspect(block.aspectRatio);
   const focal = block.focal ?? '50% 50%';
+  const resolvedSrc = useResolvedSrc(block.src);
 
   const figureStyle: React.CSSProperties = {};
   if (aspect) figureStyle.aspectRatio = aspect;
@@ -26,7 +52,11 @@ export function Image({ block }: { block: ImageBlock }) {
       style={figureStyle}
     >
       <div className="block-image__frame">
-        <img src={block.src} alt={block.alt ?? ''} style={imgStyle} loading="lazy" />
+        {resolvedSrc ? (
+          <img src={resolvedSrc} alt={block.alt ?? ''} style={imgStyle} loading="lazy" />
+        ) : (
+          <div className="block-image__placeholder" />
+        )}
         {block.annotations?.length ? (
           <div className="block-image__annotations" aria-hidden="true">
             {block.annotations.map((a, i) => (
