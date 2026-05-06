@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/app/**/page.tsx", "src/app/**/layout.tsx"],
+  "project": ["src/**/*.{ts,tsx}", "tests/**/*.ts"],
+  "next": {
+    "entry": ["src/app/**/page.tsx", "src/app/**/layout.tsx", "next.config.{mjs,js,ts}"]
+  },
+  "vitest": {
+    "config": ["vitest.config.ts"],
+    "entry": ["tests/**/*.test.ts"]
+  }
+}

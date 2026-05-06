@@ -1,0 +1,10 @@
+.github
+docs
+tests
+coverage
+*.md
+!README.md
+.editorconfig
+.nvmrc
+eslint.config.mjs
+vitest.config.ts
