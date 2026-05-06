@@ -1,0 +1,121 @@
+/* ==========================================================================
+   app topbar
+   Single source of truth for the global top bar shared by /, /templates,
+   and /new. Same chrome rhythm as page workbars below it.
+   ========================================================================== */
+
+.app-topbar {
+  height: 56px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.app-topbar__inner {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1;
+}
+
+.app-topbar__brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--text);
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.app-topbar__brand:hover .app-topbar__brand-mark {
+  transform: translateY(-0.5px);
+}
+
+.app-topbar__brand-name {
+  display: inline-block;
+}
+
+.app-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-topbar__link {
+  height: var(--h-control);
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+
+.app-topbar__link:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.app-topbar__link:active {
+  transform: translateY(0.5px);
+}
+
+.app-topbar__link[aria-current='page'] {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.app-topbar__cta {
+  display: inline-flex;
+  align-items: center;
+  height: var(--h-control);
+  padding: 0 14px;
+  margin-left: 6px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), var(--shadow-1);
+}
+
+.app-topbar__cta:hover {
+  opacity: 0.9;
+}
+
+.app-topbar__cta:active {
+  transform: translateY(0.5px);
+}

@@ -14,7 +14,6 @@ import { allPalettes, allStyles } from '@/themes/registry';
 
 import { InsertMenu } from './InsertMenu';
 import { SAMPLE_MARKDOWN } from './sample-deck';
-import { SlideThumbnailList } from './SlideThumbnailList';
 import { SourceEditor } from './SourceEditor';
 import { ThemeDrawer } from './ThemeDrawer';
 
@@ -40,6 +39,11 @@ type Props = {
   deckId?: string;
 };
 
+const SOURCE_WIDTH_KEY = 'stackdeck:source-width';
+const SOURCE_WIDTH_DEFAULT = 480;
+const SOURCE_WIDTH_MIN = 320;
+const SOURCE_WIDTH_MAX = 900;
+
 export function Editor({ deckId }: Props) {
   const router = useRouter();
   const [source, setSource] = useState(SAMPLE_MARKDOWN);
@@ -52,6 +56,22 @@ export function Editor({ deckId }: Props) {
 
   const insertRef = useRef<((s: string) => void) | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [sourceWidth, setSourceWidth] = useState<number>(SOURCE_WIDTH_DEFAULT);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = window.localStorage.getItem(SOURCE_WIDTH_KEY);
+    if (!raw) return;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return;
+    setSourceWidth(Math.min(SOURCE_WIDTH_MAX, Math.max(SOURCE_WIDTH_MIN, n)));
+  }, []);
+
+  const commitSourceWidth = useCallback((next: number) => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(SOURCE_WIDTH_KEY, String(next));
+  }, []);
 
   useEffect(() => {
     if (!deckId) return;
@@ -197,21 +217,22 @@ export function Editor({ deckId }: Props) {
         </div>
       </header>
 
-      <div className="editor__shell no-print">
-        {result.ok ? (
-          <SlideThumbnailList
-            deck={result.deck}
-            selectedIndex={selectedSlide}
-            onSelect={handleSelectSlide}
-          />
-        ) : (
-          <aside className="thumb-list thumb-list--empty" aria-label="Slide navigation" />
-        )}
-
+      <div
+        className="editor__shell no-print"
+        style={{ ['--source-width' as string]: `${sourceWidth}px` } as React.CSSProperties}
+      >
         <div className="editor__source-pane">
           <SourceEditor value={source} onChange={setSource} onReady={onEditorReady} />
           <InsertMenu onInsert={handleInsert} />
         </div>
+
+        <Resizer
+          value={sourceWidth}
+          min={SOURCE_WIDTH_MIN}
+          max={SOURCE_WIDTH_MAX}
+          onChange={setSourceWidth}
+          onCommit={commitSourceWidth}
+        />
 
         <div className="editor__preview-pane">
           {result.ok ? (
@@ -353,46 +374,68 @@ function PreviewStage({
           <DeckRenderer deck={visibleDeck} />
         </div>
       </div>
-      <div className="stage__bar" role="toolbar" aria-label="Slide navigation">
-        <button
-          type="button"
-          className="stage__nav"
-          onClick={() => onSelectSlide(safeIndex - 1)}
-          disabled={safeIndex === 0}
-          aria-label="Previous slide"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-            <path
-              d="M9 11L5 7L9 3"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-        <span className="stage__counter" aria-live="polite">
-          <span className="stage__counter-num">{String(safeIndex + 1).padStart(2, '0')}</span>
-          <span className="stage__counter-sep">/</span>
-          <span className="stage__counter-total">{String(total).padStart(2, '0')}</span>
+      <ThumbStrip deck={deck} selectedIndex={safeIndex} onSelect={onSelectSlide} />
+    </div>
+  );
+}
+
+function ThumbStrip({
+  deck,
+  selectedIndex,
+  onSelect,
+}: {
+  deck: Deck;
+  selectedIndex: number;
+  onSelect: (i: number) => void;
+}) {
+  const total = deck.slides.length;
+  const activeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  }, [selectedIndex]);
+
+  return (
+    <div className="thumb-strip" role="tablist" aria-label="Slide navigation">
+      <span className="thumb-strip__counter" aria-live="polite">
+        <span className="thumb-strip__counter-num">
+          {String(Math.min(selectedIndex + 1, total)).padStart(2, '0')}
         </span>
-        <button
-          type="button"
-          className="stage__nav"
-          onClick={() => onSelectSlide(safeIndex + 1)}
-          disabled={safeIndex >= total - 1}
-          aria-label="Next slide"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-            <path
-              d="M5 3L9 7L5 11"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        <span className="thumb-strip__counter-sep">/</span>
+        <span className="thumb-strip__counter-total">
+          {String(total).padStart(2, '0')}
+        </span>
+      </span>
+      <div className="thumb-strip__rail">
+        {deck.slides.map((slide, i) => {
+          const single: Deck = { ...deck, slides: [slide] };
+          const active = i === selectedIndex;
+          return (
+            <button
+              key={slide.id}
+              ref={active ? activeRef : null}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              aria-label={`Slide ${i + 1}`}
+              className={`thumb-strip__item${
+                active ? ' thumb-strip__item--active' : ''
+              }`}
+              onClick={() => onSelect(i)}
+            >
+              <span className="thumb-strip__num">{String(i + 1).padStart(2, '0')}</span>
+              <div className="thumb-strip__frame">
+                <div className="thumb-strip__scaler">
+                  <DeckRenderer deck={single} className="deck--thumbnail" />
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -412,5 +455,72 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
       <span className="save-indicator__dot" aria-hidden />
       {text}
     </span>
+  );
+}
+
+function Resizer({
+  value,
+  min,
+  max,
+  onChange,
+  onCommit,
+}: {
+  value: number;
+  min: number;
+  max: number;
+  onChange: (next: number) => void;
+  onCommit: (next: number) => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = value;
+    setDragging(true);
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+
+    let latest = startWidth;
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.min(max, Math.max(min, startWidth + (ev.clientX - startX)));
+      latest = next;
+      onChange(next);
+    };
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      setDragging(false);
+      onCommit(latest);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const step = e.shiftKey ? 32 : 8;
+    const next = Math.min(max, Math.max(min, value + (e.key === 'ArrowLeft' ? -step : step)));
+    onChange(next);
+    onCommit(next);
+  };
+
+  return (
+    <div
+      className={`editor__resizer${dragging ? ' editor__resizer--dragging' : ''}`}
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize source pane"
+      aria-valuenow={value}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      tabIndex={0}
+      onMouseDown={onMouseDown}
+      onKeyDown={onKeyDown}
+    />
   );
 }

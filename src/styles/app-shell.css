@@ -73,11 +73,13 @@
   --h-control-sm: 28px;
   --h-control-xs: 22px;
 
-  /* Type scale: avoid <12px chrome anywhere */
+  /* Type scale: avoid <12px chrome anywhere.
+     --fs-base is the standard body/normal-text size and matches the
+     topbar nav link (--fs-md), so chrome and body text feel level. */
   --fs-micro: 11px;
   --fs-xs: 12px;
   --fs-sm: 13px;
-  --fs-base: 14px;
+  --fs-base: 15px;
   --fs-md: 15px;
   --fs-lg: 17px;
   --fs-xl: 22px;
@@ -100,6 +102,8 @@
 body {
   background: var(--bg);
   min-height: 100vh;
+  font-size: var(--fs-base);
+  line-height: 1.5;
 }
 
 /* Selection */

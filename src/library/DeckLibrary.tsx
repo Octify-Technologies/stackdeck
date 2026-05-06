@@ -13,6 +13,7 @@ import {
   listDecks,
 } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
+import { AppTopbar } from '@/components/AppTopbar';
 
 type SortKey = 'recent' | 'oldest' | 'title';
 
@@ -53,29 +54,7 @@ export function DeckLibrary() {
 
   return (
     <div className="library">
-      <header className="library__topbar">
-        <div className="library__bar-inner">
-          <Link href="/" className="library__brand">
-            <span className="library__brand-name">stackdeck</span>
-          </Link>
-          <div className="library__topbar-actions">
-            <Link href="/templates" className="library__nav-link">
-              Templates
-            </Link>
-            <a
-              href="https://github.com/Octify-Technologies/stackdeck"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="library__nav-link"
-            >
-              GitHub
-            </a>
-            <Link href="/new" className="library__cta">
-              New deck
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppTopbar />
 
       <div className="library__workbar">
         <div className="library__bar-inner">
@@ -277,8 +256,13 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
 
   const updated = formatRelativeDate(deck.updatedAt);
 
+  const templateAttr = deck.templateName ? templateSlug(deck.templateName) : undefined;
+
   return (
-    <div className={`deck-card${confirming ? ' deck-card--confirming' : ''}`}>
+    <div
+      className={`deck-card${confirming ? ' deck-card--confirming' : ''}`}
+      data-template={templateAttr}
+    >
       <Link href={`/d/${deck.id}/edit`} className="deck-card__link">
         <div className="deck-card__preview">
           {previewDeck ? (
@@ -301,12 +285,12 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
               {slideCount > 0 ? `${slideCount} ${slideCount === 1 ? 'slide' : 'slides'}` : '—'}
             </span>
             {deck.templateName ? (
-              <>
-                <span className="deck-card__sub-dot" aria-hidden>
-                  ·
-                </span>
-                <span className="deck-card__sub-item">{deck.templateName}</span>
-              </>
+              <span
+                className="deck-card__chip"
+                data-template={templateSlug(deck.templateName)}
+              >
+                {deck.templateName}
+              </span>
             ) : null}
           </div>
         </div>
@@ -389,6 +373,13 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
       )}
     </div>
   );
+}
+
+function templateSlug(name: string): string {
+  const key = name.toLowerCase();
+  if (key.includes('pitch')) return 'pitch';
+  if (key.includes('editorial')) return 'editorial';
+  return 'other';
 }
 
 function formatRelativeDate(iso: string): string {

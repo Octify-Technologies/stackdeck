@@ -8,6 +8,7 @@ import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import { createDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
+import { AppTopbar } from '@/components/AppTopbar';
 
 import { SAMPLE_MARKDOWN } from '@/editor/sample-deck';
 
@@ -32,26 +33,7 @@ export function TemplatesGallery() {
 
   return (
     <div className="templates-page">
-      <header className="templates-page__topbar">
-        <div className="templates-page__bar-inner">
-          <Link href="/" className="templates-page__brand">
-            stackdeck
-          </Link>
-          <div className="templates-page__topbar-actions">
-            <Link href="/" className="templates-page__nav-link">
-              Library
-            </Link>
-            <a
-              href="https://github.com/Octify-Technologies/stackdeck"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="templates-page__nav-link"
-            >
-              GitHub
-            </a>
-          </div>
-        </div>
-      </header>
+      <AppTopbar />
 
       <div className="templates-page__workbar">
         <div className="templates-page__bar-inner">
@@ -111,8 +93,10 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
     }
   }, [preset]);
 
+  const templateAttr = templateSlug(preset.id);
+
   return (
-    <button type="button" className="template-card" onClick={onClick}>
+    <button type="button" className="template-card" data-template={templateAttr} onClick={onClick}>
       <div className="template-card__preview">
         <div className="template-card__scaler">
           {previewDeck.ok ? <DeckRenderer deck={previewDeck.deck} /> : null}
@@ -130,4 +114,10 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
       </div>
     </button>
   );
+}
+
+function templateSlug(id: string): 'pitch' | 'editorial' | 'other' {
+  if (id.includes('pitch')) return 'pitch';
+  if (id.includes('editorial')) return 'editorial';
+  return 'other';
 }

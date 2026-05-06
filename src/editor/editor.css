@@ -54,7 +54,7 @@
   align-items: center;
   gap: 12px;
   height: 56px;
-  padding: 0 18px;
+  padding: 0 var(--page-pad);
   background: var(--bg-glass);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
@@ -178,27 +178,40 @@
   text-transform: capitalize;
 }
 
-/* Save indicator */
+/* Save indicator: status pill chip */
 
 .save-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  height: 26px;
+  padding: 0 11px 0 9px;
   font-family: var(--mono);
   font-size: var(--fs-micro);
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   flex-shrink: 0;
-  color: var(--text-3);
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
 }
 
 .save-indicator__dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 999px;
   flex-shrink: 0;
   background: var(--text-3);
+}
+
+.save-indicator--saving {
+  color: var(--warn);
+  border-color: rgba(245, 196, 106, 0.28);
+  background: rgba(245, 196, 106, 0.08);
 }
 
 .save-indicator--saving .save-indicator__dot {
@@ -207,7 +220,9 @@
 }
 
 .save-indicator--saved {
-  color: var(--text-2);
+  color: var(--ok);
+  border-color: rgba(127, 219, 160, 0.28);
+  background: rgba(127, 219, 160, 0.08);
 }
 
 .save-indicator--saved .save-indicator__dot {
@@ -216,6 +231,8 @@
 
 .save-indicator--error {
   color: var(--err);
+  border-color: rgba(240, 128, 128, 0.32);
+  background: rgba(240, 128, 128, 0.08);
 }
 
 .save-indicator--error .save-indicator__dot {
@@ -306,9 +323,15 @@
 /* Shell layout
    --------------------------------------------------------------------------*/
 
+/* Three (or four) columns: source | resizer | preview | drawer?
+   Source width is driven by --source-width set inline by Editor.tsx and
+   clamped here so a stale localStorage value can never explode the layout. */
 .editor__shell {
   display: grid;
-  grid-template-columns: 232px 1fr 1.2fr;
+  grid-template-columns:
+    clamp(320px, var(--source-width, 480px), min(900px, 70vw))
+    6px
+    1fr;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -316,108 +339,51 @@
 }
 
 .editor__shell:has(.drawer) {
-  grid-template-columns: 232px 1fr 1.2fr 380px;
+  grid-template-columns:
+    clamp(320px, var(--source-width, 480px), min(900px, 70vw))
+    6px
+    1fr
+    380px;
 }
 
-/* Thumbnail list
-   --------------------------------------------------------------------------*/
-
-.thumb-list {
-  background: var(--bg);
-  border-right: 1px solid var(--line);
-  overflow-y: auto;
-  padding: 16px 14px 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 0;
-}
-
-.thumb-list--empty {
-  background: var(--bg);
-}
-
-.thumb-list__item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* Resizer handle: 6px-wide column with a centered hairline.
+   Hover/drag thicken the line and tint the hit zone. */
+.editor__resizer {
+  position: relative;
+  cursor: col-resize;
   background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  width: 100%;
-  border-radius: var(--r-md);
-  padding: 6px;
+  user-select: none;
+  z-index: 5;
   transition: background var(--t-fast) var(--ease);
 }
 
-.thumb-list__item:hover {
-  background: var(--surface);
-}
-
-.thumb-list__number {
-  font-family: var(--mono);
-  font-size: var(--fs-micro);
-  font-weight: 500;
-  color: var(--text-3);
-  letter-spacing: 0.14em;
-  font-feature-settings: 'tnum';
-  padding-left: 2px;
-}
-
-.thumb-list__frame {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line);
-  background: var(--bg-elev-1);
-  overflow: hidden;
-  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
-  box-shadow: var(--highlight);
-}
-
-.thumb-list__item:hover .thumb-list__frame {
-  border-color: var(--line-strong);
-}
-
-.thumb-list__item--active {
-  background: var(--surface);
-}
-
-.thumb-list__item--active .thumb-list__frame {
-  border-color: var(--text);
-  box-shadow: 0 0 0 1px var(--text), var(--highlight-strong);
-}
-
-.thumb-list__item--active .thumb-list__number {
-  color: var(--text);
-}
-
-.thumb-list__scaler {
+.editor__resizer::before {
+  content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  width: 1280px;
-  height: 720px;
-  transform: scale(calc((192 / 1280)));
-  transform-origin: top left;
-  pointer-events: none;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  margin-left: -0.5px;
+  background: var(--line);
+  transition: background var(--t-fast) var(--ease), width var(--t-fast) var(--ease),
+    margin-left var(--t-fast) var(--ease);
 }
 
-.thumb-list__scaler .deck {
-  padding: 0;
-  gap: 0;
-  align-items: stretch;
+.editor__resizer:hover::before,
+.editor__resizer:focus-visible::before,
+.editor__resizer--dragging::before {
+  background: var(--text-2);
+  width: 2px;
+  margin-left: -1px;
 }
 
-.thumb-list__scaler .slide-frame {
-  width: 1280px;
-  max-width: 1280px;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
+.editor__resizer--dragging {
+  background: var(--surface);
+}
+
+.editor__resizer:focus-visible {
+  outline: none;
 }
 
 /* Source pane
@@ -430,7 +396,6 @@
 .editor__source-pane {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--line);
   background: var(--bg-pane);
   overflow: hidden;
   min-height: 0;
@@ -755,107 +720,215 @@
   z-index: 1;
 }
 
+/* Flex (not grid) — grid auto-tracks size to max-content of children, so a
+   fluid `width: 100%` + `aspect-ratio` slide resolves to its 1280px max-width
+   and the viewport ends up horizontally scrolling instead of shrinking the
+   slide to fit. Flex constrains children to the parent's actual width. */
 .stage__viewport {
   flex: 1;
   min-height: 0;
-  display: grid;
-  place-items: center;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 36px 36px 28px;
-  overflow: auto;
+  overflow: hidden;
 }
+
+/* Slide is rendered at its native 1280x720 design size and proportionally
+   scaled with transform to fit the available width via container query
+   units. This guarantees pixel parity with the PDF export — what you see
+   is exactly what you get — and prevents content overflow when the pane
+   is narrower than 1280px. The frame's shadow and border live on the
+   outer wrapper so they don't get scaled with the transform. */
 
 .stage__slide {
   width: 100%;
   max-width: 1280px;
-  display: flex;
-  justify-content: center;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  container-type: inline-size;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+  display: block;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
-/* Override slide chrome inside the preview stage: sharp corners, soft shadow */
-
 .stage__slide .deck {
+  position: absolute;
+  inset: 0;
   padding: 0;
   gap: 0;
+  width: 1280px;
+  height: 720px;
+  /* length ÷ length yields a unitless number — required by scale().
+     `100cqi / 1280` (number) is silently invalid and disables the
+     transform, leaving the deck at native 1280×720 and cropped. */
+  transform: scale(calc(100cqi / 1280px));
+  transform-origin: top left;
   align-items: stretch;
-  width: 100%;
 }
 
 .stage__slide .slide-frame {
   border-radius: 0;
-  box-shadow: var(--shadow-3);
-  border: 1px solid var(--line);
-  width: 100%;
+  box-shadow: none;
+  border: none;
+  width: 1280px;
   max-width: 1280px;
+  height: 720px;
 }
 
-/* Bottom bar: prev / counter / next */
+/* Floating thumb strip: docked at the bottom of the preview pane.
+   Glassy bar containing the slide counter on the left and a horizontally
+   scrolling rail of mini slide previews. The active thumb auto-scrolls
+   into view on selection.
+   --------------------------------------------------------------------------*/
 
-.stage__bar {
+.thumb-strip {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  height: 60px;
-  padding: 0 24px;
+  gap: 18px;
+  padding: 10px 18px;
   border-top: 1px solid var(--line);
   background: var(--bg-glass);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  flex-shrink: 0;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
-.stage__nav {
-  width: var(--h-control);
-  height: var(--h-control);
-  display: grid;
-  place-items: center;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--text-2);
-  cursor: pointer;
-  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
-    background var(--t-fast) var(--ease);
-}
-
-.stage__nav:hover:not(:disabled) {
-  color: var(--text);
-  border-color: var(--text-2);
-  background: var(--surface-strong);
-}
-
-.stage__nav:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.stage__counter {
+.thumb-strip__counter {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 4px;
   font-family: var(--mono);
   font-size: var(--fs-sm);
   font-weight: 500;
   letter-spacing: 0.06em;
   color: var(--text-2);
   font-variant-numeric: tabular-nums;
-  min-width: 92px;
-  justify-content: center;
+  min-width: 60px;
 }
 
-.stage__counter-num {
+.thumb-strip__counter-num {
   color: var(--text);
 }
 
-.stage__counter-sep {
+.thumb-strip__counter-sep {
   color: var(--text-3);
   margin: 0 2px;
 }
 
-.stage__counter-total {
+.thumb-strip__counter-total {
   color: var(--text-3);
+}
+
+.thumb-strip__rail {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 2px 2px;
+  min-width: 0;
+}
+
+.thumb-strip__rail::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumb-strip__rail::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.thumb-strip__rail::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thumb-strip__item {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--r-sm);
+}
+
+.thumb-strip__num {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+  font-feature-settings: 'tnum';
+  transition: color var(--t-fast) var(--ease);
+}
+
+.thumb-strip__item:hover .thumb-strip__num {
+  color: var(--text-2);
+}
+
+.thumb-strip__item--active .thumb-strip__num {
+  color: var(--text);
+}
+
+.thumb-strip__frame {
+  position: relative;
+  width: 124px;
+  height: 70px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev-1);
+  overflow: hidden;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+  box-shadow: var(--highlight);
+}
+
+.thumb-strip__item:hover .thumb-strip__frame {
+  border-color: var(--line-strong);
+}
+
+.thumb-strip__item--active .thumb-strip__frame {
+  border-color: var(--text);
+  box-shadow: 0 0 0 1px var(--text), var(--highlight-strong);
+}
+
+.thumb-strip__scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1280px;
+  height: 720px;
+  transform: scale(calc(124 / 1280));
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.thumb-strip__scaler .deck {
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+}
+
+.thumb-strip__scaler .slide-frame {
+  width: 1280px;
+  max-width: 1280px;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 /* Parse error
