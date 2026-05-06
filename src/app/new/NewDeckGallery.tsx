@@ -18,7 +18,6 @@ import {
   PageWorkbar,
 } from '@/components';
 
-import { SAMPLE_MARKDOWN } from '@/editor/sample-deck';
 import { TEMPLATE_PRESETS, type TemplatePreset } from '@/app/templates/template-presets';
 
 const STARTER_MARKDOWN = `---
@@ -57,10 +56,13 @@ const BLANK_TEMPLATE: TemplatePreset = {
   id: 'blank',
   name: 'Blank',
   vibe: 'Start from scratch',
+  category: 'case-study',
   styleId: 'modern',
   paletteId: 'electric',
   density: 'comfortable',
   mode: 'light',
+  seed: STARTER_MARKDOWN,
+  slideCount: 3,
 };
 
 export function NewDeckGallery() {
@@ -68,7 +70,7 @@ export function NewDeckGallery() {
 
   const create = async (preset: TemplatePreset) => {
     const deck = await createDeck({
-      source: STARTER_MARKDOWN,
+      source: preset.seed,
       theme: {
         styleId: preset.styleId,
         paletteId: preset.paletteId,
@@ -128,7 +130,7 @@ function BlankCard({ onClick }: { onClick: () => void }) {
 function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: () => void }) {
   const previewDeck = useMemo(() => {
     try {
-      const parsed = parseDeck(SAMPLE_MARKDOWN, {
+      const parsed = parseDeck(preset.seed, {
         theme: {
           styleId: preset.styleId,
           paletteId: preset.paletteId,
@@ -177,8 +179,8 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
   );
 }
 
-function templateSlug(id: string): 'pitch' | 'editorial' | 'other' {
-  if (id.includes('pitch')) return 'pitch';
-  if (id.includes('editorial')) return 'editorial';
+function templateSlug(id: string): 'case-study-pro' | 'case-study-editorial' | 'other' {
+  if (id === 'case-study-pro') return 'case-study-pro';
+  if (id === 'case-study-editorial') return 'case-study-editorial';
   return 'other';
 }

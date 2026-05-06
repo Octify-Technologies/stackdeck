@@ -18,8 +18,6 @@ import {
   PageWorkbar,
 } from '@/components';
 
-import { SAMPLE_MARKDOWN } from '@/editor/sample-deck';
-
 import { TEMPLATE_PRESETS, type TemplatePreset } from './template-presets';
 
 export function TemplatesGallery() {
@@ -27,7 +25,7 @@ export function TemplatesGallery() {
 
   const applyTemplate = async (preset: TemplatePreset) => {
     const deck = await createDeck({
-      source: SAMPLE_MARKDOWN,
+      source: preset.seed,
       theme: {
         styleId: preset.styleId,
         paletteId: preset.paletteId,
@@ -47,7 +45,7 @@ export function TemplatesGallery() {
         back={{ href: '/', label: 'Library', ariaLabel: 'Back to library' }}
         title="Templates"
         count={`${TEMPLATE_PRESETS.length} ${TEMPLATE_PRESETS.length === 1 ? 'preset' : 'presets'}`}
-        subtitle="Hand-crafted theme combinations. Pick one to create a new deck."
+        subtitle="Premium starting points. Each is a fully composed deck, ready to customize."
       />
 
       <PageMain>
@@ -64,7 +62,7 @@ export function TemplatesGallery() {
 function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: () => void }) {
   const previewDeck = useMemo(() => {
     try {
-      const parsed = parseDeck(SAMPLE_MARKDOWN, {
+      const parsed = parseDeck(preset.seed, {
         theme: {
           styleId: preset.styleId,
           paletteId: preset.paletteId,
@@ -73,7 +71,7 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
         },
       });
       const planned = planDeck(parsed);
-      return { ok: true as const, deck: { ...planned, slides: planned.slides.slice(0, 1) } };
+      return { ok: true as const, deck: { ...planned, slides: planned.slides.slice(0, 3) } };
     } catch (e) {
       const message = e instanceof ParseError ? e.message : (e as Error).message;
       return { ok: false as const, error: message };
@@ -85,16 +83,19 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
   return (
     <button
       type="button"
-      className="surface-card template-card"
+      className="surface-card template-card template-card--multi"
       data-template={templateAttr}
       onClick={onClick}
     >
-      <div className="template-card__preview">
-        <div className="template-card__scaler">
+      <div className="template-card__preview template-card__preview--multi">
+        <div className="template-card__scaler template-card__scaler--multi">
           {previewDeck.ok ? <DeckRenderer deck={previewDeck.deck} /> : null}
         </div>
         <span className="template-card__chip" data-template={templateAttr}>
-          {preset.name}
+          {preset.category}
+        </span>
+        <span className="template-card__count" aria-label={`${preset.slideCount} slides`}>
+          {preset.slideCount} slides
         </span>
       </div>
       <div className="template-card__meta">
@@ -113,8 +114,8 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
   );
 }
 
-function templateSlug(id: string): 'pitch' | 'editorial' | 'other' {
-  if (id.includes('pitch')) return 'pitch';
-  if (id.includes('editorial')) return 'editorial';
+function templateSlug(id: string): 'case-study-pro' | 'case-study-editorial' | 'other' {
+  if (id === 'case-study-pro') return 'case-study-pro';
+  if (id === 'case-study-editorial') return 'case-study-editorial';
   return 'other';
 }

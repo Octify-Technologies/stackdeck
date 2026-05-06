@@ -10,11 +10,16 @@ type Props = {
   totalSlides: number;
   brand?: Brand;
   mode: Mode;
+  footer?: string;
+  section?: string;
 };
 
-export function SlideRenderer({ slide, index, totalSlides, brand, mode }: Props) {
+const FURNITURE_HIDDEN = new Set(['cover', 'fullBleed', 'section']);
+
+export function SlideRenderer({ slide, index, totalSlides, brand, mode, footer, section }: Props) {
   const layout = getLayout(slide.layout);
   const pageNumber = `${String(index + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+  const showFurniture = !FURNITURE_HIDDEN.has(slide.layout);
 
   return (
     <section
@@ -23,10 +28,12 @@ export function SlideRenderer({ slide, index, totalSlides, brand, mode }: Props)
       data-layout={slide.layout}
       data-page={pageNumber}
     >
+      {showFurniture && section ? <div className="slide-kicker">{section}</div> : null}
       {slide.blocks.map((block, i) => (
         <BlockRenderer key={i} block={block} />
       ))}
       <SlideLogo brand={brand} layout={slide.layout} mode={mode} />
+      {showFurniture && footer ? <div className="slide-footer">{footer}</div> : null}
     </section>
   );
 }
