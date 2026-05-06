@@ -446,4 +446,44 @@ B
     };
     deck.slides.forEach((s) => s.blocks.forEach(walk));
   });
+
+  it('parses ::grid with extended cols=12 and rows=4', () => {
+    const md = '::grid{cols=12 rows=4}\nHello\n::';
+    const deck = parseDeck(md);
+    const grid = deck.slides[0].blocks[0] as Grid;
+    expect(grid.type).toBe('grid');
+    expect(grid.cols).toBe(12);
+    expect(grid.rows).toBe(4);
+  });
+
+  it('parses ::cell with span inside a grid', () => {
+    const md = `::grid{cols=12}
+::cell{span=8}
+Main content.
+::
+::cell{span=4}
+Side note.
+::
+::`;
+    const deck = parseDeck(md);
+    const grid = deck.slides[0].blocks[0] as Grid;
+    expect(grid.children).toHaveLength(2);
+    const c1 = grid.children[0] as import('@/ir/schema').Cell;
+    expect(c1.type).toBe('cell');
+    expect(c1.span).toBe(8);
+    expect((grid.children[1] as import('@/ir/schema').Cell).span).toBe(4);
+  });
+
+  it('parses ::cell rowSpan via row option', () => {
+    const md = `::grid{cols=4 rows=2}
+::cell{span=2 row=2}
+Tall.
+::
+::`;
+    const deck = parseDeck(md);
+    const grid = deck.slides[0].blocks[0] as Grid;
+    const cell = grid.children[0] as import('@/ir/schema').Cell;
+    expect(cell.rowSpan).toBe(2);
+    expect(cell.span).toBe(2);
+  });
 });

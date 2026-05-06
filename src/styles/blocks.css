@@ -379,6 +379,14 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.block-grid[data-cols='6'] {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.block-grid[data-cols='12'] {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
 .block-grid[data-rows='1'] {
   grid-template-rows: minmax(0, 1fr);
 }
@@ -389,6 +397,20 @@
 
 .block-grid[data-rows='3'] {
   grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+.block-grid[data-rows='4'] {
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+
+/* ─── Cell ─────────────────────────────────────────────────────────────── */
+
+.block-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+  min-height: 0;
 }
 
 /* ============================================================

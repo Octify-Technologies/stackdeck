@@ -86,8 +86,15 @@ export type Columns = {
 
 export type Grid = {
   type: 'grid';
-  cols: 2 | 3 | 4;
-  rows: 1 | 2 | 3;
+  cols: 2 | 3 | 4 | 6 | 12;
+  rows: 1 | 2 | 3 | 4;
+  children: Block[];
+};
+
+export type Cell = {
+  type: 'cell';
+  span?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  rowSpan?: 1 | 2 | 3 | 4;
   children: Block[];
 };
 
@@ -125,6 +132,7 @@ export type Block =
   | Box
   | Columns
   | Grid
+  | Cell
   | Chart
   | Table;
 
@@ -209,6 +217,7 @@ const BlockSchema: z.ZodType<Block> = z.lazy(() =>
     BoxSchema,
     ColumnsSchema,
     GridSchema,
+    CellSchema,
   ]),
 );
 
@@ -231,9 +240,33 @@ const ColumnsSchema: z.ZodType<Columns> = z.lazy(() =>
 const GridSchema: z.ZodType<Grid> = z.lazy(() =>
   z.object({
     type: z.literal('grid'),
-    cols: z.union([z.literal(2), z.literal(3), z.literal(4)]),
-    rows: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+    cols: z.union([z.literal(2), z.literal(3), z.literal(4), z.literal(6), z.literal(12)]),
+    rows: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
     children: z.array(BlockSchema).min(1),
+  }),
+);
+
+const CellSchema: z.ZodType<Cell> = z.lazy(() =>
+  z.object({
+    type: z.literal('cell'),
+    span: z
+      .union([
+        z.literal(1),
+        z.literal(2),
+        z.literal(3),
+        z.literal(4),
+        z.literal(5),
+        z.literal(6),
+        z.literal(7),
+        z.literal(8),
+        z.literal(9),
+        z.literal(10),
+        z.literal(11),
+        z.literal(12),
+      ])
+      .optional(),
+    rowSpan: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]).optional(),
+    children: z.array(BlockSchema),
   }),
 );
 

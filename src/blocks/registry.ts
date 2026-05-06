@@ -3,6 +3,7 @@ import type { ComponentType } from 'react';
 import type { Block } from '@/ir/schema';
 
 import { Box } from './default/Box';
+import { Cell } from './default/Cell';
 import { Chart } from './default/Chart';
 import { Code } from './default/Code';
 import { Columns } from './default/Columns';
@@ -70,6 +71,7 @@ const blockRegistry: Registry = {
   box: { default: Box },
   columns: { default: Columns },
   grid: { default: Grid },
+  cell: { default: Cell },
 };
 
 export function resolveBlockComponent<T extends BlockType>(
