@@ -28,6 +28,7 @@ export function SlideRenderer({ slide, index, totalSlides, brand, mode, footer, 
       data-layout={slide.layout}
       data-page={pageNumber}
     >
+      <div className="slide-bg" aria-hidden="true" />
       {showFurniture && section ? <div className="slide-kicker">{section}</div> : null}
       {slide.blocks.map((block, i) => (
         <BlockRenderer key={i} block={block} />
