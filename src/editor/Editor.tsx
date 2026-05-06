@@ -7,6 +7,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import { reorderSlide } from '@/ir/source-edit';
+import { replaceHeadingOccurrence, type EditableKind } from '@/ir/text-edit';
 import { lintColors } from '@/render/lint';
 import { resolveTheme } from '@/render/theme-resolver';
 import type { Brand, Deck, Density, Mode, ThemeRef } from '@/ir/schema';
@@ -183,6 +184,10 @@ export function Editor({ deckId }: Props) {
     setSelectedSlide(to);
   }, []);
 
+  const handleHeadingEdit = useCallback((kind: EditableKind, index: number, nextText: string) => {
+    setSource((s) => replaceHeadingOccurrence(s, kind, index, nextText));
+  }, []);
+
   const handleInsert = useCallback((snippet: string) => {
     insertRef.current?.(snippet);
   }, []);
@@ -347,6 +352,7 @@ export function Editor({ deckId }: Props) {
               selectedSlide={selectedSlide}
               onSelectSlide={handleSelectSlide}
               onReorderSlide={handleReorderSlide}
+              onHeadingEdit={handleHeadingEdit}
             />
           ) : (
             <div className="editor__error">
@@ -459,11 +465,13 @@ function PreviewStage({
   selectedSlide,
   onSelectSlide,
   onReorderSlide,
+  onHeadingEdit,
 }: {
   deck: Deck;
   selectedSlide: number;
   onSelectSlide: (i: number) => void;
   onReorderSlide: (from: number, to: number) => void;
+  onHeadingEdit: (kind: EditableKind, index: number, nextText: string) => void;
 }) {
   const total = deck.slides.length;
   const safeIndex = Math.min(Math.max(selectedSlide, 0), Math.max(total - 1, 0));
@@ -488,10 +496,88 @@ function PreviewStage({
     return () => window.removeEventListener('keydown', onKey);
   }, [safeIndex, total, onSelectSlide]);
 
+  const slideRef = useRef<HTMLDivElement>(null);
+
+  const beginEdit = useCallback(
+    (el: HTMLElement) => {
+      const tag = el.tagName.toLowerCase();
+      if (!/^h[1-4]$/.test(tag)) return;
+      // Compute occurrence index across the FULL deck, not just the visible
+      // slide. We render slides individually, so we have to look through deck.
+      const kind = tag as EditableKind;
+      const targetText = el.textContent ?? '';
+      let occurrence = 0;
+      const targetLevel = Number(kind.slice(1));
+      outer: for (let s = 0; s < deck.slides.length; s++) {
+        const blocks = deck.slides[s].blocks;
+        const stack: typeof blocks = [...blocks];
+        while (stack.length > 0) {
+          const b = stack.shift()!;
+          if (b.type === 'heading') {
+            if (b.level === targetLevel) {
+              if (s === safeIndex && b.text === targetText) {
+                break outer;
+              }
+              occurrence++;
+            }
+          } else if (b.type === 'box') {
+            stack.unshift(...b.children);
+          } else if (b.type === 'columns') {
+            stack.unshift(...b.columns.flat());
+          } else if (b.type === 'grid' || b.type === 'cell') {
+            stack.unshift(...b.children);
+          }
+        }
+      }
+      el.contentEditable = 'true';
+      el.classList.add('preview-editable');
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+
+      const finish = () => {
+        el.removeEventListener('blur', finish);
+        el.removeEventListener('keydown', onKey);
+        el.contentEditable = 'false';
+        el.classList.remove('preview-editable');
+        const next = (el.textContent ?? '').trim();
+        if (next && next !== targetText) onHeadingEdit(kind, occurrence, next);
+      };
+      const onKey = (ke: KeyboardEvent) => {
+        if (ke.key === 'Enter' && !ke.shiftKey) {
+          ke.preventDefault();
+          el.blur();
+        } else if (ke.key === 'Escape') {
+          ke.preventDefault();
+          el.textContent = targetText;
+          el.blur();
+        }
+      };
+      el.addEventListener('blur', finish);
+      el.addEventListener('keydown', onKey);
+    },
+    [deck, safeIndex, onHeadingEdit],
+  );
+
+  const onDoubleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const t = e.target as HTMLElement;
+      const heading = t.closest('h1, h2, h3, h4') as HTMLElement | null;
+      if (heading && slideRef.current?.contains(heading)) {
+        e.preventDefault();
+        beginEdit(heading);
+      }
+    },
+    [beginEdit],
+  );
+
   return (
     <div className="stage">
       <div className="stage__viewport">
-        <div className="stage__slide">
+        <div className="stage__slide" ref={slideRef} onDoubleClick={onDoubleClick}>
           <DeckRenderer deck={visibleDeck} />
         </div>
       </div>
