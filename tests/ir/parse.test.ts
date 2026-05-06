@@ -526,4 +526,44 @@ Tall.
     const deck = parseDeck(md);
     expect(deck.slides[0].blocks).toHaveLength(0);
   });
+
+  it('::stats with 3 entries lays out as a horizontal row', () => {
+    const md = `::stats
+::stat{value="1" label="A"}
+::stat{value="2" label="B"}
+::stat{value="3" label="C"}
+::`;
+    const deck = parseDeck(md);
+    const grid = deck.slides[0].blocks[0] as Grid;
+    expect(grid.cols).toBe(3);
+    expect(grid.rows).toBe(1);
+  });
+
+  it('::stats with 4 entries lays out as 2x2', () => {
+    const md = `::stats
+::stat{value="1" label="A"}
+::stat{value="2" label="B"}
+::stat{value="3" label="C"}
+::stat{value="4" label="D"}
+::`;
+    const deck = parseDeck(md);
+    const grid = deck.slides[0].blocks[0] as Grid;
+    expect(grid.cols).toBe(2);
+    expect(grid.rows).toBe(2);
+  });
+
+  it('::stats with 6 entries lays out as 3x2', () => {
+    const md = `::stats
+::stat{value="1" label="A"}
+::stat{value="2" label="B"}
+::stat{value="3" label="C"}
+::stat{value="4" label="D"}
+::stat{value="5" label="E"}
+::stat{value="6" label="F"}
+::`;
+    const deck = parseDeck(md);
+    const grid = deck.slides[0].blocks[0] as Grid;
+    expect(grid.cols).toBe(3);
+    expect(grid.rows).toBe(2);
+  });
 });

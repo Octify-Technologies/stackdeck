@@ -587,17 +587,24 @@ function expandBlockDirective(
   return children;
 }
 
-function pickGridCols(pattern: string, count: number): 2 | 3 | 4 {
-  if (pattern === 'kpis') {
-    if (count <= 4) return 2;
-    if (count <= 6) return 3;
-    return 4;
-  }
+/**
+ * Smart grid layout for stats and KPIs. Targets the most pleasing arrangement
+ * for the most common counts:
+ *
+ *   1, 2 → row of 2
+ *   3    → row of 3 (horizontal)
+ *   4    → 2x2
+ *   5, 6 → 3x2
+ *   7, 8 → 4x2
+ *   9+   → 3x3
+ */
+function pickGridCols(_pattern: string, count: number): 2 | 3 | 4 {
   if (count <= 2) return 2;
-  if (count <= 3) return 3;
-  if (count <= 4) return 2;
+  if (count === 3) return 3;
+  if (count === 4) return 2;
   if (count <= 6) return 3;
-  return 4;
+  if (count <= 8) return 4;
+  return 3;
 }
 
 function pickGridRows(_pattern: string, count: number, cols: 2 | 3 | 4): 1 | 2 | 3 {
