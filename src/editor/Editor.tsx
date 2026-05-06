@@ -7,12 +7,14 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import { reorderSlide } from '@/ir/source-edit';
+import { lintColors } from '@/render/lint';
+import { resolveTheme } from '@/render/theme-resolver';
 import type { Brand, Deck, Density, Mode, ThemeRef } from '@/ir/schema';
 import { createAsset, assetSrc } from '@/storage/asset-store';
 import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 import { ExportPdf } from '@/render/ExportPdf';
-import { allPalettes, allStyles } from '@/themes/registry';
+import { allPalettes, allStyles, getPalette, getStyle } from '@/themes/registry';
 
 import { AssetsDrawer } from './AssetsDrawer';
 import { InsertMenu } from './InsertMenu';
@@ -149,6 +151,17 @@ export function Editor({ deckId }: Props) {
     }),
     [state.styleId, state.paletteId, state.density, state.mode],
   );
+
+  const lintWarnings = useMemo(() => {
+    try {
+      const style = getStyle(state.styleId);
+      const palette = getPalette(state.paletteId);
+      const resolved = resolveTheme(theme, style, palette, state.brand);
+      return lintColors(resolved.colors);
+    } catch {
+      return [];
+    }
+  }, [theme, state.styleId, state.paletteId, state.brand]);
 
   const result = useMemo(() => {
     try {
@@ -316,6 +329,18 @@ export function Editor({ deckId }: Props) {
         />
 
         <div className="editor__preview-pane" onDrop={onPreviewDrop} onDragOver={onPreviewDragOver}>
+          {lintWarnings.length > 0 ? (
+            <div className="editor__lint" role="status">
+              <span className="editor__lint-icon" aria-hidden>
+                ⚠
+              </span>
+              <span className="editor__lint-text">
+                {lintWarnings.length === 1
+                  ? `${lintWarnings[0].label} contrast is ${lintWarnings[0].ratio} (needs ${lintWarnings[0].needs})`
+                  : `${lintWarnings.length} contrast issues — adjust palette or brand colors`}
+              </span>
+            </div>
+          ) : null}
           {result.ok ? (
             <PreviewStage
               deck={result.deck}
