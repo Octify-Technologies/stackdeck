@@ -34,8 +34,55 @@
 }
 
 .slide.layout-cover::after,
-.slide.layout-fullbleed::after {
+.slide.layout-fullbleed::after,
+.slide.layout-section::after {
   display: none;
+}
+
+/* Section kicker — small label that names the current section on body slides. */
+.slide-kicker {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  opacity: 0.65;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.slide-kicker::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background: currentColor;
+  vertical-align: middle;
+  margin-right: 8px;
+  opacity: 0.6;
+}
+
+/* Deck footer — small line at the bottom-left of body slides. */
+.slide-footer {
+  position: absolute;
+  bottom: var(--space-sm);
+  left: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ─── flow ──────────────────────────────────────────────────────────────── */

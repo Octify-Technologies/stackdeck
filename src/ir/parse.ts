@@ -45,7 +45,7 @@ type LineToken =
   | { kind: 'colsep' }
   | { kind: 'void'; name: string; options: Record<string, string> };
 
-const DIRECTIVE_OPEN_RE = /^::([a-zA-Z][a-zA-Z0-9.]*)(\{[^}]*\})?\s*$/;
+const DIRECTIVE_OPEN_RE = /^::([a-zA-Z][a-zA-Z0-9.-]*)(\{[^}]*\})?\s*$/;
 const DIRECTIVE_CLOSE_RE = /^::\s*$/;
 const COLUMN_SEP_RE = /^:::\s*$/;
 
@@ -253,19 +253,27 @@ function collectColumnGroups(tokens: LineToken[], cursor: Cursor, count: number)
   return cols.slice(0, count);
 }
 
+function inferTrend(options: Record<string, string>): Stat['trend'] {
+  if (options.trend === 'up' || options.trend === 'down' || options.trend === 'flat') {
+    return options.trend as Stat['trend'];
+  }
+  if (options.delta) {
+    const d = options.delta.trim();
+    if (d.startsWith('+')) return 'up';
+    if (d.startsWith('-') || d.startsWith('−')) return 'down';
+  }
+  return undefined;
+}
+
 function expandVoidDirective(name: string, options: Record<string, string>): Block | null {
   if (name === 'stat') {
     if (!options.value) return null;
-    const trend =
-      options.trend === 'up' || options.trend === 'down' || options.trend === 'flat'
-        ? (options.trend as Stat['trend'])
-        : undefined;
     return {
       type: 'stat',
       value: options.value,
       label: options.label,
       delta: options.delta,
-      trend,
+      trend: inferTrend(options),
     };
   }
   return null;
@@ -369,6 +377,143 @@ function expandBlockDirective(
     const children = parseChildren(tokens, cursor, true);
     const heading: Heading = { type: 'heading', level: 2, text: 'Agenda' };
     return [heading, ...children];
+  }
+
+  if (name === 'scope-strip') {
+    parseChildren(tokens, cursor, true);
+    const cells: Block[][] = [];
+    const cell = (label: string, value: string | undefined): Block[] =>
+      value
+        ? [
+            { type: 'text', text: label, emphasis: 'caption' } satisfies Text,
+            { type: 'text', text: value, emphasis: 'normal' } satisfies Text,
+          ]
+        : [];
+    if (options.industry) cells.push(cell('Industry', options.industry));
+    if (options.region) cells.push(cell('Region', options.region));
+    if (options.timeframe) cells.push(cell('Timeframe', options.timeframe));
+    while (cells.length < 3) cells.push([]);
+    const cols = cells.slice(0, 3);
+    return [{ type: 'columns', count: 3, columns: cols }];
+  }
+
+  if (name === 'big-number') {
+    parseChildren(tokens, cursor, true);
+    if (!options.value) return [];
+    const stat: Stat = {
+      type: 'stat',
+      value: options.value,
+      label: options.label,
+      delta: options.delta,
+      trend: inferTrend(options),
+    };
+    const children: Block[] = [stat];
+    if (options.source) {
+      children.push({
+        type: 'text',
+        text: `Source: ${options.source}`,
+        emphasis: 'caption',
+      } satisfies Text);
+    }
+    return [{ type: 'box', tone: 'neutral', children }];
+  }
+
+  if (name === 'kpi-grid') {
+    const children = parseChildren(tokens, cursor, true);
+    const stats = children.filter((b): b is Stat => b.type === 'stat');
+    const cols = pickGridCols('kpis', stats.length);
+    const rows = pickGridRows('kpis', stats.length, cols);
+    const grid: Block = { type: 'grid', cols, rows, children: stats };
+    if (options.source) {
+      const caption: Text = {
+        type: 'text',
+        text: `Source: ${options.source}`,
+        emphasis: 'caption',
+      };
+      return [grid, caption];
+    }
+    return [grid];
+  }
+
+  if (name === 'problem' || name === 'approach') {
+    const children = parseChildren(tokens, cursor, true);
+    const hasHeading = children.some((b) => b.type === 'heading');
+    const tone: Tone = name === 'problem' ? 'warn' : 'info';
+    const finalChildren: Block[] = hasHeading
+      ? children
+      : [
+          {
+            type: 'heading',
+            level: 2,
+            text: name === 'problem' ? 'Problem' : 'Approach',
+          } satisfies Heading,
+          ...children,
+        ];
+    return [{ type: 'box', tone, children: finalChildren }];
+  }
+
+  if (name === 'before-after') {
+    const groups = collectColumnGroups(tokens, cursor, 2);
+    const wrap = (blocks: Block[], tone: Tone): Block[] => [
+      { type: 'box', tone, children: blocks },
+    ];
+    const cols: Block[][] = [wrap(groups[0], 'warn'), wrap(groups[1], 'success')];
+    return [{ type: 'columns', count: 2, columns: cols }];
+  }
+
+  if (name === 'testimonial') {
+    const children = parseChildren(tokens, cursor, true);
+    const quote = children.find((b): b is Quote => b.type === 'quote');
+    const attributionParts = [options.name, options.role, options.company].filter(Boolean);
+    const attribution = attributionParts.length > 0 ? attributionParts.join(', ') : undefined;
+    const finalQuote: Quote = quote
+      ? { ...quote, attribution: attribution ?? quote.attribution }
+      : { type: 'quote', text: '', emphasis: 'normal', attribution };
+    const inner: Block[] = [finalQuote];
+    return [{ type: 'box', tone: 'neutral', children: inner }];
+  }
+
+  if (name === 'pull-quote') {
+    const children = parseChildren(tokens, cursor, true);
+    const quote = children.find((b): b is Quote => b.type === 'quote');
+    if (quote) return [{ ...quote, emphasis: 'big' }];
+    return [];
+  }
+
+  if (name === 'tear-sheet') {
+    parseChildren(tokens, cursor, true);
+    const cell = (label: string, value: string): Block[] => [
+      { type: 'text', text: label, emphasis: 'caption' } satisfies Text,
+      { type: 'text', text: value, emphasis: 'normal' } satisfies Text,
+    ];
+    const items: Block[] = [];
+    if (options.client) items.push(...cell('Client', options.client));
+    if (options.engagement) items.push(...cell('Engagement', options.engagement));
+    if (options.outcome) items.push(...cell('Outcome', options.outcome));
+    if (options.date) items.push(...cell('Date', options.date));
+    return [{ type: 'grid', cols: 2, rows: 2, children: items }];
+  }
+
+  if (name === 'contact') {
+    parseChildren(tokens, cursor, true);
+    const left: Block[] = [];
+    const right: Block[] = [];
+    if (options.name) {
+      left.push({ type: 'heading', level: 3, text: options.name } satisfies Heading);
+    }
+    if (options.role) {
+      left.push({ type: 'text', text: options.role, emphasis: 'caption' } satisfies Text);
+    }
+    if (options.email) {
+      right.push({ type: 'text', text: options.email, emphasis: 'normal' } satisfies Text);
+    }
+    if (options.phone) {
+      right.push({ type: 'text', text: options.phone, emphasis: 'normal' } satisfies Text);
+    }
+    if (options.url) {
+      right.push({ type: 'text', text: options.url, emphasis: 'normal' } satisfies Text);
+    }
+    return [{ type: 'columns', count: 2, columns: [left, right] }];
   }
 
   const children = parseChildren(tokens, cursor, true);
@@ -577,6 +722,8 @@ export function parseDeck(source: string, options: ParseOptions = {}): Deck {
     headingTitle ??
     'Untitled Deck';
 
+  const fmFooter = typeof fm.data?.footer === 'string' ? (fm.data.footer as string) : undefined;
+
   const deck: Deck = {
     version: IR_VERSION,
     id: options.deckId ?? ulid(),
@@ -584,6 +731,7 @@ export function parseDeck(source: string, options: ParseOptions = {}): Deck {
     aspectRatio: '16:9',
     theme,
     ...(brand ? { brand } : {}),
+    ...(fmFooter ? { footer: fmFooter } : {}),
     slides,
     createdAt: now,
     updatedAt: now,

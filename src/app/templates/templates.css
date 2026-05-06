@@ -8,12 +8,12 @@
 
 /* Per-template accent colors used by .surface-card[data-template=*]. */
 
-.template-card[data-template='pitch'] {
+.template-card[data-template='case-study-pro'] {
   --accent: 56, 189, 248;
 }
 
-.template-card[data-template='editorial'] {
-  --accent: 244, 114, 182;
+.template-card[data-template='case-study-editorial'] {
+  --accent: 217, 119, 87;
 }
 
 /* Preview window
@@ -26,6 +26,11 @@
   background: #050504;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
+}
+
+/* Multi-slide preview shows 3 stacked 16:9 slides. */
+.template-card__preview--multi {
+  aspect-ratio: 16 / 11;
 }
 
 .template-card--blank .template-card__preview {
@@ -65,10 +70,20 @@
   pointer-events: none;
 }
 
+.template-card__scaler--multi {
+  height: auto;
+}
+
 .template-card__scaler .deck {
   padding: 0;
   gap: 0;
   align-items: stretch;
+}
+
+.template-card__scaler--multi .deck {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .template-card__scaler .slide-frame {
@@ -78,6 +93,22 @@
   border-radius: 0;
   border: none;
   box-shadow: none;
+}
+
+/* Slide-count badge in the preview corner */
+.template-card__count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  z-index: 2;
 }
 
 /* Meta block under the preview

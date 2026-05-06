@@ -408,6 +408,7 @@ export type Deck = {
   aspectRatio: AspectRatio;
   theme: ThemeRef;
   brand?: Brand;
+  footer?: string;
   slides: Slide[];
   createdAt: string;
   updatedAt: string;
@@ -420,6 +421,7 @@ const DeckSchema: z.ZodType<Deck> = z.object({
   aspectRatio: z.enum(ASPECT_RATIOS),
   theme: ThemeRefSchema,
   brand: BrandSchema.optional(),
+  footer: z.string().optional(),
   slides: z.array(SlideSchema),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

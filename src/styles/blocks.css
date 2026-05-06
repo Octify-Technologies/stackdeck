@@ -220,7 +220,11 @@
   line-height: 1;
   color: var(--color-brand);
   letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'lnum' 1,
+    'ss01' 1;
 }
 
 .block-stat-label {
@@ -241,6 +245,10 @@
   padding: 2px 8px;
   border-radius: var(--radius-sm);
   width: fit-content;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'lnum' 1;
 }
 
 .block-stat-delta-up {
@@ -1044,4 +1052,77 @@
 
 [data-style='soft'] .block-table tbody td {
   border-bottom: 1px solid color-mix(in oklab, var(--color-brand) 10%, var(--color-border));
+}
+
+/* ─── Premium directive polish ───────────────────────────────────────────── */
+
+/* Big-number: a Box containing exactly one Stat plus a single caption text
+   gets a takeover treatment: massive value, caption rendered as a small
+   sourced footnote sitting under the stat. */
+.block-box.block-box-neutral:has(> .block-stat:only-of-type):has(
+    > .block-text-caption:only-of-type
+  ):not(:has(> .block-heading)):not(:has(> .block-list)) {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-2xl, 48px);
+  gap: var(--space-md);
+  background: transparent;
+  border: none;
+}
+
+.block-box.block-box-neutral:has(> .block-stat:only-of-type):has(
+    > .block-text-caption:only-of-type
+  ):not(:has(> .block-heading)):not(:has(> .block-list))
+  > .block-stat {
+  font-feature-settings:
+    'tnum' 1,
+    'lnum' 1;
+}
+
+.block-box.block-box-neutral:has(> .block-stat:only-of-type):has(
+    > .block-text-caption:only-of-type
+  ):not(:has(> .block-heading)):not(:has(> .block-list))
+  > .block-stat
+  .block-stat-value {
+  font-size: clamp(72px, 10vw, 168px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--color-brand);
+}
+
+.block-box.block-box-neutral:has(> .block-stat:only-of-type):has(
+    > .block-text-caption:only-of-type
+  ):not(:has(> .block-heading)):not(:has(> .block-list))
+  > .block-text-caption {
+  margin-top: var(--space-md);
+  max-width: 56ch;
+  opacity: 0.75;
+}
+
+/* Tear-sheet treatment: a 2x2 grid of paired caption + normal text reads as
+   a fact sheet — caption is the label, normal is the value. */
+.block-grid[data-cols='2'][data-rows='2']
+  > .block-text-caption
+  + .block-text:not(.block-text-caption) {
+  font-size: 1.15em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+  margin-bottom: var(--space-md);
+}
+
+/* Scope-strip treatment: a 3-column row of caption+text pairs reads as
+   a header strip across the top of a slide. */
+.block-columns[data-cols='3']:has(> .block-columns-col > .block-text-caption:first-child) {
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.block-columns[data-cols='3']
+  > .block-columns-col
+  > .block-text-caption
+  + .block-text:not(.block-text-caption) {
+  font-weight: 500;
+  letter-spacing: -0.005em;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Deck } from '@/ir/schema';
+import type { Deck, Heading, Slide } from '@/ir/schema';
 import { getPalette, getStyle } from '@/themes/registry';
 
 import { SlideRenderer } from './SlideRenderer';
@@ -12,9 +12,25 @@ type Props = {
   className?: string;
 };
 
+function computeSectionContext(slides: Slide[]): (string | undefined)[] {
+  const out: (string | undefined)[] = [];
+  let current: string | undefined;
+  for (const slide of slides) {
+    if (slide.layout === 'section' || slide.layout === 'cover') {
+      const h = slide.blocks.find((b): b is Heading => b.type === 'heading' && b.level === 1);
+      current = h?.text ?? current;
+      out.push(undefined);
+    } else {
+      out.push(current);
+    }
+  }
+  return out;
+}
+
 export function DeckRenderer({ deck, className }: Props) {
   const style = getStyle(deck.theme.styleId);
   const palette = getPalette(deck.theme.paletteId);
+  const sectionContext = computeSectionContext(deck.slides);
 
   return (
     <ThemeProvider theme={deck.theme} style={style} palette={palette} brand={deck.brand}>
@@ -27,6 +43,8 @@ export function DeckRenderer({ deck, className }: Props) {
               totalSlides={deck.slides.length}
               brand={deck.brand}
               mode={deck.theme.mode}
+              footer={deck.footer}
+              section={sectionContext[i]}
             />
           </div>
         ))}

@@ -46,22 +46,6 @@ export default function OpenGraphImage() {
           Open-source slide deck builder. Switch themes instantly. Export to PDF.
         </div>
       </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div
-          style={{
-            padding: '12px 24px',
-            borderRadius: 999,
-            background: '#6366f1',
-            color: '#fff',
-            fontSize: 24,
-            fontWeight: 600,
-          }}
-        >
-          stackdeck.octifytechnologies.com
-        </div>
-        <div style={{ color: '#7d7896', fontSize: 22 }}>No backend. No accounts. No lock-in.</div>
-      </div>
     </div>,
     { ...size },
   );
