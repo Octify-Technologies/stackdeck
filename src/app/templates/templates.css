@@ -1,118 +1,212 @@
 /* ==========================================================================
    templates / new-deck gallery
-   Same chrome rhythm as library. Hairline cards, mono labels, no chips.
+   Same chrome rhythm as the library: global topbar + page workbar +
+   compact card grid. Cards mirror the deck-card surface treatment so
+   the two pages feel like one app. Used by both /templates and /new.
    ========================================================================== */
 
 .templates-page {
   min-height: 100vh;
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   font-family: var(--ui);
-  padding: 0;
-  position: relative;
+  display: flex;
+  flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.templates-page__topbar {
+/* Bars: full-bleed sticky chrome with an inner content wrapper that
+   aligns with the grid below (same --page-max + --page-pad as library).
+   --------------------------------------------------------------------------*/
+
+.templates-page__bar-inner {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 48px;
-  padding: 0 20px;
+  gap: 16px;
+}
+
+/* Global topbar */
+
+.templates-page__topbar {
+  height: 56px;
   border-bottom: 1px solid var(--line);
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
 }
 
 .templates-page__brand {
-  font-family: var(--ui);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  text-decoration: none;
   display: inline-flex;
   align-items: baseline;
   gap: 4px;
+  text-decoration: none;
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1;
 }
 
 .templates-page__brand::after {
   content: '';
   display: inline-block;
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
   background: var(--text);
-  margin-left: 2px;
+  margin-left: 3px;
+  transform: translateY(-1px);
   align-self: center;
 }
 
-.templates-page__header {
-  max-width: 1280px;
-  margin: 0 auto;
+.templates-page__topbar-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  position: relative;
-  z-index: 1;
-  padding: 56px 32px 28px;
+  align-items: center;
+  gap: 4px;
+}
+
+.templates-page__nav-link {
+  height: var(--h-control);
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+
+.templates-page__nav-link:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.templates-page__nav-link:active {
+  transform: translateY(0.5px);
+}
+
+/* Page workbar (page title + count)
+   --------------------------------------------------------------------------*/
+
+.templates-page__workbar {
+  height: 64px;
   border-bottom: 1px solid var(--line);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025) 0%,
+    rgba(255, 255, 255, 0.005) 100%
+  );
+}
+
+.templates-page__workbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
 }
 
 .templates-page__back {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--h-control);
+  padding: 0 10px 0 8px;
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-2);
   text-decoration: none;
-  width: fit-content;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: color var(--t-fast) var(--ease);
+  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
 }
 
 .templates-page__back:hover {
   color: var(--text);
+  background: var(--surface);
+}
+
+.templates-page__back-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-3);
+  transition: transform var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+
+.templates-page__back:hover .templates-page__back-arrow {
+  color: var(--text);
+  transform: translateX(-2px);
 }
 
 .templates-page__title {
-  margin: 6px 0 0;
+  margin: 0;
   font-family: var(--ui);
-  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-size: var(--fs-lg);
   font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
+  letter-spacing: -0.018em;
   color: var(--text);
 }
 
+.templates-page__count {
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
 .templates-page__subtitle {
-  margin: 8px 0 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: var(--fs-sm);
   color: var(--text-2);
-  max-width: 60ch;
+  max-width: 56ch;
   line-height: 1.5;
 }
 
-.templates-page__grid {
-  max-width: 1280px;
+/* Card grid
+   --------------------------------------------------------------------------*/
+
+.templates-page__main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--page-max);
   margin: 0 auto;
+  padding: 32px var(--page-pad) 96px;
+}
+
+.templates-page__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 14px;
-  padding: 32px 32px 96px;
-  position: relative;
-  z-index: 1;
+  gap: 16px;
 }
+
+/* Template card
+   Mirrors .deck-card: lifted surface, top-lit gradient, inner highlight,
+   shadow stack, hover lift.
+   --------------------------------------------------------------------------*/
 
 .template-card {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  background: var(--bg-elev);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+    var(--bg-elev-1);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: 0;
@@ -120,34 +214,46 @@
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: border-color var(--t-med) var(--ease);
   color: var(--text);
+  box-shadow: var(--highlight), var(--shadow-2);
+  transition: border-color var(--t-med) var(--ease), transform var(--t-med) var(--ease),
+    box-shadow var(--t-med) var(--ease);
 }
 
 .template-card:hover {
   border-color: var(--line-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--highlight-strong), var(--shadow-3);
+}
+
+.template-card:active {
+  transform: translateY(0);
 }
 
 .template-card--blank {
   background: transparent;
   border-style: dashed;
+  border-color: var(--line-strong);
+  box-shadow: none;
 }
 
 .template-card--blank:hover {
   background: var(--surface);
   border-color: var(--text-2);
+  box-shadow: none;
 }
 
 .template-card__preview {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #050505;
+  background: #050504;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
 }
 
 .template-card--blank .template-card__preview {
+  background: transparent;
   border-bottom-color: var(--line);
 }
 
@@ -158,16 +264,16 @@
 }
 
 .template-card__preview--blank span {
-  font-size: 18px;
-  font-weight: 300;
-  color: var(--text);
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border-radius: 999px;
   background: var(--surface-strong);
   border: 1px solid var(--line-strong);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 300;
   line-height: 1;
 }
 
@@ -207,31 +313,33 @@
 .template-card__name {
   margin: 0;
   font-family: var(--ui);
-  font-size: 14px;
+  font-size: var(--fs-md);
   font-weight: 500;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.012em;
   color: var(--text);
+  line-height: 1.25;
 }
 
 .template-card__vibe {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--text-2);
   line-height: 1.45;
+  letter-spacing: -0.003em;
 }
 
 .template-card__tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .template-card__tag {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: var(--fs-xs);
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0;
   background: transparent;
@@ -246,4 +354,28 @@
   content: '·';
   margin: 0 8px;
   color: var(--text-3);
+}
+
+/* Responsive
+   --------------------------------------------------------------------------*/
+
+@media (max-width: 720px) {
+  .templates-page__workbar {
+    height: auto;
+  }
+
+  .templates-page__workbar .templates-page__bar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 18px;
+    gap: 10px;
+  }
+
+  .templates-page__topbar .templates-page__bar-inner {
+    padding: 0 18px;
+  }
+
+  .templates-page__main {
+    padding: 22px 18px 96px;
+  }
 }

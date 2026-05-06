@@ -33,25 +33,61 @@ export function TemplatesGallery() {
   return (
     <div className="templates-page">
       <header className="templates-page__topbar">
-        <Link href="/" className="templates-page__brand">
-          stackdeck
-        </Link>
-      </header>
-      <header className="templates-page__header">
-        <Link href="/" className="templates-page__back" aria-label="Back to library">
-          Library
-        </Link>
-        <h1 className="templates-page__title">Templates</h1>
-        <p className="templates-page__subtitle">
-          {TEMPLATE_PRESETS.length} hand-crafted theme combinations. Pick one to create a new deck.
-        </p>
+        <div className="templates-page__bar-inner">
+          <Link href="/" className="templates-page__brand">
+            stackdeck
+          </Link>
+          <div className="templates-page__topbar-actions">
+            <Link href="/" className="templates-page__nav-link">
+              Library
+            </Link>
+            <a
+              href="https://github.com/Octify-Technologies/stackdeck"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="templates-page__nav-link"
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
       </header>
 
-      <div className="templates-page__grid">
-        {TEMPLATE_PRESETS.map((preset) => (
-          <TemplateCard key={preset.id} preset={preset} onClick={() => applyTemplate(preset)} />
-        ))}
+      <div className="templates-page__workbar">
+        <div className="templates-page__bar-inner">
+          <div className="templates-page__workbar-left">
+            <Link href="/" className="templates-page__back" aria-label="Back to library">
+              <span className="templates-page__back-arrow" aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M9 11L5 7L9 3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              Library
+            </Link>
+            <h1 className="templates-page__title">Templates</h1>
+            <span className="templates-page__count">
+              {TEMPLATE_PRESETS.length} {TEMPLATE_PRESETS.length === 1 ? 'preset' : 'presets'}
+            </span>
+          </div>
+          <p className="templates-page__subtitle">
+            Hand-crafted theme combinations. Pick one to create a new deck.
+          </p>
+        </div>
       </div>
+
+      <main className="templates-page__main">
+        <div className="templates-page__grid">
+          {TEMPLATE_PRESETS.map((preset) => (
+            <TemplateCard key={preset.id} preset={preset} onClick={() => applyTemplate(preset)} />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

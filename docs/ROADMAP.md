@@ -1,5 +1,7 @@
 # Roadmap
 
+Set 1:
+
 - Two premium templates only: `case-study-pro` (sales-call optimized) and `case-study-editorial` (sendable PDF optimized)
 - Bespoke React composition per template, IR as the shared contract
 - Real `::grid` and `::cell` primitives with span control and asymmetric splits
@@ -8,6 +10,9 @@
 - Image treatments per template: duotone, B&W, polaroid, hard-frame, mask
 - Designed page furniture: page numbers, kickers, footers, section markers
 - Auto-contrast on every palette swap
+
+Set 2:
+
 - Smart layout selection (3 stats horizontal, 4 stats 2x2, 6 stats 3x2)
 - Premium directives: `::cover`, `::section`, `::scope-strip`, `::problem`, `::approach`, `::kpi-grid`, `::big-number`, `::before-after`, `::testimonial-card`, `::pull-quote`, `::asset-frame`, `::annotated-image`, `::tear-sheet`, `::contact`
 - Smart number formatting and auto trend arrows in `::kpi-grid` and `::big-number` (`$1.2M`, `+47%↑` with OpenType numerals)
@@ -17,6 +22,9 @@
 - Brand kit per project: logo, colors, fonts, footer
 - Projects and folders to organize decks
 - Full-text search across all stored decks
+
+Set 3:
+
 - In-preview editing: click any element in the preview to edit in place
 - Drag-to-reorder slides in the thumbnail panel
 - Undo and redo
@@ -26,6 +34,9 @@
 - Keyboard shortcuts (cmd+/, cmd+d, cmd+1..9)
 - Custom font upload (woff2)
 - Version history via auto-snapshots
+
+Set 4:
+
 - Workspace export and import as a single `.zip` (decks, assets, templates, brand kits)
 - Color contrast linter
 - Required alt text on images

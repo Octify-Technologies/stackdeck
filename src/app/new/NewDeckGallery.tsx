@@ -71,29 +71,62 @@ export function NewDeckGallery() {
     router.push(`/d/${deck.id}/edit`);
   };
 
+  const totalChoices = TEMPLATE_PRESETS.length + 1;
+
   return (
     <div className="templates-page">
       <header className="templates-page__topbar">
-        <Link href="/" className="templates-page__brand">
-          stackdeck
-        </Link>
-      </header>
-      <header className="templates-page__header">
-        <Link href="/" className="templates-page__back">
-          Library
-        </Link>
-        <h1 className="templates-page__title">Start a deck</h1>
-        <p className="templates-page__subtitle">
-          Each template is a starter deck plus a theme. Change colors, fonts, and content after.
-        </p>
+        <div className="templates-page__bar-inner">
+          <Link href="/" className="templates-page__brand">
+            stackdeck
+          </Link>
+          <div className="templates-page__topbar-actions">
+            <Link href="/" className="templates-page__nav-link">
+              Library
+            </Link>
+            <Link href="/templates" className="templates-page__nav-link">
+              Templates
+            </Link>
+          </div>
+        </div>
       </header>
 
-      <div className="templates-page__grid">
-        <BlankCard onClick={() => create(BLANK_TEMPLATE)} />
-        {TEMPLATE_PRESETS.map((preset) => (
-          <TemplateCard key={preset.id} preset={preset} onClick={() => create(preset)} />
-        ))}
+      <div className="templates-page__workbar">
+        <div className="templates-page__bar-inner">
+          <div className="templates-page__workbar-left">
+            <Link href="/" className="templates-page__back" aria-label="Back to library">
+              <span className="templates-page__back-arrow" aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M9 11L5 7L9 3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              Library
+            </Link>
+            <h1 className="templates-page__title">Start a deck</h1>
+            <span className="templates-page__count">
+              {totalChoices} {totalChoices === 1 ? 'option' : 'options'}
+            </span>
+          </div>
+          <p className="templates-page__subtitle">
+            Each template is a starter deck plus a theme. Change colors, fonts, and content after.
+          </p>
+        </div>
       </div>
+
+      <main className="templates-page__main">
+        <div className="templates-page__grid">
+          <BlankCard onClick={() => create(BLANK_TEMPLATE)} />
+          {TEMPLATE_PRESETS.map((preset) => (
+            <TemplateCard key={preset.id} preset={preset} onClick={() => create(preset)} />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

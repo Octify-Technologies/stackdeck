@@ -1,36 +1,86 @@
 /* ==========================================================================
    stackdeck app shell
-   Refined monochrome editorial dark. One source of truth for tokens.
-   Affects only the app chrome (library, new, templates, editor).
-   Slide rendering is governed by themes/registry and styles/*.
+   Layered editorial dark. Not flat black. Warm off-white type.
+   One source of truth for tokens. Affects only the app chrome
+   (library, new, templates, editor). Slide rendering is governed
+   by themes/registry and styles/blocks.css + deck.css + layouts.css.
    ========================================================================== */
 
 :root {
-  /* Surfaces */
+  /* Page is the void: deep, near-black, deliberately flat. Premium feel
+     lives in what sits ON the page (cards, drawer, glass), not in the
+     page itself. Surfaces are NEUTRAL grays — no warm tint — so they
+     read as elevated planes rather than as a different material.
+     Type stays warm cream above (--text), giving the macOS / Things
+     palette: warm whites on neutral grays. */
   --bg: #0a0a0a;
-  --bg-elev: #111111;
+  --bg-canvas: #0a0a0a;
+  --bg-elev-1: #1c1c1c;
+  --bg-elev-2: #262626;
   --bg-pane: #0d0d0d;
-  --surface: rgba(255, 255, 255, 0.025);
-  --surface-strong: rgba(255, 255, 255, 0.05);
+  --bg-glass: rgba(26, 26, 26, 0.82);
 
-  /* Hairlines */
-  --line: rgba(255, 255, 255, 0.07);
-  --line-strong: rgba(255, 255, 255, 0.12);
+  /* Translucent surfaces over the page */
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-strong: rgba(255, 255, 255, 0.075);
+  --surface-press: rgba(255, 255, 255, 0.11);
 
-  /* Type */
-  --text: #fafafa;
-  --text-2: #8e8e8e;
-  --text-3: #555555;
+  /* Hairlines: bumped so card edges are visible against pure black */
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --line-bright: rgba(255, 255, 255, 0.28);
+
+  /* Inner highlights: the key to "floating on black".
+     Top glint (light from above) + bottom rim (subtle shadow at base) =
+     classic dimensional surface on a dark ground. */
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  --highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+
+  /* Type: warm off-white instead of clinical white */
+  --text: #f3eee5;
+  --text-2: #a8a59c;
+  --text-3: #6e6b63;
 
   /* Signal only, no chromatic brand accent */
   --ok: #7fdba0;
   --warn: #f5c46a;
   --err: #f08080;
 
+  /* Shadow stack: composite multi-layer for real depth on black */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 4px 8px -4px rgba(0, 0, 0, 0.6),
+    0 10px 24px -10px rgba(0, 0, 0, 0.7);
+  --shadow-3: 0 12px 24px -8px rgba(0, 0, 0, 0.65),
+    0 28px 56px -12px rgba(0, 0, 0, 0.85);
+
   /* Geometry */
   --r-sm: 6px;
-  --r-md: 8px;
-  --r-lg: 10px;
+  --r-md: 9px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* Layout: shared by every page so chrome aligns with grid */
+  --page-max: 1320px;
+  --page-pad: 22px;
+
+  /* Control sizing: ONE chrome height across the entire app.
+     Use --h-control for nav links, CTAs, segmented options, drawer
+     buttons, stage controls. --h-control-sm for dense secondary
+     (deck-card overlay actions). --h-control-xs for inline tiny icons. */
+  --h-control: 34px;
+  --h-control-sm: 28px;
+  --h-control-xs: 22px;
+
+  /* Type scale: avoid <12px chrome anywhere */
+  --fs-micro: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 22px;
 
   /* Motion */
   --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -40,12 +90,21 @@
 
   /* Fonts (UI only; slide themes use their own) */
   --ui: var(--font-geist), Geist, ui-sans-serif, system-ui, sans-serif;
+  --display: var(--font-fraunces), 'Fraunces', Georgia, serif;
   --mono: var(--font-jetbrains), ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+
+  /* Back-compat alias for older selectors */
+  --bg-elev: var(--bg-elev-1);
+}
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 232, 196, 0.18);
   color: #ffffff;
 }
 
@@ -56,6 +115,7 @@
 .editor input:focus-visible,
 .library button:focus-visible,
 .library a:focus-visible,
+.library input:focus-visible,
 .templates-page button:focus-visible,
 .templates-page a:focus-visible {
   outline: 1px solid var(--text);
@@ -81,7 +141,7 @@
 .editor ::-webkit-scrollbar-thumb:hover,
 .library ::-webkit-scrollbar-thumb:hover,
 .templates-page ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   background-clip: padding-box;
 }
 .editor ::-webkit-scrollbar-track,

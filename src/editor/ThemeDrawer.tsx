@@ -49,7 +49,14 @@ export function ThemeDrawer(props: Props) {
           onClick={props.onClose}
           aria-label="Close drawer"
         >
-          ×
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+            <path
+              d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+          </svg>
         </button>
       </header>
 

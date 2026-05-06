@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, Geist, Fraunces, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
+// Inter and Space Grotesk are consumed by slide themes (themes/styles/*.ts),
+// not by app chrome. Don't remove them.
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
