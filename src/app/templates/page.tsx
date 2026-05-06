@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 import { TemplatesGallery } from './TemplatesGallery';
-import './templates.css';
+import '../presets/presets.css';
 
 export const metadata: Metadata = {
   title: 'Templates',
   description:
-    'Browse curated theme combinations for stackdeck. Pitch decks, editorials, brutalist manifestos, and more.',
+    'Content scaffolds for case studies, pitches, and sales decks. Pick a template and pair it with a preset design.',
   alternates: { canonical: '/templates' },
 };
 

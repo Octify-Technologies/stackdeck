@@ -1,25 +1,18 @@
 /* ==========================================================================
-   templates / new-deck gallery — page-specific styles
+   presets / new-deck gallery — page-specific styles
    Page shell, workbar, grid, and surface card live in shared primitives
    (components/layout/page.css and primitives/*). This file owns ONLY
-   template-card unique parts: preview frame + scaler, blank-card plus
+   preset-card unique parts: preview frame + scaler, blank-card plus
    icon, and per-template accent + tag chip.
    ========================================================================== */
 
-/* Per-template accent colors used by .surface-card[data-template=*]. */
-
-.template-card[data-template='case-study-pro'] {
-  --accent: 56, 189, 248;
-}
-
-.template-card[data-template='case-study-editorial'] {
-  --accent: 217, 119, 87;
-}
+/* Per-preset accent colors used by .surface-card[data-preset=*]. Add a
+   selector here for each new preset id to color its tag chips. */
 
 /* Preview window
    --------------------------------------------------------------------------*/
 
-.template-card__preview {
+.preset-card__preview {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -29,21 +22,21 @@
 }
 
 /* Multi-slide preview shows 3 stacked 16:9 slides. */
-.template-card__preview--multi {
+.preset-card__preview--multi {
   aspect-ratio: 16 / 11;
 }
 
-.template-card--blank .template-card__preview {
+.preset-card--blank .preset-card__preview {
   background: transparent;
 }
 
-.template-card__preview--blank {
+.preset-card__preview--blank {
   display: grid;
   place-items: center;
   background: transparent;
 }
 
-.template-card__preview--blank span {
+.preset-card__preview--blank span {
   width: 40px;
   height: 40px;
   display: grid;
@@ -59,7 +52,7 @@
 
 /* The 1280×720 deck preview is rendered at full size and scaled down
    to fit the card width. */
-.template-card__scaler {
+.preset-card__scaler {
   position: absolute;
   top: 0;
   left: 0;
@@ -70,23 +63,23 @@
   pointer-events: none;
 }
 
-.template-card__scaler--multi {
+.preset-card__scaler--multi {
   height: auto;
 }
 
-.template-card__scaler .deck {
+.preset-card__scaler .deck {
   padding: 0;
   gap: 0;
   align-items: stretch;
 }
 
-.template-card__scaler--multi .deck {
+.preset-card__scaler--multi .deck {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.template-card__scaler .slide-frame {
+.preset-card__scaler .slide-frame {
   width: 1280px;
   max-width: 1280px;
   height: 720px;
@@ -95,8 +88,50 @@
   box-shadow: none;
 }
 
+/* Light/Dark mode toggle in the preview corner (top-left).
+   Sits above the scaled deck preview and lets users flip the
+   preview palette without opening the deck. */
+.preset-card__mode-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.preset-card__mode-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.preset-card__mode-btn:hover {
+  color: #fff;
+}
+
+.preset-card__mode-btn[data-active='true'] {
+  background: #fff;
+  color: #0a0a0a;
+}
+
 /* Slide-count badge in the preview corner */
-.template-card__count {
+.preset-card__count {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -114,14 +149,14 @@
 /* Meta block under the preview
    --------------------------------------------------------------------------*/
 
-.template-card__meta {
+.preset-card__meta {
   padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.template-card__tags {
+.preset-card__tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -130,7 +165,7 @@
 
 /* Tag chip — applied alongside .t-label, keeps mono uppercase typography
    from the primitive and adds the accent-colored pill shape. */
-.template-card__tag {
+.preset-card__tag {
   padding: 2px 8px;
   background: rgba(var(--accent), 0.06);
   color: rgba(var(--accent), 0.85);

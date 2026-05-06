@@ -1,8 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
+import type { Mode } from '@/ir/schema';
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import { createDeck } from '@/storage/deck-store';
@@ -18,7 +19,8 @@ import {
   PageWorkbar,
 } from '@/components';
 
-import { TEMPLATE_PRESETS, type TemplatePreset } from '@/app/templates/template-presets';
+import { TEMPLATES, type Template } from '@/app/templates/templates';
+import { PRESETS, getPreset, type Preset } from '@/app/presets/presets';
 
 const STARTER_MARKDOWN = `---
 title: New deck
@@ -52,33 +54,23 @@ Replace this with your own title.
 ::
 `;
 
-const BLANK_TEMPLATE: TemplatePreset = {
-  id: 'blank',
-  name: 'Blank',
-  vibe: 'Start from scratch',
-  category: 'case-study',
-  styleId: 'modern',
-  paletteId: 'electric',
-  density: 'comfortable',
-  mode: 'light',
-  seed: STARTER_MARKDOWN,
-  slideCount: 3,
-};
+type Picked = { template: Template | null; preset: Preset | null };
 
 export function NewDeckGallery() {
   const router = useRouter();
+  const [picked, setPicked] = useState<Picked | null>(null);
 
-  const create = async (preset: TemplatePreset) => {
+  const create = async (template: Template | null, preset: Preset, mode: Mode) => {
     try {
       const deck = await createDeck({
-        source: preset.seed,
+        source: template?.seed ?? STARTER_MARKDOWN,
         theme: {
           styleId: preset.styleId,
           paletteId: preset.paletteId,
           density: preset.density,
-          mode: preset.mode,
+          mode,
         },
-        templateName: preset.id === 'blank' ? undefined : preset.name,
+        templateName: template?.name,
       });
       router.push(`/d/${deck.id}/edit`);
     } catch (err) {
@@ -87,24 +79,42 @@ export function NewDeckGallery() {
     }
   };
 
-  const totalChoices = TEMPLATE_PRESETS.length + 1;
+  if (picked) {
+    return (
+      <PresetPicker
+        picked={picked}
+        onCancel={() => setPicked(null)}
+        onConfirm={(preset, mode) => create(picked.template, preset, mode)}
+      />
+    );
+  }
 
   return (
-    <PageShell className="templates-page">
+    <PageShell className="presets-page">
       <AppTopbar />
 
       <PageWorkbar
         back={{ href: '/', label: 'Library', ariaLabel: 'Back to library' }}
         title="Start a deck"
-        count={`${totalChoices} ${totalChoices === 1 ? 'option' : 'options'}`}
-        subtitle="Each template is a starter deck plus a theme. Change colors, fonts, and content after."
+        count={`${TEMPLATES.length + 1} ${TEMPLATES.length + 1 === 1 ? 'option' : 'options'}`}
+        subtitle="Pick a template (the content) or start blank. Next step is the preset (the design)."
       />
 
       <PageMain>
         <GalleryGrid>
-          <BlankCard onClick={() => create(BLANK_TEMPLATE)} />
-          {TEMPLATE_PRESETS.map((preset) => (
-            <TemplateCard key={preset.id} preset={preset} onClick={() => create(preset)} />
+          <BlankCard
+            onClick={() => {
+              const defaultPreset = PRESETS[0];
+              if (!defaultPreset) return;
+              setPicked({ template: null, preset: null });
+            }}
+          />
+          {TEMPLATES.map((template) => (
+            <TemplateCard
+              key={template.id}
+              template={template}
+              onClick={() => setPicked({ template, preset: null })}
+            />
           ))}
         </GalleryGrid>
       </PageMain>
@@ -116,31 +126,34 @@ function BlankCard({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      className="surface-card surface-card--dashed template-card template-card--blank"
+      className="surface-card surface-card--dashed preset-card preset-card--blank"
       onClick={onClick}
     >
-      <div className="template-card__preview template-card__preview--blank">
+      <div className="preset-card__preview preset-card__preview--blank">
         <span aria-hidden>+</span>
       </div>
-      <div className="template-card__meta">
+      <div className="preset-card__meta">
         <Heading level={3} size="md">
           Blank deck
         </Heading>
-        <Caption>Start from scratch. Modern style by default.</Caption>
+        <Caption>Start from scratch. Pick a preset on the next step.</Caption>
       </div>
     </button>
   );
 }
 
-function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: () => void }) {
+function TemplateCard({ template, onClick }: { template: Template; onClick: () => void }) {
+  const preset = getPreset(template.recommendedPresetId);
+
   const previewDeck = useMemo(() => {
+    if (!preset) return { ok: false as const, error: 'Preset missing' };
     try {
-      const parsed = parseDeck(preset.seed, {
+      const parsed = parseDeck(template.seed, {
         theme: {
           styleId: preset.styleId,
           paletteId: preset.paletteId,
           density: preset.density,
-          mode: preset.mode,
+          mode: preset.defaultMode,
         },
       });
       const planned = planDeck(parsed);
@@ -149,43 +162,183 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
       const message = e instanceof ParseError ? e.message : (e as Error).message;
       return { ok: false as const, error: message };
     }
-  }, [preset]);
-
-  const templateAttr = templateSlug(preset.id);
+  }, [template, preset]);
 
   return (
     <button
       type="button"
-      className="surface-card template-card"
-      data-template={templateAttr}
+      className="surface-card preset-card"
+      data-preset={template.recommendedPresetId}
       onClick={onClick}
     >
-      <div className="template-card__preview">
-        <div className="template-card__scaler">
+      <div className="preset-card__preview">
+        <div className="preset-card__scaler">
           {previewDeck.ok ? <DeckRenderer deck={previewDeck.deck} /> : null}
         </div>
-        <span className="template-card__chip" data-template={templateAttr}>
-          {preset.name}
+        <span className="preset-card__chip" data-preset={template.recommendedPresetId}>
+          {template.category}
         </span>
       </div>
-      <div className="template-card__meta">
+      <div className="preset-card__meta">
         <Heading level={3} size="md">
-          {preset.name}
+          {template.name}
         </Heading>
-        <Caption>{preset.vibe}</Caption>
-        <div className="template-card__tags">
-          <Label className="template-card__tag">{preset.styleId}</Label>
-          <Label className="template-card__tag">{preset.paletteId}</Label>
-          <Label className="template-card__tag">{preset.density}</Label>
-          <Label className="template-card__tag">{preset.mode}</Label>
+        <Caption>{template.vibe}</Caption>
+        <div className="preset-card__tags">
+          <Label className="preset-card__tag">{template.category}</Label>
+          <Label className="preset-card__tag">{template.slideCount} slides</Label>
         </div>
       </div>
     </button>
   );
 }
 
-function templateSlug(id: string): 'case-study-pro' | 'case-study-editorial' | 'other' {
-  if (id === 'case-study-pro') return 'case-study-pro';
-  if (id === 'case-study-editorial') return 'case-study-editorial';
-  return 'other';
+function PresetPicker({
+  picked,
+  onCancel,
+  onConfirm,
+}: {
+  picked: Picked;
+  onCancel: () => void;
+  onConfirm: (preset: Preset, mode: Mode) => void;
+}) {
+  return (
+    <PageShell className="presets-page">
+      <AppTopbar />
+
+      <PageWorkbar
+        back={{ href: '#', label: 'Back', ariaLabel: 'Back to template choice' }}
+        title={picked.template ? `${picked.template.name} → pick a design` : 'Pick a design'}
+        count={`${PRESETS.length} ${PRESETS.length === 1 ? 'preset' : 'presets'}`}
+        subtitle={
+          picked.template
+            ? 'Each preset re-skins the same content. Light or dark per preset.'
+            : 'Blank deck. Pick a design and a mode.'
+        }
+      />
+
+      <PageMain>
+        <GalleryGrid>
+          {PRESETS.map((preset) => (
+            <PresetChoiceCard
+              key={preset.id}
+              preset={preset}
+              template={picked.template}
+              onConfirm={(mode) => onConfirm(preset, mode)}
+            />
+          ))}
+        </GalleryGrid>
+        <button
+          type="button"
+          onClick={onCancel}
+          style={{
+            margin: '24px auto',
+            display: 'block',
+            background: 'transparent',
+            border: 0,
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            fontSize: 13,
+          }}
+        >
+          ← Pick a different template
+        </button>
+      </PageMain>
+    </PageShell>
+  );
+}
+
+function PresetChoiceCard({
+  preset,
+  template,
+  onConfirm,
+}: {
+  preset: Preset;
+  template: Template | null;
+  onConfirm: (mode: Mode) => void;
+}) {
+  const [previewMode, setPreviewMode] = useState<Mode>(preset.defaultMode);
+  const seed = template?.seed ?? STARTER_MARKDOWN;
+
+  const previewDeck = useMemo(() => {
+    try {
+      const parsed = parseDeck(seed, {
+        theme: {
+          styleId: preset.styleId,
+          paletteId: preset.paletteId,
+          density: preset.density,
+          mode: previewMode,
+        },
+      });
+      const planned = planDeck(parsed);
+      return { ok: true as const, deck: { ...planned, slides: planned.slides.slice(0, 3) } };
+    } catch (e) {
+      const message = e instanceof ParseError ? e.message : (e as Error).message;
+      return { ok: false as const, error: message };
+    }
+  }, [preset, previewMode, seed]);
+
+  const stop = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  return (
+    <button
+      type="button"
+      className="surface-card preset-card preset-card--multi"
+      data-preset={preset.id}
+      onClick={() => onConfirm(previewMode)}
+    >
+      <div className="preset-card__preview preset-card__preview--multi">
+        <div className="preset-card__scaler preset-card__scaler--multi">
+          {previewDeck.ok ? <DeckRenderer deck={previewDeck.deck} /> : null}
+        </div>
+        <div
+          className="preset-card__mode-toggle"
+          onClick={stop}
+          role="group"
+          aria-label="Preview mode"
+        >
+          <button
+            type="button"
+            className="preset-card__mode-btn"
+            data-active={previewMode === 'light'}
+            onClick={(e) => {
+              stop(e);
+              setPreviewMode('light');
+            }}
+            aria-pressed={previewMode === 'light'}
+          >
+            Light
+          </button>
+          <button
+            type="button"
+            className="preset-card__mode-btn"
+            data-active={previewMode === 'dark'}
+            onClick={(e) => {
+              stop(e);
+              setPreviewMode('dark');
+            }}
+            aria-pressed={previewMode === 'dark'}
+          >
+            Dark
+          </button>
+        </div>
+        <span className="preset-card__chip" data-preset={preset.id}>
+          design
+        </span>
+      </div>
+      <div className="preset-card__meta">
+        <Heading level={3} size="md">
+          {preset.name}
+        </Heading>
+        <Caption>{preset.vibe}</Caption>
+        <div className="preset-card__tags">
+          <Label className="preset-card__tag">{preset.styleId}</Label>
+          <Label className="preset-card__tag">{previewMode}</Label>
+        </div>
+      </div>
+    </button>
+  );
 }

@@ -275,8 +275,8 @@ export function Editor({ deckId }: Props) {
         </div>
 
         <div className="editor__topbar-right">
-          <Link href="/templates" className="editor__nav-link">
-            Templates
+          <Link href="/presets" className="editor__nav-link">
+            Presets
           </Link>
           <button
             type="button"

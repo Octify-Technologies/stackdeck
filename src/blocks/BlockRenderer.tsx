@@ -12,6 +12,10 @@ export function StyleIdProvider({ styleId, children }: { styleId: string; childr
   return <StyleIdContext.Provider value={styleId}>{children}</StyleIdContext.Provider>;
 }
 
+export function useStyleId(): string {
+  return useContext(StyleIdContext);
+}
+
 /**
  * Dispatches an IR Block to the right atomic component, looking up per-Style
  * overrides via the registry. The renderer never sees pattern directives, and
