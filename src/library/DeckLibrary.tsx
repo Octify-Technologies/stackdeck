@@ -13,7 +13,19 @@ import {
   listDecks,
 } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
-import { AppTopbar } from '@/components/AppTopbar';
+import {
+  AppTopbar,
+  Body,
+  Button,
+  Caption,
+  GalleryGrid,
+  Heading,
+  Mono,
+  PageMain,
+  PageShell,
+  PageWorkbar,
+  Subheading,
+} from '@/components';
 
 type SortKey = 'recent' | 'oldest' | 'title';
 
@@ -51,38 +63,38 @@ export function DeckLibrary() {
   const totalCount = decks?.length ?? 0;
   const visibleCount = visibleDecks?.length ?? 0;
 
+  const countLabel = query
+    ? `${visibleCount} of ${totalCount}`
+    : `${totalCount} ${totalCount === 1 ? 'deck' : 'decks'}`;
+
   return (
-    <div className="library">
+    <PageShell className="library">
       <AppTopbar />
 
-      <div className="library__workbar">
-        <div className="library__bar-inner">
-          <div className="library__workbar-left">
-            <h1 className="library__page-title">Decks</h1>
-            <span className="library__count" aria-live="polite">
-              {query
-                ? `${visibleCount} of ${totalCount}`
-                : `${totalCount} ${totalCount === 1 ? 'deck' : 'decks'}`}
-            </span>
-          </div>
-          <div className="library__workbar-right">
+      <PageWorkbar
+        title="Decks"
+        count={countLabel}
+        actions={
+          <>
             <SearchField value={query} onChange={setQuery} />
             <SortControl value={sort} onChange={setSort} />
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <main className="library__main">
+      <PageMain className="library__main">
         {decks === null ? (
-          <div className="library__loading">Loading decks</div>
+          <Mono as="div" className="library__loading">
+            Loading decks
+          </Mono>
         ) : decks.length === 0 ? (
           <EmptyState />
         ) : visibleCount === 0 ? (
           <NoMatches query={query} onClear={() => setQuery('')} />
         ) : (
-          <div className="library__grid">
+          <GalleryGrid>
             {query ? null : (
-              <Link href="/new" className="library__new-card">
+              <Link href="/new" className="surface-card surface-card--dashed library__new-card">
                 <div className="library__new-card-icon" aria-hidden>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path
@@ -94,20 +106,18 @@ export function DeckLibrary() {
                   </svg>
                 </div>
                 <div className="library__new-card-text">
-                  <span className="library__new-card-title">Start a new deck</span>
-                  <span className="library__new-card-sub">
-                    Pick a template or write from scratch
-                  </span>
+                  <Body strong>Start a new deck</Body>
+                  <Caption muted>Pick a template or write from scratch</Caption>
                 </div>
               </Link>
             )}
             {visibleDecks!.map((deck) => (
               <DeckCard key={deck.id} deck={deck} onChange={refresh} />
             ))}
-          </div>
+          </GalleryGrid>
         )}
-      </main>
-    </div>
+      </PageMain>
+    </PageShell>
   );
 }
 
@@ -190,12 +200,16 @@ function EmptyState() {
         </span>
         <span>::</span>
       </div>
-      <h2>No decks yet</h2>
-      <p>Pick a template to get started, or write a deck from scratch in markdown.</p>
+      <Heading level={2} size="xl">
+        No decks yet
+      </Heading>
+      <Subheading>
+        Pick a template to get started, or write a deck from scratch in markdown.
+      </Subheading>
       <div className="library__empty-actions">
-        <Link href="/new" className="library__cta">
+        <Button as="link" href="/new" variant="primary">
           Start a deck
-        </Link>
+        </Button>
       </div>
     </div>
   );
@@ -204,11 +218,13 @@ function EmptyState() {
 function NoMatches({ query, onClear }: { query: string; onClear: () => void }) {
   return (
     <div className="library__nomatch">
-      <h2>No decks match “{query}”</h2>
-      <p>Try a different search, or clear the filter to see everything.</p>
-      <button type="button" className="library__cta" onClick={onClear}>
+      <Heading level={2} size="xl">
+        No decks match &ldquo;{query}&rdquo;
+      </Heading>
+      <Subheading>Try a different search, or clear the filter to see everything.</Subheading>
+      <Button variant="primary" onClick={onClear}>
         Clear search
-      </button>
+      </Button>
     </div>
   );
 }
@@ -247,7 +263,7 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
 
   return (
     <div
-      className={`deck-card${confirming ? ' deck-card--confirming' : ''}`}
+      className={`surface-card deck-card${confirming ? ' deck-card--confirming' : ''}`}
       data-template={templateAttr}
     >
       <Link href={`/d/${deck.id}/edit`} className="deck-card__link">
@@ -262,15 +278,19 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
           <div className="deck-card__preview-shade" aria-hidden />
         </div>
         <div className="deck-card__meta">
-          <h3 className="deck-card__title">{deck.title}</h3>
+          <Heading level={3} size="md">
+            {deck.title}
+          </Heading>
           <div className="deck-card__sub">
-            <span className="deck-card__sub-item">{updated}</span>
+            <Caption as="span" muted>
+              {updated}
+            </Caption>
             <span className="deck-card__sub-dot" aria-hidden>
               ·
             </span>
-            <span className="deck-card__sub-item deck-card__sub-item--mono">
+            <Mono>
               {slideCount > 0 ? `${slideCount} ${slideCount === 1 ? 'slide' : 'slides'}` : '—'}
-            </span>
+            </Mono>
             {deck.templateName ? (
               <span className="deck-card__chip" data-template={templateSlug(deck.templateName)}>
                 {deck.templateName}
@@ -282,17 +302,15 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
 
       {confirming ? (
         <div className="deck-card__confirm" role="alertdialog" aria-label={`Delete ${deck.title}`}>
-          <span className="deck-card__confirm-text">Delete?</span>
-          <button
-            type="button"
-            className="deck-card__confirm-cancel"
-            onClick={() => setConfirming(false)}
-          >
+          <Caption as="span" className="deck-card__confirm-text">
+            Delete?
+          </Caption>
+          <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>
             Cancel
-          </button>
-          <button
-            type="button"
-            className="deck-card__confirm-yes"
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
             onClick={async () => {
               await deleteDeck(deck.id);
               setConfirming(false);
@@ -300,13 +318,14 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
             }}
           >
             Delete
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="deck-card__actions">
-          <button
-            type="button"
-            className="deck-card__action"
+          <Button
+            variant="ghost"
+            size="sm"
+            iconOnly
             onClick={async () => {
               await duplicateDeck(deck.id);
               await onChange();
@@ -331,10 +350,11 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
                 strokeLinecap="round"
               />
             </svg>
-          </button>
-          <button
-            type="button"
-            className="deck-card__action deck-card__action--danger"
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            iconOnly
             onClick={() => setConfirming(true)}
             aria-label="Delete deck"
             title="Delete"
@@ -348,7 +368,7 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
                 strokeLinejoin="round"
               />
             </svg>
-          </button>
+          </Button>
         </div>
       )}
     </div>

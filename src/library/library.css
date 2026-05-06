@@ -1,111 +1,10 @@
 /* ==========================================================================
-   library
-   Workspace home. Two-row chrome (global topbar + page workbar) sits
-   on a layered dark canvas. Cards are real elevated surfaces with
-   inner highlight, never flat black. Mono used sparingly.
+   library — page-specific styles
+   Page shell, workbar, grid, surface card, and typography all live in
+   shared primitives (components/layout/page.css and primitives/*).
+   This file owns ONLY library-unique chrome: search, sort, deck-card,
+   empty/no-match decoration, and quick-create card.
    ========================================================================== */
-
-.library {
-  min-height: 100vh;
-  background: transparent;
-  color: var(--text);
-  font-family: var(--ui);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Bars: full-bleed sticky chrome with an inner content wrapper that
-   aligns with the grid below (same --page-max + --page-pad).
-   --------------------------------------------------------------------------*/
-
-.library__bar-inner {
-  width: 100%;
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 0 var(--page-pad);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-/* Topbar lives in the shared <AppTopbar /> component (components/AppTopbar.css). */
-
-.library__cta {
-  display: inline-flex;
-  align-items: center;
-  height: var(--h-control);
-  padding: 0 14px;
-  background: var(--text);
-  color: var(--bg);
-  border-radius: var(--r-sm);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--ui);
-  letter-spacing: -0.005em;
-  transition:
-    opacity var(--t-fast) var(--ease),
-    transform var(--t-fast) var(--ease);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.2),
-    var(--shadow-1);
-}
-
-.library__cta:hover {
-  opacity: 0.9;
-}
-
-.library__cta:active {
-  transform: translateY(0.5px);
-}
-
-/* Page workbar (page title + count + search + sort)
-   --------------------------------------------------------------------------*/
-
-.library__workbar {
-  height: 64px;
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.025) 0%,
-    rgba(255, 255, 255, 0.005) 100%
-  );
-}
-
-.library__workbar-left {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  min-width: 0;
-}
-
-.library__page-title {
-  margin: 0;
-  font-family: var(--ui);
-  font-size: var(--fs-lg);
-  font-weight: 500;
-  letter-spacing: -0.018em;
-  color: var(--text);
-}
-
-.library__count {
-  font-family: var(--mono);
-  font-size: var(--fs-xs);
-  color: var(--text-3);
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.library__workbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
 
 /* Search
    --------------------------------------------------------------------------*/
@@ -232,62 +131,25 @@
     0 0 0 1px var(--line-strong);
 }
 
-/* Main grid area
+/* Loading state (uses .t-mono base; this just adds spacing + tracking).
    --------------------------------------------------------------------------*/
-
-.library__main {
-  flex: 1;
-  width: 100%;
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 32px var(--page-pad) 96px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
 
 .library__loading {
   padding: 72px 0;
   text-align: center;
-  color: var(--text-3);
-  font-family: var(--mono);
-  font-size: var(--fs-xs);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.library__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-}
-
-/* Quick-create card
+/* Quick-create card — extends .surface-card .surface-card--dashed.
+   This only owns internal layout, icon chip, and the warm radial flair.
    --------------------------------------------------------------------------*/
 
 .library__new-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
   height: 100%;
-  min-height: 0;
-  background: transparent;
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--r-lg);
   padding: 20px;
-  text-decoration: none;
-  color: var(--text);
-  transition:
-    border-color var(--t-med) var(--ease),
-    background var(--t-med) var(--ease),
-    transform var(--t-med) var(--ease);
-  overflow: hidden;
-}
-
-.library__new-card:active {
-  transform: translateY(0.5px);
 }
 
 .library__new-card::before {
@@ -298,11 +160,6 @@
   opacity: 0;
   transition: opacity var(--t-med) var(--ease);
   pointer-events: none;
-}
-
-.library__new-card:hover {
-  border-color: var(--text-2);
-  background: var(--surface);
 }
 
 .library__new-card:hover::before {
@@ -326,37 +183,9 @@
   gap: 4px;
 }
 
-.library__new-card-title {
-  font-family: var(--ui);
-  font-size: var(--fs-md);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--text);
-}
-
-.library__new-card-sub {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-  letter-spacing: -0.003em;
-}
-
-/* Deck card
+/* Deck card — extends .surface-card. Owns per-template accent and the
+   confirming state.
    --------------------------------------------------------------------------*/
-
-.deck-card {
-  --accent: 180, 180, 180;
-  position: relative;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%), var(--bg-elev-1);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  box-shadow: var(--highlight), var(--shadow-2);
-  transition:
-    border-color var(--t-med) var(--ease),
-    transform var(--t-med) var(--ease),
-    box-shadow var(--t-med) var(--ease);
-}
 
 .deck-card[data-template='pitch'] {
   --accent: 56, 189, 248;
@@ -364,16 +193,6 @@
 
 .deck-card[data-template='editorial'] {
   --accent: 244, 114, 182;
-}
-
-.deck-card:hover {
-  border-color: rgba(var(--accent), 0.45);
-  transform: translateY(-1px);
-  box-shadow:
-    var(--highlight-strong),
-    var(--shadow-3),
-    0 0 0 1px rgba(var(--accent), 0.12),
-    0 12px 32px -16px rgba(var(--accent), 0.35);
 }
 
 .deck-card--confirming {
@@ -443,40 +262,19 @@
   gap: 6px;
 }
 
-.deck-card__title {
-  margin: 0;
-  font-family: var(--ui);
-  font-size: var(--fs-md);
-  font-weight: 500;
-  letter-spacing: -0.012em;
-  color: var(--text);
+.deck-card__meta .t-heading {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.25;
 }
 
 .deck-card__sub {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: var(--fs-sm);
-  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   min-height: 18px;
-}
-
-.deck-card__sub-item {
-  letter-spacing: -0.003em;
-}
-
-.deck-card__sub-item--mono {
-  font-family: var(--mono);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.02em;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
 }
 
 .deck-card__sub-dot {
@@ -544,33 +342,22 @@
   transform: translateY(0);
 }
 
-.deck-card__action {
-  width: var(--h-control-sm);
-  height: var(--h-control-sm);
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line-strong);
+/* Action buttons sit on top of the dark preview, so override the
+   transparent ghost/danger styles with a glassy chip background. */
+.deck-card__actions .btn {
   background: rgba(15, 14, 13, 0.92);
+  border-color: var(--line-strong);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: var(--text-2);
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition:
-    color var(--t-fast) var(--ease),
-    border-color var(--t-fast) var(--ease),
-    background var(--t-fast) var(--ease);
 }
 
-.deck-card__action:hover {
+.deck-card__actions .btn--ghost:hover {
   background: var(--bg-elev-2);
-  color: var(--text);
   border-color: var(--text-2);
 }
 
-.deck-card__action--danger:hover {
-  background: rgba(240, 128, 128, 0.1);
-  color: var(--err);
+.deck-card__actions .btn--danger:hover {
+  background: rgba(240, 128, 128, 0.12);
   border-color: rgba(240, 128, 128, 0.4);
 }
 
@@ -608,40 +395,26 @@
 .deck-card__confirm-text {
   font-weight: 500;
   letter-spacing: -0.005em;
-}
-
-.deck-card__confirm-cancel,
-.deck-card__confirm-yes {
-  height: 22px;
-  padding: 0 9px;
-  border-radius: 4px;
-  border: none;
-  font-family: var(--ui);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: -0.003em;
-  cursor: pointer;
-  transition:
-    background var(--t-fast) var(--ease),
-    color var(--t-fast) var(--ease);
-}
-
-.deck-card__confirm-cancel {
-  background: transparent;
-  color: var(--text-2);
-}
-
-.deck-card__confirm-cancel:hover {
-  background: var(--surface-strong);
   color: var(--text);
 }
 
-.deck-card__confirm-yes {
-  background: var(--err);
-  color: #2a0a0a;
+/* Confirm-overlay buttons share the .btn primitive but live on a colored
+   glass background, so we tighten their height. */
+.deck-card__confirm .btn {
+  height: 22px;
+  padding: 0 9px;
+  font-size: var(--fs-xs);
+  border-radius: 4px;
+  font-weight: 600;
 }
 
-.deck-card__confirm-yes:hover {
+.deck-card__confirm .btn--danger {
+  background: var(--err);
+  color: #2a0a0a;
+  border-color: transparent;
+}
+
+.deck-card__confirm .btn--danger:hover {
   background: #f5a3a3;
 }
 
@@ -687,21 +460,13 @@
   line-height: 1.5;
 }
 
-.library__empty h2,
-.library__nomatch h2 {
+.library__empty .t-heading,
+.library__nomatch .t-heading {
   margin: 8px 0 0;
-  font-family: var(--ui);
-  font-size: var(--fs-xl);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--text);
 }
 
-.library__empty p,
-.library__nomatch p {
-  margin: 0;
-  font-size: var(--fs-base);
-  color: var(--text-2);
+.library__empty .t-subheading,
+.library__nomatch .t-subheading {
   max-width: 48ch;
   line-height: 1.55;
 }
@@ -714,28 +479,8 @@
    --------------------------------------------------------------------------*/
 
 @media (max-width: 720px) {
-  .library__workbar {
-    height: auto;
-  }
-
-  .library__workbar .library__bar-inner {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 12px 18px;
-    gap: 10px;
-  }
-
-  .library__workbar-left,
-  .library__workbar-right {
-    justify-content: space-between;
-  }
-
   .library__search {
     flex: 1;
     width: auto;
-  }
-
-  .library__main {
-    padding: 22px 18px 96px;
   }
 }

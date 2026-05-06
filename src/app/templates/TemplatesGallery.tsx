@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
@@ -8,7 +7,16 @@ import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
 import { createDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
-import { AppTopbar } from '@/components/AppTopbar';
+import {
+  AppTopbar,
+  Caption,
+  GalleryGrid,
+  Heading,
+  Label,
+  PageMain,
+  PageShell,
+  PageWorkbar,
+} from '@/components';
 
 import { SAMPLE_MARKDOWN } from '@/editor/sample-deck';
 
@@ -32,45 +40,24 @@ export function TemplatesGallery() {
   };
 
   return (
-    <div className="templates-page">
+    <PageShell className="templates-page">
       <AppTopbar />
 
-      <div className="templates-page__workbar">
-        <div className="templates-page__bar-inner">
-          <div className="templates-page__workbar-left">
-            <Link href="/" className="templates-page__back" aria-label="Back to library">
-              <span className="templates-page__back-arrow" aria-hidden>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path
-                    d="M9 11L5 7L9 3"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-              Library
-            </Link>
-            <h1 className="templates-page__title">Templates</h1>
-            <span className="templates-page__count">
-              {TEMPLATE_PRESETS.length} {TEMPLATE_PRESETS.length === 1 ? 'preset' : 'presets'}
-            </span>
-          </div>
-          <p className="templates-page__subtitle">
-            Hand-crafted theme combinations. Pick one to create a new deck.
-          </p>
-        </div>
-      </div>
+      <PageWorkbar
+        back={{ href: '/', label: 'Library', ariaLabel: 'Back to library' }}
+        title="Templates"
+        count={`${TEMPLATE_PRESETS.length} ${TEMPLATE_PRESETS.length === 1 ? 'preset' : 'presets'}`}
+        subtitle="Hand-crafted theme combinations. Pick one to create a new deck."
+      />
 
-      <main className="templates-page__main">
-        <div className="templates-page__grid">
+      <PageMain>
+        <GalleryGrid>
           {TEMPLATE_PRESETS.map((preset) => (
             <TemplateCard key={preset.id} preset={preset} onClick={() => applyTemplate(preset)} />
           ))}
-        </div>
-      </main>
-    </div>
+        </GalleryGrid>
+      </PageMain>
+    </PageShell>
   );
 }
 
@@ -96,20 +83,30 @@ function TemplateCard({ preset, onClick }: { preset: TemplatePreset; onClick: ()
   const templateAttr = templateSlug(preset.id);
 
   return (
-    <button type="button" className="template-card" data-template={templateAttr} onClick={onClick}>
+    <button
+      type="button"
+      className="surface-card template-card"
+      data-template={templateAttr}
+      onClick={onClick}
+    >
       <div className="template-card__preview">
         <div className="template-card__scaler">
           {previewDeck.ok ? <DeckRenderer deck={previewDeck.deck} /> : null}
         </div>
+        <span className="template-card__chip" data-template={templateAttr}>
+          {preset.name}
+        </span>
       </div>
       <div className="template-card__meta">
-        <h3 className="template-card__name">{preset.name}</h3>
-        <p className="template-card__vibe">{preset.vibe}</p>
+        <Heading level={3} size="md">
+          {preset.name}
+        </Heading>
+        <Caption>{preset.vibe}</Caption>
         <div className="template-card__tags">
-          <span className="template-card__tag">{preset.styleId}</span>
-          <span className="template-card__tag">{preset.paletteId}</span>
-          <span className="template-card__tag">{preset.density}</span>
-          <span className="template-card__tag">{preset.mode}</span>
+          <Label className="template-card__tag">{preset.styleId}</Label>
+          <Label className="template-card__tag">{preset.paletteId}</Label>
+          <Label className="template-card__tag">{preset.density}</Label>
+          <Label className="template-card__tag">{preset.mode}</Label>
         </div>
       </div>
     </button>

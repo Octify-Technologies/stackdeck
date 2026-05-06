@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Button } from './primitives/Button';
+
 import './AppTopbar.css';
 
 const NAV_ITEMS: ReadonlyArray<{ href: string; label: string; match: (p: string) => boolean }> = [
@@ -15,7 +17,7 @@ export function AppTopbar() {
 
   return (
     <header className="app-topbar">
-      <div className="app-topbar__inner">
+      <div className="page-bar-inner app-topbar__inner">
         <Link href="/" className="app-topbar__brand" aria-label="stackdeck home">
           <span className="app-topbar__brand-mark" aria-hidden>
             <svg width="36" height="36" viewBox="0 0 22 22" fill="none">
@@ -30,27 +32,29 @@ export function AppTopbar() {
           {NAV_ITEMS.map((item) => {
             const active = item.match(pathname);
             return (
-              <Link
+              <Button
                 key={item.href}
+                as="link"
                 href={item.href}
-                className="app-topbar__link"
+                variant="ghost"
                 aria-current={active ? 'page' : undefined}
               >
                 {item.label}
-              </Link>
+              </Button>
             );
           })}
-          <a
+          <Button
+            as="a"
             href="https://github.com/Octify-Technologies/stackdeck"
             target="_blank"
             rel="noopener noreferrer"
-            className="app-topbar__link"
+            variant="ghost"
           >
             GitHub
-          </a>
-          <Link href="/new" className="app-topbar__cta">
+          </Button>
+          <Button as="link" href="/new" variant="primary" className="app-topbar__cta">
             New deck
-          </Link>
+          </Button>
         </nav>
       </div>
     </header>

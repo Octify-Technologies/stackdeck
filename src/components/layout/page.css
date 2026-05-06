@@ -1,0 +1,195 @@
+/* ==========================================================================
+   page layout primitives
+   Shared chrome for gallery-style pages: PageShell, PageBarInner,
+   PageWorkbar, BackLink, GalleryGrid, surface card base.
+   ========================================================================== */
+
+/* PageShell: outermost wrapper used by every gallery-style page. */
+.page-shell {
+  min-height: 100vh;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--ui);
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* PageBarInner: max-width content rail used inside topbar AND workbar. */
+.page-bar-inner {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* PageWorkbar: 64px sub-header below the global topbar. */
+.page-workbar {
+  height: 64px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025) 0%,
+    rgba(255, 255, 255, 0.005) 100%
+  );
+}
+
+.page-workbar__left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+}
+
+.page-workbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.page-workbar__subtitle {
+  max-width: 56ch;
+  text-align: right;
+}
+
+/* BackLink: arrow + label, used to return to a parent route. */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--h-control);
+  padding: 0 10px 0 8px;
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+
+.back-link:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.back-link__arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-3);
+  transition:
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+
+.back-link:hover .back-link__arrow {
+  color: var(--text);
+  transform: translateX(-2px);
+}
+
+/* PageMain: card grid container with consistent gutters. */
+.page-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 32px var(--page-pad) 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* GalleryGrid: responsive auto-fill card grid. */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* SurfaceCard: shared base for clickable card surfaces (deck, template).
+   Cards extend this with their own --accent and per-card content. */
+.surface-card {
+  --accent: 180, 180, 180;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%), var(--bg-elev-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 0;
+  overflow: hidden;
+  text-decoration: none;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: var(--highlight), var(--shadow-2);
+  transition:
+    border-color var(--t-med) var(--ease),
+    transform var(--t-med) var(--ease),
+    box-shadow var(--t-med) var(--ease);
+}
+
+.surface-card:hover {
+  border-color: rgba(var(--accent), 0.45);
+  transform: translateY(-1px);
+  box-shadow:
+    var(--highlight-strong),
+    var(--shadow-3),
+    0 0 0 1px rgba(var(--accent), 0.12),
+    0 12px 32px -16px rgba(var(--accent), 0.35);
+}
+
+.surface-card:active {
+  transform: translateY(0);
+}
+
+.surface-card--dashed {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
+.surface-card--dashed:hover {
+  background: var(--surface);
+  border-color: var(--text-2);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+/* Responsive
+   --------------------------------------------------------------------------*/
+
+@media (max-width: 720px) {
+  .page-workbar {
+    height: auto;
+  }
+
+  .page-workbar .page-bar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 18px;
+    gap: 10px;
+  }
+
+  .page-workbar__right {
+    justify-content: space-between;
+  }
+
+  .page-main {
+    padding: 22px 18px 96px;
+  }
+}

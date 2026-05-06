@@ -1,0 +1,163 @@
+/* ==========================================================================
+   button primitive
+   One control with variant + size modifiers. Replaces .library__cta,
+   .editor__cta, .library__sort-option, ad-hoc icon buttons.
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--h-control);
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  letter-spacing: -0.003em;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+}
+
+.btn:focus-visible {
+  outline: 1px solid var(--text);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sizes */
+
+.btn--sm {
+  height: var(--h-control-sm);
+  padding: 0 10px;
+  font-size: var(--fs-sm);
+}
+
+.btn--xs {
+  height: var(--h-control-xs);
+  padding: 0 8px;
+  font-size: var(--fs-xs);
+  gap: 4px;
+}
+
+/* Primary: dark pill with shadow (the marquee CTA) */
+
+.btn--primary {
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 600;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    var(--shadow-1);
+}
+
+.btn--primary:hover {
+  opacity: 0.92;
+}
+
+.btn--primary:active {
+  transform: translateY(0.5px);
+}
+
+/* Secondary: bordered surface */
+
+.btn--secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.btn--secondary:hover {
+  background: var(--surface-strong);
+  border-color: var(--line-strong);
+}
+
+.btn--secondary:active {
+  transform: translateY(0.5px);
+}
+
+/* Ghost: no chrome until hovered */
+
+.btn--ghost {
+  color: var(--text-2);
+}
+
+.btn--ghost:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.btn--ghost:active {
+  transform: translateY(0.5px);
+}
+
+/* Ghost active state (used for segmented controls and "current" links) */
+
+.btn--ghost[aria-pressed='true'],
+.btn--ghost[aria-current='page'] {
+  color: var(--text);
+  background: var(--surface);
+}
+
+/* Link: looks like text */
+
+.btn--link {
+  height: auto;
+  padding: 0;
+  color: var(--text-2);
+  font-weight: 500;
+  background: transparent;
+  border-radius: 0;
+}
+
+.btn--link:hover {
+  color: var(--text);
+}
+
+/* Danger: same shape as secondary, hot edge */
+
+.btn--danger {
+  background: transparent;
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.btn--danger:hover {
+  background: rgba(255, 107, 107, 0.08);
+  border-color: rgba(255, 107, 107, 0.5);
+  color: #ff8585;
+}
+
+/* Icon-only: square, no padding */
+
+.btn--icon {
+  width: var(--h-control);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn--icon.btn--sm {
+  width: var(--h-control-sm);
+}
+
+.btn--icon.btn--xs {
+  width: var(--h-control-xs);
+}

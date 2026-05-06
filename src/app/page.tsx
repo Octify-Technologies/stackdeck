@@ -5,6 +5,9 @@ import '@/library/library.css';
 
 export const metadata: Metadata = {
   title: 'Your decks',
+  description:
+    'Your library of markdown slide decks. Create, edit, and export beautiful presentations with stackdeck.',
+  alternates: { canonical: '/' },
 };
 
 export default function HomePage() {
