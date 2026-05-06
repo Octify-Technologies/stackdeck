@@ -159,15 +159,25 @@ describe('deck-store', () => {
     expect((decks[0] as Partial<StoredDeck>).source).toBeUndefined();
   });
 
-  it('updateDeck updates source and bumps updatedAt', async () => {
+  it('updateDeck updates source and bumps updatedAt without clobbering title', async () => {
     const created = await createDeck({
       source: '# A',
       theme: { styleId: 'modern', paletteId: 'electric', density: 'comfortable', mode: 'light' },
     });
     await new Promise((r) => setTimeout(r, 5));
     const updated = await updateDeck(created.id, { source: '# B' });
-    expect(updated?.title).toBe('B');
+    expect(updated?.source).toBe('# B');
+    expect(updated?.title).toBe('A');
     expect(updated?.updatedAt).not.toBe(created.updatedAt);
+  });
+
+  it('updateDeck applies an explicit title patch', async () => {
+    const created = await createDeck({
+      source: '# A',
+      theme: { styleId: 'modern', paletteId: 'electric', density: 'comfortable', mode: 'light' },
+    });
+    const updated = await updateDeck(created.id, { title: 'Renamed' });
+    expect(updated?.title).toBe('Renamed');
   });
 
   it('updateDeck on missing id returns undefined', async () => {
