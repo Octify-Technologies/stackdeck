@@ -279,6 +279,15 @@ export function Editor({ deckId }: Props) {
           >
             Design
           </button>
+          {deckId ? (
+            <Link
+              href={`/d/${deckId}/present`}
+              className="editor__nav-link editor__nav-link--button"
+              prefetch={false}
+            >
+              Present
+            </Link>
+          ) : null}
           <ExportPdf className="editor__cta" />
         </div>
       </header>
