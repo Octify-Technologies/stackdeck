@@ -169,7 +169,15 @@ export function Editor({ deckId }: Props) {
           </Link>
           <div className="editor__topbar-divider" aria-hidden />
           <div className="editor__deck-title-group">
-            <span className="editor__deck-title">{storedDeck?.title ?? 'Untitled deck'}</span>
+            <DeckTitleField
+              value={storedDeck?.title ?? 'Untitled deck'}
+              onCommit={async (title) => {
+                if (!deckId) return;
+                const next = await updateDeck(deckId, { title });
+                if (next) setStoredDeck(next);
+              }}
+              disabled={!deckId}
+            />
             <SaveIndicator status={saveStatus} />
           </div>
         </div>
@@ -256,6 +264,70 @@ export function Editor({ deckId }: Props) {
 
       <div className="print-only">{result.ok ? <DeckRenderer deck={result.deck} /> : null}</div>
     </div>
+  );
+}
+
+function DeckTitleField({
+  value,
+  onCommit,
+  disabled,
+}: {
+  value: string;
+  onCommit: (next: string) => void | Promise<void>;
+  disabled?: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!editing) setDraft(value);
+  }, [value, editing]);
+
+  useEffect(() => {
+    if (editing) {
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      });
+    }
+  }, [editing]);
+
+  const commit = () => {
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== value) onCommit(trimmed);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        className="editor__deck-title editor__deck-title--editing"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit();
+          if (e.key === 'Escape') {
+            setDraft(value);
+            setEditing(false);
+          }
+        }}
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className="editor__deck-title editor__deck-title--button"
+      onClick={() => !disabled && setEditing(true)}
+      title={disabled ? value : 'Click to rename'}
+      disabled={disabled}
+    >
+      {value}
+    </button>
   );
 }
 

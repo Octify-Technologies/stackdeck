@@ -162,6 +162,29 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 280px;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  border-radius: var(--app-radius-sm);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-geist), Geist, system-ui, sans-serif;
+  transition:
+    background 150ms var(--app-easing),
+    border-color 150ms var(--app-easing);
+}
+
+.editor__deck-title--button:hover:not(:disabled) {
+  background: var(--app-surface);
+  border-color: var(--app-line);
+}
+
+.editor__deck-title--editing {
+  background: var(--app-surface-strong);
+  border-color: var(--app-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--app-accent-faint);
+  cursor: text;
 }
 
 .editor__crumb {
