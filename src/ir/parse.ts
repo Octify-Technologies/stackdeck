@@ -32,7 +32,7 @@ import {
 } from './schema';
 
 const DEFAULT_THEME: ThemeRef = {
-  presetId: 'dossier-noir',
+  presetId: '',
 };
 
 const VOID_DIRECTIVES = new Set(['stat', 'slide', 'image']);

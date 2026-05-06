@@ -25,9 +25,9 @@ type Registry = {
 };
 
 /**
- * One default renderer per block type. The deck design is locked in
- * `src/styles/dossier.css` and reads from CSS color/font tokens; the
- * renderer never branches on preset.
+ * One default renderer per block type. The renderer never branches on
+ * preset; visual variation comes from per-preset scoped CSS and bespoke
+ * signature components dispatched at the SlideRenderer level.
  */
 const blockRegistry: Registry = {
   heading: Heading,

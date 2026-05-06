@@ -30,25 +30,45 @@ type ResolvedTheme = {
 };
 
 /**
+ * Neutral fallback tokens used when no palette is registered. Dark surface,
+ * neutral text. Lets the app render without crashing while the registries
+ * are empty.
+ */
+const FALLBACK_TOKENS: ColorTokens = {
+  brand: '#fafafa',
+  accent: '#a3a3a3',
+  surface: '#0a0a0a',
+  surfaceMuted: '#171717',
+  text: '#fafafa',
+  textMuted: '#a1a1aa',
+  border: '#27272a',
+  success: '#22c55e',
+  warn: '#f59e0b',
+  danger: '#ef4444',
+};
+
+/**
  * Compose a Preset + Palette (+ optional Brand overrides) into a flat
- * token map ready to apply as CSS custom properties.
+ * token map ready to apply as CSS custom properties. Either side may be
+ * undefined when the registry is empty.
  */
 export function resolveTheme(
   ref: ThemeRef,
-  preset: Preset,
-  palette: Palette,
+  preset: Preset | undefined,
+  palette: Palette | undefined,
   brand?: Brand,
 ): ResolvedTheme {
-  const colors = mergeColors(palette.tokens, brand);
+  const baseTokens = palette?.tokens ?? FALLBACK_TOKENS;
+  const colors = mergeColors(baseTokens, brand);
   const fontFamily = resolveFontFamily(preset, ref);
   const cssVars = buildCssVars(colors, fontFamily);
   return { ref, colors, cssVars };
 }
 
-function resolveFontFamily(preset: Preset, ref: ThemeRef): string {
+function resolveFontFamily(preset: Preset | undefined, ref: ThemeRef): string {
   const overrideId = ref.fontId;
   const override = overrideId ? getFont(overrideId) : undefined;
-  const fallback = getFont(preset.fontId) ?? getFont('geist');
+  const fallback = getFont(preset?.fontId) ?? getFont('geist');
   return (override ?? fallback)?.family ?? 'system-ui, sans-serif';
 }
 

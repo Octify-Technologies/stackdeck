@@ -27,7 +27,7 @@ export function ThemeDrawer(props: Props) {
   const [section, setSection] = useState<Section>('theme');
 
   const palette = getPalette(props.paletteId);
-  const surfaceForContrast = palette.tokens.surface;
+  const surfaceForContrast = palette?.tokens.surface ?? '#0a0a0a';
 
   return (
     <aside className="drawer" aria-label="Design system">
@@ -106,8 +106,9 @@ function ThemeSection({
   onFontChange: (id: string | undefined) => void;
 }) {
   const preset = getPreset(presetId);
-  const presetFont = getFont(preset.fontId);
-  const activeId = fontId ?? preset.fontId;
+  const presetFontId = preset?.fontId ?? 'geist';
+  const presetFont = getFont(presetFontId);
+  const activeId = fontId ?? presetFontId;
   const activeFamily = getFont(activeId)?.family ?? presetFont?.family ?? 'system-ui';
 
   return (
@@ -120,7 +121,7 @@ function ThemeSection({
               label={f.name}
               family={f.family}
               selected={f.id === activeId}
-              onClick={() => onFontChange(f.id === preset.fontId ? undefined : f.id)}
+              onClick={() => onFontChange(f.id === presetFontId ? undefined : f.id)}
             />
           ))}
         </div>

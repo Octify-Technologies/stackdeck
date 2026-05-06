@@ -9,8 +9,8 @@ import { resolveTheme } from './theme-resolver';
 
 type Props = {
   theme: ThemeRef;
-  preset: Preset;
-  palette: Palette;
+  preset: Preset | undefined;
+  palette: Palette | undefined;
   brand?: Brand;
   children: ReactNode;
   className?: string;
@@ -21,7 +21,7 @@ type Props = {
  * derived from the active Preset + Palette (+ optional Brand overrides).
  * Block components read these variables; switching theme is a CSS variable
  * swap with no React reconciliation. The visual design itself is locked in
- * `src/styles/dossier.css` and applies to every `.deck-root`.
+ * the active preset's scoped CSS file and applies to every `.deck-root`.
  */
 export function ThemeProvider({ theme, preset, palette, brand, children, className }: Props) {
   const resolved = useMemo(
@@ -35,7 +35,7 @@ export function ThemeProvider({ theme, preset, palette, brand, children, classNa
     <div
       className={['deck-root', className].filter(Boolean).join(' ')}
       style={styleObject}
-      data-palette={theme.paletteId ?? preset.paletteId}
+      data-palette={theme.paletteId ?? preset?.paletteId ?? ''}
     >
       {children}
     </div>

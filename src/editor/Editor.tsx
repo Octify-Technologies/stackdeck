@@ -15,7 +15,7 @@ import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 import { ExportPdf } from '@/render/ExportPdf';
 import { getPalette } from '@/themes/registry';
-import { DEFAULT_PRESET_ID, getPreset, PRESETS } from '@/app/presets/presets';
+import { DEFAULT_PRESET_ID, getPreset } from '@/app/presets/presets';
 
 import { AssetsDrawer } from './AssetsDrawer';
 import { InsertMenu } from './InsertMenu';
@@ -32,7 +32,7 @@ type EditorState = {
 
 const DEFAULT_STATE: EditorState = {
   presetId: DEFAULT_PRESET_ID,
-  paletteId: PRESETS[0].paletteId,
+  paletteId: '',
   fontId: undefined,
   brand: {},
 };
@@ -98,7 +98,7 @@ export function Editor({ deckId }: Props) {
       const presetForDeck = getPreset(deck.theme.presetId);
       setState({
         presetId: deck.theme.presetId,
-        paletteId: deck.theme.paletteId ?? presetForDeck.paletteId,
+        paletteId: deck.theme.paletteId ?? presetForDeck?.paletteId ?? '',
         fontId: deck.theme.fontId,
         brand: deck.brand ?? {},
       });
