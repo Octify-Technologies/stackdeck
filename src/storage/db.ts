@@ -1,9 +1,10 @@
 'use client';
 
 const DB_NAME = 'stackdeck';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export const STORE_DECKS = 'decks';
+export const STORE_ASSETS = 'assets';
 const STORE_BRANDS = 'brands';
 const STORE_PREFS = 'prefs';
 
@@ -24,6 +25,10 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(STORE_PREFS)) {
         db.createObjectStore(STORE_PREFS);
+      }
+      if (!db.objectStoreNames.contains(STORE_ASSETS)) {
+        const store = db.createObjectStore(STORE_ASSETS, { keyPath: 'id' });
+        store.createIndex('createdAt', 'createdAt');
       }
     };
     req.onsuccess = () => resolve(req.result);
