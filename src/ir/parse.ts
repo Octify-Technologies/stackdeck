@@ -14,6 +14,8 @@ import {
   type Deck,
   type Grid,
   type Heading,
+  type Image,
+  type ImageAnnotation,
   type LayoutId,
   type List,
   type ListItem,
@@ -36,7 +38,7 @@ const DEFAULT_THEME: ThemeRef = {
   mode: 'light',
 };
 
-const VOID_DIRECTIVES = new Set(['stat', 'slide']);
+const VOID_DIRECTIVES = new Set(['stat', 'slide', 'image']);
 
 const TONE_VALUES = new Set<Tone>(['info', 'warn', 'success', 'neutral']);
 
@@ -267,6 +269,20 @@ function inferTrend(options: Record<string, string>): Stat['trend'] {
   return undefined;
 }
 
+function buildImage(options: Record<string, string>): Image | null {
+  if (!options.src) return null;
+  const treatment =
+    options.treatment === 'frame' || options.treatment === 'bleed' ? options.treatment : 'plain';
+  const img: Image = { type: 'image', src: options.src, treatment };
+  if (options.alt) img.alt = options.alt;
+  if (options.caption) img.caption = options.caption;
+  if (options.aspect ?? options.aspectRatio) {
+    img.aspectRatio = options.aspect ?? options.aspectRatio;
+  }
+  if (options.focal) img.focal = options.focal;
+  return img;
+}
+
 function expandVoidDirective(name: string, options: Record<string, string>): Block | null {
   if (name === 'stat') {
     if (!options.value) return null;
@@ -277,6 +293,9 @@ function expandVoidDirective(name: string, options: Record<string, string>): Blo
       delta: options.delta,
       trend: inferTrend(options),
     };
+  }
+  if (name === 'image') {
+    return buildImage(options);
   }
   return null;
 }
@@ -317,6 +336,28 @@ function expandBlockDirective(
     ) as Grid['rows'];
     const children = parseChildren(tokens, cursor, true);
     return [{ type: 'grid', cols, rows, children }];
+  }
+
+  if (name === 'asset-frame') {
+    parseChildren(tokens, cursor, true);
+    const img = buildImage({ ...options, treatment: 'frame' });
+    return img ? [img] : [];
+  }
+
+  if (name === 'annotated-image') {
+    const lines = collectRawLines(tokens, cursor);
+    const annotations: ImageAnnotation[] = [];
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line.startsWith('-')) continue;
+      const m = /^-\s*\(([^,]+),\s*([^)]+)\)\s+(.+)$/.exec(line);
+      if (!m) continue;
+      annotations.push({ x: m[1].trim(), y: m[2].trim(), label: m[3].trim() });
+    }
+    const img = buildImage(options);
+    if (!img) return [];
+    if (annotations.length > 0) img.annotations = annotations;
+    return [img];
   }
 
   if (name === 'cell') {

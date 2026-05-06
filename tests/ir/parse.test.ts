@@ -486,4 +486,44 @@ Tall.
     expect(cell.rowSpan).toBe(2);
     expect(cell.span).toBe(2);
   });
+
+  it('parses ::image void directive into an image block', () => {
+    const md = '::image{src="/a.jpg" alt="A" caption="Hello" aspect="16:9" focal="40% 30%"}';
+    const deck = parseDeck(md);
+    const img = deck.slides[0].blocks[0] as import('@/ir/schema').Image;
+    expect(img.type).toBe('image');
+    expect(img.src).toBe('/a.jpg');
+    expect(img.alt).toBe('A');
+    expect(img.caption).toBe('Hello');
+    expect(img.aspectRatio).toBe('16:9');
+    expect(img.focal).toBe('40% 30%');
+    expect(img.treatment).toBe('plain');
+  });
+
+  it('::asset-frame yields image with treatment=frame', () => {
+    const md = '::asset-frame{src="/b.png" caption="Diagram"}\n::';
+    const deck = parseDeck(md);
+    const img = deck.slides[0].blocks[0] as import('@/ir/schema').Image;
+    expect(img.type).toBe('image');
+    expect(img.treatment).toBe('frame');
+    expect(img.caption).toBe('Diagram');
+  });
+
+  it('::annotated-image collects annotations from body lines', () => {
+    const md = `::annotated-image{src="/c.png" alt="Map"}
+- (20%, 30%) Origin
+- (75%, 60%) Destination
+::`;
+    const deck = parseDeck(md);
+    const img = deck.slides[0].blocks[0] as import('@/ir/schema').Image;
+    expect(img.type).toBe('image');
+    expect(img.annotations).toHaveLength(2);
+    expect(img.annotations?.[0]).toEqual({ x: '20%', y: '30%', label: 'Origin' });
+  });
+
+  it('::image without src returns no block', () => {
+    const md = '::image{alt="missing"}';
+    const deck = parseDeck(md);
+    expect(deck.slides[0].blocks).toHaveLength(0);
+  });
 });

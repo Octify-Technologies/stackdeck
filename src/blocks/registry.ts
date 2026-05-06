@@ -9,6 +9,7 @@ import { Code } from './default/Code';
 import { Columns } from './default/Columns';
 import { Grid } from './default/Grid';
 import { Heading as DefaultHeading } from './default/Heading';
+import { Image } from './default/Image';
 import { List } from './default/List';
 import { Quote as DefaultQuote } from './default/Quote';
 import { Stat as DefaultStat } from './default/Stat';
@@ -72,6 +73,7 @@ const blockRegistry: Registry = {
   columns: { default: Columns },
   grid: { default: Grid },
   cell: { default: Cell },
+  image: { default: Image },
 };
 
 export function resolveBlockComponent<T extends BlockType>(

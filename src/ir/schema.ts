@@ -98,6 +98,30 @@ export type Cell = {
   children: Block[];
 };
 
+export type ImageTreatment = 'plain' | 'frame' | 'bleed';
+
+export type Image = {
+  type: 'image';
+  src: string;
+  alt?: string;
+  caption?: string;
+  /** Aspect ratio expressed as "W:H" or "W/H". Defaults to natural. */
+  aspectRatio?: string;
+  /** Focal point for crops, "x% y%". Defaults to "50% 50%". */
+  focal?: string;
+  treatment?: ImageTreatment;
+  /** Optional list of {x, y, label} annotations rendered over the image. */
+  annotations?: ImageAnnotation[];
+};
+
+export type ImageAnnotation = {
+  /** "x%" position from left. */
+  x: string;
+  /** "y%" position from top. */
+  y: string;
+  label: string;
+};
+
 export type ChartKind = 'bar' | 'line' | 'donut';
 
 export type ChartDatum = {
@@ -134,7 +158,8 @@ export type Block =
   | Grid
   | Cell
   | Chart
-  | Table;
+  | Table
+  | Image;
 
 const HeadingSchema: z.ZodType<Heading> = z.object({
   type: z.literal('heading'),
@@ -218,6 +243,7 @@ const BlockSchema: z.ZodType<Block> = z.lazy(() =>
     ColumnsSchema,
     GridSchema,
     CellSchema,
+    ImageSchema,
   ]),
 );
 
@@ -245,6 +271,23 @@ const GridSchema: z.ZodType<Grid> = z.lazy(() =>
     children: z.array(BlockSchema).min(1),
   }),
 );
+
+const ImageAnnotationSchema: z.ZodType<ImageAnnotation> = z.object({
+  x: z.string().min(1),
+  y: z.string().min(1),
+  label: z.string().min(1),
+});
+
+const ImageSchema: z.ZodType<Image> = z.object({
+  type: z.literal('image'),
+  src: z.string().min(1),
+  alt: z.string().optional(),
+  caption: z.string().optional(),
+  aspectRatio: z.string().optional(),
+  focal: z.string().optional(),
+  treatment: z.enum(['plain', 'frame', 'bleed']).optional(),
+  annotations: z.array(ImageAnnotationSchema).optional(),
+});
 
 const CellSchema: z.ZodType<Cell> = z.lazy(() =>
   z.object({
