@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
-import type { Brand, Density, Mode, ThemeRef } from '@/ir/schema';
+import type { Brand, Deck, Density, Mode, ThemeRef } from '@/ir/schema';
 import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 import { ExportPdf } from '@/render/ExportPdf';
@@ -128,9 +128,6 @@ export function Editor({ deckId }: Props) {
 
   const handleSelectSlide = useCallback((index: number) => {
     setSelectedSlide(index);
-    if (typeof document === 'undefined') return;
-    const frame = document.querySelector(`[data-slide-index='${index}']`)?.closest('.slide-frame');
-    if (frame) frame.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, []);
 
   const handleInsert = useCallback((snippet: string) => {
@@ -182,26 +179,7 @@ export function Editor({ deckId }: Props) {
           </div>
         </div>
 
-        <div className="editor__topbar-center">
-          <span className="editor__crumb">
-            <span className="editor__crumb-label">Style</span>
-            <span className="editor__crumb-value">{state.styleId}</span>
-          </span>
-          <span className="editor__crumb-sep" aria-hidden>
-            ·
-          </span>
-          <span className="editor__crumb">
-            <span className="editor__crumb-label">Palette</span>
-            <span className="editor__crumb-value">{state.paletteId}</span>
-          </span>
-          <span className="editor__crumb-sep" aria-hidden>
-            ·
-          </span>
-          <span className="editor__crumb editor__crumb--mode">{state.mode}</span>
-        </div>
-
         <div className="editor__topbar-right">
-          <InsertMenu onInsert={handleInsert} />
           <Link href="/templates" className="editor__nav-link">
             Templates
           </Link>
@@ -232,11 +210,16 @@ export function Editor({ deckId }: Props) {
 
         <div className="editor__source-pane">
           <SourceEditor value={source} onChange={setSource} onReady={onEditorReady} />
+          <InsertMenu onInsert={handleInsert} />
         </div>
 
         <div className="editor__preview-pane">
           {result.ok ? (
-            <DeckRenderer deck={result.deck} />
+            <PreviewStage
+              deck={result.deck}
+              selectedSlide={selectedSlide}
+              onSelectSlide={handleSelectSlide}
+            />
           ) : (
             <div className="editor__error">
               <strong>Parse error</strong>
@@ -328,6 +311,90 @@ function DeckTitleField({
     >
       {value}
     </button>
+  );
+}
+
+function PreviewStage({
+  deck,
+  selectedSlide,
+  onSelectSlide,
+}: {
+  deck: Deck;
+  selectedSlide: number;
+  onSelectSlide: (i: number) => void;
+}) {
+  const total = deck.slides.length;
+  const safeIndex = Math.min(Math.max(selectedSlide, 0), Math.max(total - 1, 0));
+  const visibleDeck = useMemo<Deck>(
+    () => ({ ...deck, slides: total === 0 ? [] : [deck.slides[safeIndex]] }),
+    [deck, safeIndex, total],
+  );
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('input, textarea, [contenteditable], .cm-editor')) return;
+      if (e.key === 'ArrowLeft' && safeIndex > 0) {
+        e.preventDefault();
+        onSelectSlide(safeIndex - 1);
+      } else if (e.key === 'ArrowRight' && safeIndex < total - 1) {
+        e.preventDefault();
+        onSelectSlide(safeIndex + 1);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [safeIndex, total, onSelectSlide]);
+
+  return (
+    <div className="stage">
+      <div className="stage__viewport">
+        <div className="stage__slide">
+          <DeckRenderer deck={visibleDeck} />
+        </div>
+      </div>
+      <div className="stage__bar" role="toolbar" aria-label="Slide navigation">
+        <button
+          type="button"
+          className="stage__nav"
+          onClick={() => onSelectSlide(safeIndex - 1)}
+          disabled={safeIndex === 0}
+          aria-label="Previous slide"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+            <path
+              d="M9 11L5 7L9 3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <span className="stage__counter" aria-live="polite">
+          <span className="stage__counter-num">{String(safeIndex + 1).padStart(2, '0')}</span>
+          <span className="stage__counter-sep">/</span>
+          <span className="stage__counter-total">{String(total).padStart(2, '0')}</span>
+        </span>
+        <button
+          type="button"
+          className="stage__nav"
+          onClick={() => onSelectSlide(safeIndex + 1)}
+          disabled={safeIndex >= total - 1}
+          aria-label="Next slide"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+            <path
+              d="M5 3L9 7L5 11"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
 }
 

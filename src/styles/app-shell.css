@@ -1,0 +1,91 @@
+/* ==========================================================================
+   stackdeck app shell
+   Refined monochrome editorial dark. One source of truth for tokens.
+   Affects only the app chrome (library, new, templates, editor).
+   Slide rendering is governed by themes/registry and styles/*.
+   ========================================================================== */
+
+:root {
+  /* Surfaces */
+  --bg: #0a0a0a;
+  --bg-elev: #111111;
+  --bg-pane: #0d0d0d;
+  --surface: rgba(255, 255, 255, 0.025);
+  --surface-strong: rgba(255, 255, 255, 0.05);
+
+  /* Hairlines */
+  --line: rgba(255, 255, 255, 0.07);
+  --line-strong: rgba(255, 255, 255, 0.12);
+
+  /* Type */
+  --text: #fafafa;
+  --text-2: #8e8e8e;
+  --text-3: #555555;
+
+  /* Signal only, no chromatic brand accent */
+  --ok: #7fdba0;
+  --warn: #f5c46a;
+  --err: #f08080;
+
+  /* Geometry */
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 10px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --t-fast: 120ms;
+  --t-med: 180ms;
+  --t-slow: 280ms;
+
+  /* Fonts (UI only; slide themes use their own) */
+  --ui: var(--font-geist), Geist, ui-sans-serif, system-ui, sans-serif;
+  --mono: var(--font-jetbrains), ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+}
+
+/* Selection */
+::selection {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+/* Focus ring (default for app chrome) */
+.app-shell-focus:focus-visible,
+.editor button:focus-visible,
+.editor a:focus-visible,
+.editor input:focus-visible,
+.library button:focus-visible,
+.library a:focus-visible,
+.templates-page button:focus-visible,
+.templates-page a:focus-visible {
+  outline: 1px solid var(--text);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Scrollbars (subtle, monochrome) */
+.editor ::-webkit-scrollbar,
+.library ::-webkit-scrollbar,
+.templates-page ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.editor ::-webkit-scrollbar-thumb,
+.library ::-webkit-scrollbar-thumb,
+.templates-page ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.editor ::-webkit-scrollbar-thumb:hover,
+.library ::-webkit-scrollbar-thumb:hover,
+.templates-page ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+  background-clip: padding-box;
+}
+.editor ::-webkit-scrollbar-track,
+.library ::-webkit-scrollbar-track,
+.templates-page ::-webkit-scrollbar-track {
+  background: transparent;
+}

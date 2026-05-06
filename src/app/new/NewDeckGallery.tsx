@@ -73,17 +73,19 @@ export function NewDeckGallery() {
 
   return (
     <div className="templates-page">
+      <header className="templates-page__topbar">
+        <Link href="/" className="templates-page__brand">
+          stackdeck
+        </Link>
+      </header>
       <header className="templates-page__header">
         <Link href="/" className="templates-page__back">
-          ← Library
+          Library
         </Link>
-        <div>
-          <h1 className="templates-page__title">Pick a template</h1>
-          <p className="templates-page__subtitle">
-            Each template is a starter deck plus a theme. You can change colors, fonts, and content
-            after.
-          </p>
-        </div>
+        <h1 className="templates-page__title">Start a deck</h1>
+        <p className="templates-page__subtitle">
+          Each template is a starter deck plus a theme. Change colors, fonts, and content after.
+        </p>
       </header>
 
       <div className="templates-page__grid">
@@ -104,7 +106,7 @@ function BlankCard({ onClick }: { onClick: () => void }) {
       </div>
       <div className="template-card__meta">
         <h3 className="template-card__name">Blank deck</h3>
-        <p className="template-card__vibe">Start from scratch with the Modern style</p>
+        <p className="template-card__vibe">Start from scratch. Modern style by default.</p>
       </div>
     </button>
   );

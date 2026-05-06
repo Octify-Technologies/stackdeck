@@ -32,17 +32,19 @@ export function TemplatesGallery() {
 
   return (
     <div className="templates-page">
+      <header className="templates-page__topbar">
+        <Link href="/" className="templates-page__brand">
+          stackdeck
+        </Link>
+      </header>
       <header className="templates-page__header">
         <Link href="/" className="templates-page__back" aria-label="Back to library">
-          ← Library
+          Library
         </Link>
-        <div>
-          <h1 className="templates-page__title">Templates</h1>
-          <p className="templates-page__subtitle">
-            {TEMPLATE_PRESETS.length} hand-crafted theme combinations. Click one to create a new
-            deck with that theme.
-          </p>
-        </div>
+        <h1 className="templates-page__title">Templates</h1>
+        <p className="templates-page__subtitle">
+          {TEMPLATE_PRESETS.length} hand-crafted theme combinations. Pick one to create a new deck.
+        </p>
       </header>
 
       <div className="templates-page__grid">

@@ -17,6 +17,7 @@ import {
 import { useEffect, useRef } from 'react';
 
 import { directiveHighlight } from './cm-directive-highlight';
+import { slashCommandSource } from './cm-slash-command';
 import { stackdeckSyntaxHighlighting, stackdeckTheme } from './cm-theme';
 
 type Props = {
@@ -69,7 +70,12 @@ export function SourceEditor({ value, onChange, onReady }: Props) {
           bracketMatching(),
           closeBrackets(),
           indentOnInput(),
-          autocompletion(),
+          autocompletion({
+            override: [slashCommandSource],
+            activateOnTyping: true,
+            icons: false,
+            defaultKeymap: true,
+          }),
           EditorView.lineWrapping,
           keymap.of([
             ...defaultKeymap,

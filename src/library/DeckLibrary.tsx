@@ -27,9 +27,6 @@ export function DeckLibrary() {
     <div className="library">
       <header className="library__topbar">
         <Link href="/" className="library__brand">
-          <span className="library__brand-mark" aria-hidden>
-            S
-          </span>
           <span className="library__brand-name">stackdeck</span>
         </Link>
         <div className="library__topbar-actions">
@@ -57,7 +54,7 @@ export function DeckLibrary() {
             </p>
           </div>
           <Link href="/new" className="library__cta">
-            <span aria-hidden>+</span> New deck
+            New deck
           </Link>
         </section>
 
@@ -157,13 +154,7 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
         </div>
         <div className="deck-card__meta">
           <h3 className="deck-card__title">{deck.title}</h3>
-          <div className="deck-card__row">
-            <span className="deck-card__chip">{deck.theme.styleId}</span>
-            {deck.templateName ? (
-              <span className="deck-card__chip">{deck.templateName}</span>
-            ) : null}
-            <span className="deck-card__date">{updated}</span>
-          </div>
+          <span className="deck-card__date">{updated}</span>
         </div>
       </Link>
       <div className="deck-card__actions">

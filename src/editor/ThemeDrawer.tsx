@@ -169,7 +169,7 @@ function ThemeSection({
               className={`segmented__option ${m === mode ? 'segmented__option--active' : ''}`}
               onClick={() => onModeChange(m)}
             >
-              {m === 'light' ? '☀ Light' : '☾ Dark'}
+              {m}
             </button>
           ))}
         </div>
