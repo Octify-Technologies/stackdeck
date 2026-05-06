@@ -74,9 +74,7 @@ export async function updateDeck(id: string, patch: UpdateInput): Promise<Stored
   const next: StoredDeck = {
     ...existing,
     ...patch,
-    title:
-      patch.title ??
-      (patch.source ? (extractTitle(patch.source) ?? existing.title) : existing.title),
+    title: patch.title ?? existing.title,
     updatedAt: new Date().toISOString(),
   };
   await dbPut(STORE_DECKS, next);

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
@@ -56,6 +56,7 @@ export function Editor({ deckId }: Props) {
 
   const insertRef = useRef<((s: string) => void) | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipNextSaveRef = useRef(false);
 
   const [sourceWidth, setSourceWidth] = useState<number>(SOURCE_WIDTH_DEFAULT);
 
@@ -74,7 +75,11 @@ export function Editor({ deckId }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!deckId) return;
+    if (!deckId) {
+      setLoaded(true);
+      return;
+    }
+    setLoaded(false);
     let cancelled = false;
     getDeck(deckId).then((deck) => {
       if (cancelled) return;
@@ -82,6 +87,7 @@ export function Editor({ deckId }: Props) {
         router.replace('/');
         return;
       }
+      skipNextSaveRef.current = true;
       setStoredDeck(deck);
       setSource(deck.source);
       setState({
@@ -91,6 +97,7 @@ export function Editor({ deckId }: Props) {
         mode: deck.theme.mode,
         brand: deck.brand ?? {},
       });
+      setSaveStatus('idle');
       setLoaded(true);
     });
     return () => {
@@ -100,6 +107,10 @@ export function Editor({ deckId }: Props) {
 
   useEffect(() => {
     if (!deckId || !loaded) return;
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
+      return;
+    }
     setSaveStatus('saving');
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(async () => {
@@ -299,7 +310,11 @@ function DeckTitleField({
 
   const commit = () => {
     const trimmed = draft.trim();
-    if (trimmed && trimmed !== value) onCommit(trimmed);
+    if (!trimmed) {
+      setDraft(value);
+    } else if (trimmed !== value) {
+      onCommit(trimmed);
+    }
     setEditing(false);
   };
 
@@ -354,7 +369,7 @@ function PreviewStage({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target?.closest('input, textarea, [contenteditable], .cm-editor')) return;
+      if (target?.closest('input, textarea, [contenteditable], .cm-editor, .drawer')) return;
       if (e.key === 'ArrowLeft' && safeIndex > 0) {
         e.preventDefault();
         onSelectSlide(safeIndex - 1);
@@ -391,6 +406,11 @@ function ThumbStrip({
   const total = deck.slides.length;
   const activeRef = useRef<HTMLButtonElement>(null);
 
+  const singles = useMemo<Deck[]>(
+    () => deck.slides.map((slide) => ({ ...deck, slides: [slide] })),
+    [deck],
+  );
+
   useEffect(() => {
     activeRef.current?.scrollIntoView({
       behavior: 'smooth',
@@ -412,34 +432,51 @@ function ThumbStrip({
       </span>
       <div className="thumb-strip__rail">
         {deck.slides.map((slide, i) => {
-          const single: Deck = { ...deck, slides: [slide] };
           const active = i === selectedIndex;
           return (
-            <button
+            <Thumb
               key={slide.id}
-              ref={active ? activeRef : null}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              aria-label={`Slide ${i + 1}`}
-              className={`thumb-strip__item${
-                active ? ' thumb-strip__item--active' : ''
-              }`}
-              onClick={() => onSelect(i)}
-            >
-              <span className="thumb-strip__num">{String(i + 1).padStart(2, '0')}</span>
-              <div className="thumb-strip__frame">
-                <div className="thumb-strip__scaler">
-                  <DeckRenderer deck={single} className="deck--thumbnail" />
-                </div>
-              </div>
-            </button>
+              ref={active ? activeRef : undefined}
+              index={i}
+              single={singles[i]}
+              active={active}
+              onSelect={onSelect}
+            />
           );
         })}
       </div>
     </div>
   );
 }
+
+type ThumbProps = {
+  index: number;
+  single: Deck;
+  active: boolean;
+  onSelect: (i: number) => void;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+const Thumb = memo(function Thumb({ index, single, active, onSelect, ref }: ThumbProps) {
+  return (
+    <button
+      ref={ref}
+      type="button"
+      role="tab"
+      aria-selected={active}
+      aria-label={`Slide ${index + 1}`}
+      className={`thumb-strip__item${active ? ' thumb-strip__item--active' : ''}`}
+      onClick={() => onSelect(index)}
+    >
+      <span className="thumb-strip__num">{String(index + 1).padStart(2, '0')}</span>
+      <div className="thumb-strip__frame">
+        <div className="thumb-strip__scaler">
+          <DeckRenderer deck={single} className="deck--thumbnail" />
+        </div>
+      </div>
+    </button>
+  );
+});
 
 function SaveIndicator({ status }: { status: SaveStatus }) {
   const map: Record<SaveStatus, string> = {

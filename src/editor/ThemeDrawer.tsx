@@ -278,16 +278,7 @@ function BrandSection({
       <button
         type="button"
         className="link-button link-button--danger"
-        onClick={() =>
-          onBrandChange({
-            name: undefined,
-            logoUrl: undefined,
-            logoDarkUrl: undefined,
-            logoPosition: undefined,
-            brandColor: undefined,
-            accentColor: undefined,
-          })
-        }
+        onClick={() => onBrandChange({})}
       >
         Reset brand
       </button>

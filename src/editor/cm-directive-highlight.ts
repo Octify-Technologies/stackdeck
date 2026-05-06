@@ -1,4 +1,3 @@
-import { syntaxTree } from '@codemirror/language';
 import {
   Decoration,
   type DecorationSet,
@@ -56,7 +55,6 @@ function buildDecorations(view: EditorView): DecorationSet {
       if (line.to === view.state.doc.length) break;
     }
   }
-  syntaxTree(view.state); // ensure parser is current
   return builder.finish();
 }
 

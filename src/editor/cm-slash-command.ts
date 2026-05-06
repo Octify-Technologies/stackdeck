@@ -11,11 +11,12 @@ export function slashCommandSource(ctx: CompletionContext): CompletionResult | n
   const word = ctx.matchBefore(/\/[\w-]*/);
   if (!word) return null;
 
-  const lineStart = ctx.state.doc.lineAt(word.from).from;
-  const before = ctx.state.sliceDoc(lineStart, word.from);
-  if (before.trim().length > 0) return null;
-
-  if (word.from === word.to && !ctx.explicit) return null;
+  if (!ctx.explicit) {
+    const lineStart = ctx.state.doc.lineAt(word.from).from;
+    const before = ctx.state.sliceDoc(lineStart, word.from);
+    if (before.trim().length > 0) return null;
+    if (word.from === word.to) return null;
+  }
 
   return {
     from: word.from,
