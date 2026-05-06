@@ -169,4 +169,33 @@
   .no-print {
     display: none !important;
   }
+
+  /* Watermark overlay on every printed slide. The text comes from a CSS
+     custom property set by the export menu; rotated, low-opacity, behind
+     content. */
+  html[data-watermark] .slide-frame {
+    position: relative;
+  }
+
+  html[data-watermark] .slide-frame::after {
+    content: var(--watermark-text, 'CONFIDENTIAL');
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display, ui-sans-serif);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    font-size: 156px;
+    color: rgba(0, 0, 0, 0.07);
+    transform: rotate(-28deg);
+    transform-origin: center;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+
+  html[data-watermark='draft'] .slide-frame::after {
+    color: rgba(220, 38, 38, 0.08);
+  }
 }
