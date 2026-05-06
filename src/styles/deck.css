@@ -129,4 +129,44 @@
     animation: none !important;
     transition: none !important;
   }
+
+  /* Hyperlinks survive into the PDF as clickable links — keep them visually
+     distinguishable from body text. */
+  .slide a[href] {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+  }
+
+  /* PDF bookmarks (auto-TOC). Modern Chrome reads `bookmark-*` from CSS
+     Generated Content for Paged Media (level 3). Section/cover slides get
+     top-level entries; H1 inside any slide becomes a sub-entry. */
+  .layout-cover h1.block-heading,
+  .layout-section h1.block-heading {
+    bookmark-level: 1;
+    bookmark-state: open;
+    bookmark-label: content();
+  }
+
+  .layout-flow h1.block-heading,
+  .layout-hero h1.block-heading,
+  .layout-grid h1.block-heading,
+  .layout-fullbleed h1.block-heading,
+  .layout-split h1.block-heading,
+  .layout-columns h1.block-heading {
+    bookmark-level: 2;
+    bookmark-label: content();
+  }
+
+  h2.block-heading {
+    bookmark-level: 3;
+    bookmark-label: content();
+  }
+
+  /* Tighten ink: hide the editor chrome that may bleed in if printed from
+     the editor view. */
+  .no-print {
+    display: none !important;
+  }
 }
