@@ -1,92 +1,66 @@
-.templates-page {
-  min-height: 100vh;
-  background: #fafafa;
-  color: #0a0a0a;
-  font-family: var(--font-inter), system-ui, sans-serif;
-  padding: 40px 32px 80px;
+/* ==========================================================================
+   templates / new-deck gallery — page-specific styles
+   Page shell, workbar, grid, and surface card live in shared primitives
+   (components/layout/page.css and primitives/*). This file owns ONLY
+   template-card unique parts: preview frame + scaler, blank-card plus
+   icon, and per-template accent + tag chip.
+   ========================================================================== */
+
+/* Per-template accent colors used by .surface-card[data-template=*]. */
+
+.template-card[data-template='pitch'] {
+  --accent: 56, 189, 248;
 }
 
-.templates-page__header {
-  max-width: 1280px;
-  margin: 0 auto 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.template-card[data-template='editorial'] {
+  --accent: 244, 114, 182;
 }
 
-.templates-page__back {
-  font-size: 13px;
-  color: #525252;
-  text-decoration: none;
-  width: fit-content;
-}
-
-.templates-page__back:hover {
-  color: #0a0a0a;
-}
-
-.templates-page__title {
-  margin: 0 0 6px;
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
-.templates-page__subtitle {
-  margin: 0;
-  font-size: 15px;
-  color: #525252;
-  max-width: 60ch;
-}
-
-.templates-page__grid {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 20px;
-}
-
-.template-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 0;
-  overflow: hidden;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition:
-    transform 200ms ease,
-    box-shadow 200ms ease,
-    border-color 200ms ease;
-}
-
-.template-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px -8px rgba(10, 10, 10, 0.12);
-  border-color: #d4d4d4;
-}
+/* Preview window
+   --------------------------------------------------------------------------*/
 
 .template-card__preview {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #f5f5f5;
+  background: #050504;
   overflow: hidden;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--line);
 }
 
+.template-card--blank .template-card__preview {
+  background: transparent;
+}
+
+.template-card__preview--blank {
+  display: grid;
+  place-items: center;
+  background: transparent;
+}
+
+.template-card__preview--blank span {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* The 1280×720 deck preview is rendered at full size and scaled down
+   to fit the card width. */
 .template-card__scaler {
   position: absolute;
   top: 0;
   left: 0;
   width: 1280px;
   height: 720px;
-  transform: scale(calc(360 / 1280));
+  transform: scale(calc(320 / 1280));
   transform-origin: top left;
   pointer-events: none;
 }
@@ -106,40 +80,29 @@
   box-shadow: none;
 }
 
+/* Meta block under the preview
+   --------------------------------------------------------------------------*/
+
 .template-card__meta {
-  padding: 16px 18px 18px;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.template-card__name {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.template-card__vibe {
-  margin: 0;
-  font-size: 13px;
-  color: #525252;
+  gap: 6px;
 }
 
 .template-card__tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
+/* Tag chip — applied alongside .t-label, keeps mono uppercase typography
+   from the primitive and adds the accent-colored pill shape. */
 .template-card__tag {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  background: #f5f5f5;
-  color: #525252;
+  padding: 2px 8px;
+  background: rgba(var(--accent), 0.06);
+  color: rgba(var(--accent), 0.85);
   border-radius: 999px;
+  border: 1px solid rgba(var(--accent), 0.18);
 }

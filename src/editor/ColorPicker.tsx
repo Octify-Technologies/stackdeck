@@ -26,10 +26,13 @@ export function ColorPicker({ label, value, onChange, contrastAgainst }: Props) 
     if (isValidHex(next)) {
       const normalized = next.startsWith('#') ? next : `#${next}`;
       onChange(normalized.toLowerCase());
+    } else {
+      setDraft(value);
     }
   };
 
-  const ratio = contrastAgainst && isValidHex(value) ? contrastRatio(value, contrastAgainst) : null;
+  const liveColor = isValidHex(draft) ? draft : isValidHex(value) ? value : null;
+  const ratio = contrastAgainst && liveColor ? contrastRatio(liveColor, contrastAgainst) : null;
   const passesAA = ratio !== null && ratio >= 4.5;
   const passesAALarge = ratio !== null && ratio >= 3;
 

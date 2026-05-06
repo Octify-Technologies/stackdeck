@@ -1,6 +1,6 @@
 import type { Columns as ColumnsBlock } from '@/ir/schema';
 
-import { BlockRenderer } from './BlockRenderer';
+import { BlockRenderer } from '../BlockRenderer';
 
 export function Columns({ block }: { block: ColumnsBlock }) {
   return (

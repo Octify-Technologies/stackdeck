@@ -1,6 +1,6 @@
 import type { Text as TextBlock } from '@/ir/schema';
 
-import { InlineText } from './InlineText';
+import { InlineText } from '../InlineText';
 
 export function Text({ block }: { block: TextBlock }) {
   return (

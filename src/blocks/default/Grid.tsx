@@ -1,6 +1,6 @@
 import type { Grid as GridBlock } from '@/ir/schema';
 
-import { BlockRenderer } from './BlockRenderer';
+import { BlockRenderer } from '../BlockRenderer';
 
 export function Grid({ block }: { block: GridBlock }) {
   return (

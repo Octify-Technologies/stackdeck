@@ -91,7 +91,42 @@ export type Grid = {
   children: Block[];
 };
 
-export type Block = Heading | Text | List | Quote | Stat | Code | Box | Columns | Grid;
+export type ChartKind = 'bar' | 'line' | 'donut';
+
+export type ChartDatum = {
+  label: string;
+  value: number;
+};
+
+export type Chart = {
+  type: 'chart';
+  kind: ChartKind;
+  title?: string;
+  data: ChartDatum[];
+  format?: 'number' | 'percent' | 'currency';
+  prefix?: string;
+  suffix?: string;
+};
+
+export type Table = {
+  type: 'table';
+  headers: string[];
+  rows: string[][];
+  emphasizeColumn?: number;
+};
+
+export type Block =
+  | Heading
+  | Text
+  | List
+  | Quote
+  | Stat
+  | Code
+  | Box
+  | Columns
+  | Grid
+  | Chart
+  | Table;
 
 const HeadingSchema: z.ZodType<Heading> = z.object({
   type: z.literal('heading'),
@@ -139,6 +174,28 @@ const CodeSchema: z.ZodType<Code> = z.object({
   content: z.string(),
 });
 
+const ChartDatumSchema: z.ZodType<ChartDatum> = z.object({
+  label: z.string().min(1),
+  value: z.number(),
+});
+
+const ChartSchema: z.ZodType<Chart> = z.object({
+  type: z.literal('chart'),
+  kind: z.enum(['bar', 'line', 'donut']),
+  title: z.string().optional(),
+  data: z.array(ChartDatumSchema).min(1),
+  format: z.enum(['number', 'percent', 'currency']).optional(),
+  prefix: z.string().optional(),
+  suffix: z.string().optional(),
+});
+
+const TableSchema: z.ZodType<Table> = z.object({
+  type: z.literal('table'),
+  headers: z.array(z.string()).min(1),
+  rows: z.array(z.array(z.string())).min(1),
+  emphasizeColumn: z.number().int().nonnegative().optional(),
+});
+
 const BlockSchema: z.ZodType<Block> = z.lazy(() =>
   z.union([
     HeadingSchema,
@@ -147,6 +204,8 @@ const BlockSchema: z.ZodType<Block> = z.lazy(() =>
     QuoteSchema,
     StatSchema,
     CodeSchema,
+    ChartSchema,
+    TableSchema,
     BoxSchema,
     ColumnsSchema,
     GridSchema,
