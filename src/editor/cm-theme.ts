@@ -76,7 +76,7 @@ export const stackdeckTheme = EditorView.theme(
  * structural markers, sky blue for directives/links, sage for quotes,
  * cream for code and emphasis. Restraint over rainbow.
  */
-export const stackdeckHighlight = HighlightStyle.define([
+const stackdeckHighlight = HighlightStyle.define([
   // Headings: warm amber hashes, bright fg text, weight increases by level
   { tag: t.heading1, color: 'var(--syn-fg-bright)', fontWeight: '600' },
   { tag: t.heading2, color: 'var(--syn-fg-bright)', fontWeight: '600' },

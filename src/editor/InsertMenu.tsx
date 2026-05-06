@@ -45,12 +45,7 @@ export function InsertMenu({ onInsert }: Props) {
         title="Insert block (or type / in the editor)"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-          <path
-            d="M7 3v8M3 7h8"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
+          <path d="M7 3v8M3 7h8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
         </svg>
         <span>Insert</span>
         <kbd className="insert-menu__kbd">/</kbd>

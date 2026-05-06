@@ -74,7 +74,9 @@
   font-weight: 500;
   color: var(--text-2);
   text-decoration: none;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
     transform var(--t-fast) var(--ease);
 }
 
@@ -108,8 +110,12 @@
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), var(--shadow-1);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    var(--shadow-1);
 }
 
 .app-topbar__cta:hover {

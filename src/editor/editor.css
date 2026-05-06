@@ -91,7 +91,9 @@
   border-radius: var(--r-sm);
   color: var(--text-2);
   text-decoration: none;
-  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
   flex-shrink: 0;
 }
 
@@ -130,7 +132,9 @@
   border-radius: var(--r-sm);
   cursor: pointer;
   text-align: left;
-  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  transition:
+    background var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
 }
 
 .editor__deck-title--button:hover:not(:disabled) {
@@ -196,7 +200,9 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
     border-color var(--t-fast) var(--ease);
 }
 
@@ -263,8 +269,11 @@
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
-    border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
   white-space: nowrap;
   height: var(--h-control);
   display: inline-flex;
@@ -302,9 +311,13 @@
   font-family: var(--ui);
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
   margin-left: 6px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), var(--shadow-1);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    var(--shadow-1);
 }
 
 .editor__cta svg {
@@ -366,7 +379,9 @@
   width: 1px;
   margin-left: -0.5px;
   background: var(--line);
-  transition: background var(--t-fast) var(--ease), width var(--t-fast) var(--ease),
+  transition:
+    background var(--t-fast) var(--ease),
+    width var(--t-fast) var(--ease),
     margin-left var(--t-fast) var(--ease);
 }
 
@@ -482,7 +497,8 @@
 .cm-stackdeck-slide-sep {
   background: var(--syn-amber-bg);
   border-left: 2px solid var(--syn-amber);
-  box-shadow: inset 0 1px 0 rgba(245, 185, 122, 0.12),
+  box-shadow:
+    inset 0 1px 0 rgba(245, 185, 122, 0.12),
     inset 0 -1px 0 rgba(245, 185, 122, 0.08);
   padding-left: 10px !important;
   margin-top: 2px;
@@ -561,7 +577,9 @@
   font-weight: 500;
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
     transform var(--t-fast) var(--ease);
   box-shadow: var(--shadow-3), var(--highlight);
 }
@@ -892,7 +910,9 @@
   border: 1px solid var(--line);
   background: var(--bg-elev-1);
   overflow: hidden;
-  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease),
     transform var(--t-fast) var(--ease);
   box-shadow: var(--highlight);
 }
@@ -903,7 +923,9 @@
 
 .thumb-strip__item--active .thumb-strip__frame {
   border-color: var(--text);
-  box-shadow: 0 0 0 1px var(--text), var(--highlight-strong);
+  box-shadow:
+    0 0 0 1px var(--text),
+    var(--highlight-strong);
 }
 
 .thumb-strip__scaler {
@@ -967,8 +989,7 @@
 .drawer {
   border-left: 1px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, transparent 35%),
-    var(--bg-elev-1);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, transparent 35%), var(--bg-elev-1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1004,7 +1025,9 @@
   place-items: center;
   color: var(--text-2);
   cursor: pointer;
-  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
 }
 
 .drawer__close:hover {
@@ -1031,7 +1054,9 @@
   cursor: pointer;
   border-bottom: 1px solid transparent;
   margin-bottom: -1px;
-  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  transition:
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
 }
 
 .drawer__tab:hover {
@@ -1090,7 +1115,9 @@
   background: var(--surface);
   color: var(--text);
   outline: none;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
 }
 
 .text-input:focus {
@@ -1154,7 +1181,9 @@
   cursor: pointer;
   font-family: inherit;
   color: var(--text);
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
 }
 
 .style-card:hover {
@@ -1251,7 +1280,9 @@
   color: var(--text-2);
   cursor: pointer;
   text-transform: capitalize;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
 }
 
 .segmented__option:hover {
@@ -1261,7 +1292,9 @@
 .segmented__option--active {
   background: var(--bg-elev-1);
   color: var(--text);
-  box-shadow: var(--highlight-strong), 0 0 0 1px var(--line-strong);
+  box-shadow:
+    var(--highlight-strong),
+    0 0 0 1px var(--line-strong);
 }
 
 /* Color picker

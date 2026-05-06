@@ -34,8 +34,7 @@ export function DeckLibrary() {
     const filtered = q
       ? decks.filter(
           (d) =>
-            d.title.toLowerCase().includes(q) ||
-            (d.templateName ?? '').toLowerCase().includes(q),
+            d.title.toLowerCase().includes(q) || (d.templateName ?? '').toLowerCase().includes(q),
         )
       : decks.slice();
     switch (sort) {
@@ -112,13 +111,7 @@ export function DeckLibrary() {
   );
 }
 
-function SearchField({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (next: string) => void;
-}) {
+function SearchField({ value, onChange }: { value: string; onChange: (next: string) => void }) {
   return (
     <label className="library__search">
       <svg
@@ -161,13 +154,7 @@ function SearchField({
   );
 }
 
-function SortControl({
-  value,
-  onChange,
-}: {
-  value: SortKey;
-  onChange: (next: SortKey) => void;
-}) {
+function SortControl({ value, onChange }: { value: SortKey; onChange: (next: SortKey) => void }) {
   const options: { id: SortKey; label: string }[] = [
     { id: 'recent', label: 'Recent' },
     { id: 'oldest', label: 'Oldest' },
@@ -285,10 +272,7 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
               {slideCount > 0 ? `${slideCount} ${slideCount === 1 ? 'slide' : 'slides'}` : '—'}
             </span>
             {deck.templateName ? (
-              <span
-                className="deck-card__chip"
-                data-template={templateSlug(deck.templateName)}
-              >
+              <span className="deck-card__chip" data-template={templateSlug(deck.templateName)}>
                 {deck.templateName}
               </span>
             ) : null}
@@ -297,11 +281,7 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
       </Link>
 
       {confirming ? (
-        <div
-          className="deck-card__confirm"
-          role="alertdialog"
-          aria-label={`Delete ${deck.title}`}
-        >
+        <div className="deck-card__confirm" role="alertdialog" aria-label={`Delete ${deck.title}`}>
           <span className="deck-card__confirm-text">Delete?</span>
           <button
             type="button"

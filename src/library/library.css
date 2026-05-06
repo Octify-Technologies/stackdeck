@@ -47,8 +47,12 @@
   cursor: pointer;
   font-family: var(--ui);
   letter-spacing: -0.005em;
-  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), var(--shadow-1);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    var(--shadow-1);
 }
 
 .library__cta:hover {
@@ -117,7 +121,9 @@
   border-radius: var(--r-sm);
   background: var(--surface);
   color: var(--text-2);
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
 }
 
 .library__search:hover {
@@ -170,7 +176,9 @@
   border-radius: 999px;
   cursor: pointer;
   flex-shrink: 0;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
 }
 
 .library__search-clear:hover {
@@ -200,7 +208,9 @@
   font-weight: 500;
   color: var(--text-2);
   cursor: pointer;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
     box-shadow var(--t-fast) var(--ease);
 }
 
@@ -217,7 +227,9 @@
 .library__sort-option--active {
   background: var(--bg-elev-1);
   color: var(--text);
-  box-shadow: var(--highlight-strong), 0 0 0 1px var(--line-strong);
+  box-shadow:
+    var(--highlight-strong),
+    0 0 0 1px var(--line-strong);
 }
 
 /* Main grid area
@@ -267,7 +279,9 @@
   padding: 20px;
   text-decoration: none;
   color: var(--text);
-  transition: border-color var(--t-med) var(--ease), background var(--t-med) var(--ease),
+  transition:
+    border-color var(--t-med) var(--ease),
+    background var(--t-med) var(--ease),
     transform var(--t-med) var(--ease);
   overflow: hidden;
 }
@@ -280,11 +294,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse at 30% 0%,
-    rgba(255, 232, 196, 0.04),
-    transparent 60%
-  );
+  background: radial-gradient(ellipse at 30% 0%, rgba(255, 232, 196, 0.04), transparent 60%);
   opacity: 0;
   transition: opacity var(--t-med) var(--ease);
   pointer-events: none;
@@ -337,13 +347,14 @@
   --accent: 180, 180, 180;
   position: relative;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
-    var(--bg-elev-1);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%), var(--bg-elev-1);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--highlight), var(--shadow-2);
-  transition: border-color var(--t-med) var(--ease), transform var(--t-med) var(--ease),
+  transition:
+    border-color var(--t-med) var(--ease),
+    transform var(--t-med) var(--ease),
     box-shadow var(--t-med) var(--ease);
 }
 
@@ -522,7 +533,9 @@
   gap: 4px;
   opacity: 0;
   transform: translateY(-2px);
-  transition: opacity var(--t-med) var(--ease), transform var(--t-med) var(--ease);
+  transition:
+    opacity var(--t-med) var(--ease),
+    transform var(--t-med) var(--ease);
 }
 
 .deck-card:hover .deck-card__actions,
@@ -543,7 +556,9 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+  transition:
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
     background var(--t-fast) var(--ease);
 }
 
@@ -606,7 +621,9 @@
   font-weight: 600;
   letter-spacing: -0.003em;
   cursor: pointer;
-  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
 }
 
 .deck-card__confirm-cancel {

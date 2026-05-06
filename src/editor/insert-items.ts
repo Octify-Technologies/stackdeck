@@ -1,4 +1,4 @@
-export type InsertItem = {
+type InsertItem = {
   label: string;
   description: string;
   snippet: string;

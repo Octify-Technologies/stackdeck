@@ -66,7 +66,9 @@
   font-weight: 500;
   color: var(--text-2);
   text-decoration: none;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
 }
 
 .templates-page__back:hover {
@@ -80,7 +82,9 @@
   width: 16px;
   height: 16px;
   color: var(--text-3);
-  transition: transform var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  transition:
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
 }
 
 .templates-page__back:hover .templates-page__back-arrow {
@@ -140,8 +144,7 @@
   display: flex;
   flex-direction: column;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
-    var(--bg-elev-1);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%), var(--bg-elev-1);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: 0;
@@ -151,7 +154,9 @@
   font-family: inherit;
   color: var(--text);
   box-shadow: var(--highlight), var(--shadow-2);
-  transition: border-color var(--t-med) var(--ease), transform var(--t-med) var(--ease),
+  transition:
+    border-color var(--t-med) var(--ease),
+    transform var(--t-med) var(--ease),
     box-shadow var(--t-med) var(--ease);
 }
 

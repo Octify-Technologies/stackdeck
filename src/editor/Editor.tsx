@@ -426,9 +426,7 @@ function ThumbStrip({
           {String(Math.min(selectedIndex + 1, total)).padStart(2, '0')}
         </span>
         <span className="thumb-strip__counter-sep">/</span>
-        <span className="thumb-strip__counter-total">
-          {String(total).padStart(2, '0')}
-        </span>
+        <span className="thumb-strip__counter-total">{String(total).padStart(2, '0')}</span>
       </span>
       <div className="thumb-strip__rail">
         {deck.slides.map((slide, i) => {
