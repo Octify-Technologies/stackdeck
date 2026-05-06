@@ -1,5 +1,7 @@
 import type { Brand, ColorTokens, Density, Mode, Palette, Style, ThemeRef } from '@/ir/schema';
 
+import { ensureContrast } from './contrast';
+
 const DENSITY_MULTIPLIER: Record<Density, number> = {
   dense: 0.75,
   comfortable: 1.0,
@@ -29,13 +31,16 @@ export function resolveTheme(
 }
 
 function mergeColors(base: ColorTokens, palette: Palette, brand?: Brand): ColorTokens {
+  const surface = palette.surface ?? base.surface;
+  const requestedText = palette.text ?? base.text;
+  const requestedTextMuted = palette.textMuted ?? base.textMuted;
   return {
     brand: brand?.brandColor ?? palette.brand,
     accent: brand?.accentColor ?? palette.accent,
-    surface: palette.surface ?? base.surface,
+    surface,
     surfaceMuted: palette.surfaceMuted ?? base.surfaceMuted,
-    text: palette.text ?? base.text,
-    textMuted: palette.textMuted ?? base.textMuted,
+    text: ensureContrast(requestedText, surface, 'strong'),
+    textMuted: ensureContrast(requestedTextMuted, surface, 'muted', 3.0),
     border: palette.border ?? base.border,
     success: base.success,
     warn: base.warn,
