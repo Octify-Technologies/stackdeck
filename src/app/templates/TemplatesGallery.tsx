@@ -24,17 +24,22 @@ export function TemplatesGallery() {
   const router = useRouter();
 
   const applyTemplate = async (preset: TemplatePreset) => {
-    const deck = await createDeck({
-      source: preset.seed,
-      theme: {
-        styleId: preset.styleId,
-        paletteId: preset.paletteId,
-        density: preset.density,
-        mode: preset.mode,
-      },
-      templateName: preset.name,
-    });
-    router.push(`/d/${deck.id}/edit`);
+    try {
+      const deck = await createDeck({
+        source: preset.seed,
+        theme: {
+          styleId: preset.styleId,
+          paletteId: preset.paletteId,
+          density: preset.density,
+          mode: preset.mode,
+        },
+        templateName: preset.name,
+      });
+      router.push(`/d/${deck.id}/edit`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not create deck';
+      window.alert(`Could not create the deck: ${message}`);
+    }
   };
 
   return (

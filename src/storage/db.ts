@@ -12,8 +12,18 @@ let dbPromise: Promise<IDBDatabase> | null = null;
 
 function openDb(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
+  dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      reject(new Error('IndexedDB is not available in this environment'));
+      return;
+    }
+    let req: IDBOpenDBRequest;
+    try {
+      req = indexedDB.open(DB_NAME, DB_VERSION);
+    } catch (err) {
+      reject(err as Error);
+      return;
+    }
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE_DECKS)) {
@@ -31,8 +41,23 @@ function openDb(): Promise<IDBDatabase> {
         store.createIndex('createdAt', 'createdAt');
       }
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onsuccess = () => {
+      const db = req.result;
+      // Let other tabs upgrade us out by closing our connection on demand.
+      db.onversionchange = () => db.close();
+      resolve(db);
+    };
+    req.onerror = () => reject(req.error ?? new Error('IndexedDB open failed'));
+    req.onblocked = () =>
+      reject(
+        new Error(
+          'IndexedDB upgrade blocked by another open tab. Close other tabs of this app and reload.',
+        ),
+      );
+  });
+  // Don't poison future calls if this one rejects.
+  dbPromise.catch(() => {
+    dbPromise = null;
   });
   return dbPromise;
 }

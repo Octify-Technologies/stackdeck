@@ -1425,22 +1425,6 @@
 /* Print
    --------------------------------------------------------------------------*/
 
-/* ─── In-preview editing ──────────────────────────────────────────────── */
-
-.stage__slide h1,
-.stage__slide h2,
-.stage__slide h3,
-.stage__slide h4 {
-  cursor: text;
-}
-
-.preview-editable {
-  outline: 2px solid var(--accent, #6ee7b7);
-  outline-offset: 4px;
-  border-radius: 4px;
-  background: rgba(110, 231, 183, 0.08);
-}
-
 /* ─── Export PDF menu ────────────────────────────────────────────────── */
 
 .export-pdf {
