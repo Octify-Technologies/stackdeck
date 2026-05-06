@@ -98,7 +98,15 @@ export type Cell = {
   children: Block[];
 };
 
-export type ImageTreatment = 'plain' | 'frame' | 'bleed';
+export type ImageTreatment =
+  | 'plain'
+  | 'frame'
+  | 'bleed'
+  | 'duotone'
+  | 'bw'
+  | 'polaroid'
+  | 'hard-frame'
+  | 'mask';
 
 export type Image = {
   type: 'image';
@@ -285,7 +293,9 @@ const ImageSchema: z.ZodType<Image> = z.object({
   caption: z.string().optional(),
   aspectRatio: z.string().optional(),
   focal: z.string().optional(),
-  treatment: z.enum(['plain', 'frame', 'bleed']).optional(),
+  treatment: z
+    .enum(['plain', 'frame', 'bleed', 'duotone', 'bw', 'polaroid', 'hard-frame', 'mask'])
+    .optional(),
   annotations: z.array(ImageAnnotationSchema).optional(),
 });
 
