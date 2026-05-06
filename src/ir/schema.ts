@@ -365,98 +365,55 @@ const ColorTokensSchema: z.ZodType<ColorTokens> = z.object({
   danger: HexColorSchema,
 });
 
-type TypographyScale = {
-  family: string;
-  weight: number;
-  scaleStep: number;
-  tracking?: number;
-  leading?: number;
-};
-
-const TypographyScaleSchema: z.ZodType<TypographyScale> = z.object({
-  family: z.string().min(1),
-  weight: z.number().int().min(100).max(900),
-  scaleStep: z.number(),
-  tracking: z.number().optional(),
-  leading: z.number().optional(),
-});
-
-export type Style = {
-  id: string;
-  name: string;
-  description?: string;
-  typography: {
-    display: TypographyScale;
-    body: TypographyScale;
-    mono?: TypographyScale;
-  };
-  colors: { light: ColorTokens; dark: ColorTokens };
-  radius: { sm: number; md: number; lg: number };
-  shadow: { light: Record<string, string>; dark: Record<string, string> };
-  motion: { duration: Record<string, number>; easing: Record<string, string> };
-  spacingBase: number;
-  printSafe: boolean;
-};
-
-const StyleSchema: z.ZodType<Style> = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  typography: z.object({
-    display: TypographyScaleSchema,
-    body: TypographyScaleSchema,
-    mono: TypographyScaleSchema.optional(),
-  }),
-  colors: z.object({ light: ColorTokensSchema, dark: ColorTokensSchema }),
-  radius: z.object({ sm: z.number(), md: z.number(), lg: z.number() }),
-  shadow: z.object({
-    light: z.record(z.string(), z.string()),
-    dark: z.record(z.string(), z.string()),
-  }),
-  motion: z.object({
-    duration: z.record(z.string(), z.number()),
-    easing: z.record(z.string(), z.string()),
-  }),
-  spacingBase: z.number().positive(),
-  printSafe: z.boolean(),
-});
-
+/**
+ * A Palette is the full color theme — light and dark color tokens. It is the
+ * only color source. Presets pick a default Palette, and decks may override it.
+ */
 export type Palette = {
   id: string;
   name: string;
-  brand: string;
-  accent: string;
-  surface?: string;
-  surfaceMuted?: string;
-  text?: string;
-  textMuted?: string;
-  border?: string;
+  light: ColorTokens;
+  dark: ColorTokens;
 };
 
 const PaletteSchema: z.ZodType<Palette> = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  brand: HexColorSchema,
-  accent: HexColorSchema,
-  surface: HexColorSchema.optional(),
-  surfaceMuted: HexColorSchema.optional(),
-  text: HexColorSchema.optional(),
-  textMuted: HexColorSchema.optional(),
-  border: HexColorSchema.optional(),
+  light: ColorTokensSchema,
+  dark: ColorTokensSchema,
 });
 
+/**
+ * Per-deck font overrides. Each slot points at an entry in the font catalog
+ * (`src/themes/fonts.ts`). When a slot is omitted, the resolver falls back
+ * to the preset's default.
+ */
+export type FontOverrides = {
+  display?: string;
+  body?: string;
+  mono?: string;
+};
+
 export type ThemeRef = {
-  styleId: string;
+  presetId: string;
   paletteId: string;
   density: Density;
   mode: Mode;
+  fonts?: FontOverrides;
 };
 
+const FontOverridesSchema: z.ZodType<FontOverrides> = z.object({
+  display: z.string().min(1).optional(),
+  body: z.string().min(1).optional(),
+  mono: z.string().min(1).optional(),
+});
+
 const ThemeRefSchema: z.ZodType<ThemeRef> = z.object({
-  styleId: z.string().min(1),
+  presetId: z.string().min(1),
   paletteId: z.string().min(1),
   density: z.enum(DENSITIES),
   mode: z.enum(MODES),
+  fonts: FontOverridesSchema.optional(),
 });
 
 export const LOGO_POSITIONS = [
@@ -530,5 +487,4 @@ function validate<T>(schema: z.ZodType<T>, input: unknown): ValidationResult<T> 
 export const validateDeck = (input: unknown) => validate(DeckSchema, input);
 export const validateSlide = (input: unknown) => validate(SlideSchema, input);
 export const validateBlock = (input: unknown) => validate(BlockSchema, input);
-export const validateStyle = (input: unknown) => validate(StyleSchema, input);
 export const validatePalette = (input: unknown) => validate(PaletteSchema, input);

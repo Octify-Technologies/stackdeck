@@ -2,6 +2,7 @@
 @import '../styles/blocks.css';
 @import '../styles/layouts.css';
 @import '../styles/deck.css';
+@import '../styles/dossier.css';
 
 * {
   box-sizing: border-box;

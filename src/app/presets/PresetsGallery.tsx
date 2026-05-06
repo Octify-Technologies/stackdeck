@@ -31,7 +31,7 @@ export function PresetsGallery() {
       const deck = await createDeck({
         source: tpl?.seed ?? '# Blank deck\n',
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode,
@@ -80,7 +80,7 @@ function PresetCard({ preset, onApply }: { preset: Preset; onApply: (mode: Mode)
     try {
       const parsed = parseDeck(previewTemplate.seed, {
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode: previewMode,
@@ -152,7 +152,6 @@ function PresetCard({ preset, onApply }: { preset: Preset; onApply: (mode: Mode)
         </Heading>
         <Caption>{preset.vibe}</Caption>
         <div className="preset-card__tags">
-          <Label className="preset-card__tag">{preset.styleId}</Label>
           <Label className="preset-card__tag">{preset.paletteId}</Label>
           <Label className="preset-card__tag">{preset.density}</Label>
           <Label className="preset-card__tag">{previewMode}</Label>

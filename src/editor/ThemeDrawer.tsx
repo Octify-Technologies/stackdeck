@@ -6,29 +6,34 @@ import {
   type Brand,
   DENSITIES,
   type Density,
+  type FontOverrides,
   LOGO_POSITIONS,
   MODES,
   type Mode,
   type Palette,
-  type Style,
 } from '@/ir/schema';
 import { deriveAccent, isValidHex } from '@/lib/color';
-import { allPalettes, allStyles, getPalette } from '@/themes/registry';
+import { allPalettes, getPalette } from '@/themes/registry';
+import { fontsForRole, getFont } from '@/themes/fonts';
+import { getPreset } from '@/app/presets/presets';
 
 import { ColorPicker } from './ColorPicker';
 
 type Section = 'theme' | 'brand';
 
+type FontRole = 'display' | 'body' | 'mono';
+
 type Props = {
-  styleId: string;
+  presetId: string;
   paletteId: string;
   density: Density;
   mode: Mode;
+  fonts: FontOverrides;
   brand: Brand;
-  onStyleChange: (id: string) => void;
   onPaletteChange: (id: string) => void;
   onDensityChange: (d: Density) => void;
   onModeChange: (m: Mode) => void;
+  onFontsChange: (fonts: FontOverrides) => void;
   onBrandChange: (b: Brand) => void;
   onClose: () => void;
 };
@@ -37,7 +42,7 @@ export function ThemeDrawer(props: Props) {
   const [section, setSection] = useState<Section>('theme');
 
   const palette = getPalette(props.paletteId);
-  const surfaceForContrast = palette.surface ?? (props.mode === 'dark' ? '#0a0a0a' : '#ffffff');
+  const surfaceForContrast = palette[props.mode].surface;
 
   return (
     <aside className="drawer" aria-label="Design system">
@@ -84,14 +89,15 @@ export function ThemeDrawer(props: Props) {
       <div className="drawer__body">
         {section === 'theme' ? (
           <ThemeSection
-            styleId={props.styleId}
+            presetId={props.presetId}
             paletteId={props.paletteId}
             density={props.density}
             mode={props.mode}
-            onStyleChange={props.onStyleChange}
+            fonts={props.fonts}
             onPaletteChange={props.onPaletteChange}
             onDensityChange={props.onDensityChange}
             onModeChange={props.onModeChange}
+            onFontsChange={props.onFontsChange}
           />
         ) : (
           <BrandSection
@@ -106,36 +112,63 @@ export function ThemeDrawer(props: Props) {
 }
 
 function ThemeSection({
-  styleId,
+  presetId,
   paletteId,
   density,
   mode,
-  onStyleChange,
+  fonts,
   onPaletteChange,
   onDensityChange,
   onModeChange,
+  onFontsChange,
 }: {
-  styleId: string;
+  presetId: string;
   paletteId: string;
   density: Density;
   mode: Mode;
-  onStyleChange: (id: string) => void;
+  fonts: FontOverrides;
   onPaletteChange: (id: string) => void;
   onDensityChange: (d: Density) => void;
   onModeChange: (m: Mode) => void;
+  onFontsChange: (fonts: FontOverrides) => void;
 }) {
+  const preset = getPreset(presetId);
+
+  const setFont = (role: FontRole, value: string | undefined) => {
+    const next: FontOverrides = { ...fonts };
+    if (value === undefined) delete next[role];
+    else next[role] = value;
+    onFontsChange(next);
+  };
+
   return (
     <div className="drawer__section">
-      <Field label="Style">
-        <div className="card-grid">
-          {allStyles.map((style) => (
-            <StyleCard
-              key={style.id}
-              style={style}
-              selected={style.id === styleId}
-              onClick={() => onStyleChange(style.id)}
-            />
-          ))}
+      <Field label="Fonts">
+        <div className="font-picker-list">
+          <FontPicker
+            role="display"
+            label="Display"
+            sample="Aa"
+            currentId={fonts.display}
+            fallbackFamily={preset.fonts.display}
+            onChange={(id) => setFont('display', id)}
+          />
+          <FontPicker
+            role="body"
+            label="Body"
+            sample="Ag"
+            currentId={fonts.body}
+            fallbackFamily={preset.fonts.body}
+            onChange={(id) => setFont('body', id)}
+          />
+          <FontPicker
+            role="mono"
+            label="Mono"
+            sample="01"
+            currentId={fonts.mono}
+            fallbackFamily={preset.fonts.mono}
+            onChange={(id) => setFont('mono', id)}
+          />
         </div>
       </Field>
 
@@ -145,6 +178,7 @@ function ThemeSection({
             <PaletteSwatch
               key={p.id}
               palette={p}
+              mode={mode}
               selected={p.id === paletteId}
               onClick={() => onPaletteChange(p.id)}
             />
@@ -181,6 +215,53 @@ function ThemeSection({
           ))}
         </div>
       </Field>
+    </div>
+  );
+}
+
+function FontPicker({
+  role,
+  label,
+  sample,
+  currentId,
+  fallbackFamily,
+  onChange,
+}: {
+  role: FontRole;
+  label: string;
+  sample: string;
+  currentId: string | undefined;
+  fallbackFamily: string;
+  onChange: (id: string | undefined) => void;
+}) {
+  const options = fontsForRole(role);
+  const activeFamily = currentId ? (getFont(currentId)?.family ?? fallbackFamily) : fallbackFamily;
+  const activeId = currentId ?? '__preset__';
+
+  return (
+    <div className="font-picker">
+      <div className="font-picker__head">
+        <span className="font-picker__label">{label}</span>
+        <span className="font-picker__sample" style={{ fontFamily: activeFamily }} aria-hidden>
+          {sample}
+        </span>
+      </div>
+      <select
+        className="font-picker__select"
+        value={activeId}
+        onChange={(e) => {
+          const next = e.target.value;
+          onChange(next === '__preset__' ? undefined : next);
+        }}
+        aria-label={`${label} font`}
+      >
+        <option value="__preset__">Preset default</option>
+        {options.map((f) => (
+          <option key={f.id} value={f.id}>
+            {f.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -286,39 +367,18 @@ function BrandSection({
   );
 }
 
-function StyleCard({
-  style,
-  selected,
-  onClick,
-}: {
-  style: Style;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`style-card ${selected ? 'style-card--selected' : ''}`}
-      aria-pressed={selected}
-    >
-      <span className="style-card__name" style={{ fontFamily: style.typography.display.family }}>
-        Aa
-      </span>
-      <span className="style-card__label">{style.name}</span>
-    </button>
-  );
-}
-
 function PaletteSwatch({
   palette,
+  mode,
   selected,
   onClick,
 }: {
   palette: Palette;
+  mode: Mode;
   selected: boolean;
   onClick: () => void;
 }) {
+  const tokens = palette[mode];
   return (
     <button
       type="button"
@@ -328,8 +388,8 @@ function PaletteSwatch({
       aria-label={palette.name}
       title={palette.name}
     >
-      <span style={{ background: palette.brand }} className="palette-swatch__half" />
-      <span style={{ background: palette.accent }} className="palette-swatch__half" />
+      <span style={{ background: tokens.brand }} className="palette-swatch__half" />
+      <span style={{ background: tokens.accent }} className="palette-swatch__half" />
     </button>
   );
 }

@@ -34,7 +34,7 @@ export function TemplatesGallery() {
       const deck = await createDeck({
         source: template.seed,
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode: preset.defaultMode,
@@ -82,7 +82,7 @@ function TemplateCard({ template, onApply }: { template: Template; onApply: () =
     try {
       const parsed = parseDeck(template.seed, {
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode: preset.defaultMode,

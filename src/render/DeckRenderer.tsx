@@ -1,7 +1,8 @@
 'use client';
 
 import type { Deck, Heading, Slide } from '@/ir/schema';
-import { getPalette, getStyle } from '@/themes/registry';
+import { getPalette } from '@/themes/registry';
+import { getPreset } from '@/app/presets/presets';
 
 import { SlideRenderer } from './SlideRenderer';
 import { ThemeProvider } from './ThemeProvider';
@@ -28,12 +29,12 @@ function computeSectionContext(slides: Slide[]): (string | undefined)[] {
 }
 
 export function DeckRenderer({ deck, className }: Props) {
-  const style = getStyle(deck.theme.styleId);
+  const preset = getPreset(deck.theme.presetId);
   const palette = getPalette(deck.theme.paletteId);
   const sectionContext = computeSectionContext(deck.slides);
 
   return (
-    <ThemeProvider theme={deck.theme} style={style} palette={palette} brand={deck.brand}>
+    <ThemeProvider theme={deck.theme} preset={preset} palette={palette} brand={deck.brand}>
       <div className={['deck', className].filter(Boolean).join(' ')}>
         {deck.slides.map((slide, i) => (
           <div key={slide.id} className="slide-frame" data-aspect={deck.aspectRatio}>

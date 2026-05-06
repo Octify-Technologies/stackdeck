@@ -1,4 +1,6 @@
-import type { Brand, ColorTokens, Density, Mode, Palette, Style, ThemeRef } from '@/ir/schema';
+import type { Brand, ColorTokens, Density, Mode, Palette, ThemeRef } from '@/ir/schema';
+import type { Preset } from '@/app/presets/presets';
+import { getFont } from '@/themes/fonts';
 
 import { ensureContrast } from './contrast';
 
@@ -9,6 +11,28 @@ const DENSITY_MULTIPLIER: Record<Density, number> = {
   spacious: 1.7,
 };
 
+/**
+ * Sensible defaults for radius / shadow / motion / spacing that every preset
+ * inherits. A preset that wants different values overrides them in its scoped
+ * CSS file (`[data-preset='<id>']`).
+ */
+const DEFAULT_SPACING_BASE = 8;
+
+const DEFAULT_RADIUS = { sm: '4px', md: '8px', lg: '16px' };
+
+const DEFAULT_SHADOW = {
+  light: {
+    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
+    md: '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
+    lg: '0 24px 48px -12px rgba(0, 0, 0, 0.16)',
+  },
+  dark: {
+    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.5)',
+    md: '0 8px 24px -4px rgba(0, 0, 0, 0.6)',
+    lg: '0 24px 48px -12px rgba(0, 0, 0, 0.8)',
+  },
+};
+
 type ResolvedTheme = {
   ref: ThemeRef;
   colors: ColorTokens;
@@ -16,32 +40,41 @@ type ResolvedTheme = {
 };
 
 /**
- * Compose a Style + Palette + Density + Mode (+ optional Brand overrides) into
+ * Compose a Preset + Palette + Density + Mode (+ optional Brand overrides) into
  * a flat token map ready to apply as CSS custom properties.
  */
 export function resolveTheme(
   ref: ThemeRef,
-  style: Style,
+  preset: Preset,
   palette: Palette,
   brand?: Brand,
 ): ResolvedTheme {
-  const colors = mergeColors(style.colors[ref.mode], palette, brand);
-  const cssVars = buildCssVars(colors, style, ref.density, ref.mode);
+  const colors = mergeColors(palette[ref.mode], brand);
+  const fonts = mergeFonts(preset, ref.fonts);
+  const cssVars = buildCssVars(colors, fonts, ref.density, ref.mode);
   return { ref, colors, cssVars };
 }
 
-function mergeColors(base: ColorTokens, palette: Palette, brand?: Brand): ColorTokens {
-  const surface = palette.surface ?? base.surface;
-  const requestedText = palette.text ?? base.text;
-  const requestedTextMuted = palette.textMuted ?? base.textMuted;
+type ResolvedFonts = { display: string; body: string; mono: string };
+
+function mergeFonts(preset: Preset, overrides?: ThemeRef['fonts']): ResolvedFonts {
   return {
-    brand: brand?.brandColor ?? palette.brand,
-    accent: brand?.accentColor ?? palette.accent,
+    display: getFont(overrides?.display)?.family ?? preset.fonts.display,
+    body: getFont(overrides?.body)?.family ?? preset.fonts.body,
+    mono: getFont(overrides?.mono)?.family ?? preset.fonts.mono,
+  };
+}
+
+function mergeColors(base: ColorTokens, brand?: Brand): ColorTokens {
+  const surface = base.surface;
+  return {
+    brand: brand?.brandColor ?? base.brand,
+    accent: brand?.accentColor ?? base.accent,
     surface,
-    surfaceMuted: palette.surfaceMuted ?? base.surfaceMuted,
-    text: ensureContrast(requestedText, surface, 'strong'),
-    textMuted: ensureContrast(requestedTextMuted, surface, 'muted', 3.0),
-    border: palette.border ?? base.border,
+    surfaceMuted: base.surfaceMuted,
+    text: ensureContrast(base.text, surface, 'strong'),
+    textMuted: ensureContrast(base.textMuted, surface, 'muted', 3.0),
+    border: base.border,
     success: base.success,
     warn: base.warn,
     danger: base.danger,
@@ -50,16 +83,14 @@ function mergeColors(base: ColorTokens, palette: Palette, brand?: Brand): ColorT
 
 function buildCssVars(
   c: ColorTokens,
-  style: Style,
+  fonts: ResolvedFonts,
   density: Density,
   mode: Mode,
 ): Record<string, string> {
   const multiplier = DENSITY_MULTIPLIER[density];
-  const base = style.spacingBase;
-  const scale = (n: number) => `${n * base * multiplier}px`;
-  const radius = (n: number) => `${n}px`;
+  const scale = (n: number) => `${n * DEFAULT_SPACING_BASE * multiplier}px`;
 
-  const shadow = style.shadow[mode];
+  const shadow = DEFAULT_SHADOW[mode];
 
   return {
     '--color-brand': c.brand,
@@ -73,17 +104,9 @@ function buildCssVars(
     '--color-warn': c.warn,
     '--color-danger': c.danger,
 
-    '--font-display': style.typography.display.family,
-    '--font-body': style.typography.body.family,
-    '--font-mono': style.typography.mono?.family ?? 'ui-monospace, monospace',
-
-    '--weight-display': String(style.typography.display.weight),
-    '--weight-body': String(style.typography.body.weight),
-
-    '--leading-display': String(style.typography.display.leading ?? 1.1),
-    '--leading-body': String(style.typography.body.leading ?? 1.5),
-
-    '--tracking-display': `${style.typography.display.tracking ?? 0}em`,
+    '--font-display': fonts.display,
+    '--font-body': fonts.body,
+    '--font-mono': fonts.mono,
 
     '--space-xs': scale(0.25),
     '--space-sm': scale(0.5),
@@ -95,12 +118,12 @@ function buildCssVars(
     '--slide-padding': scale(4.5),
     '--measure-max': '60ch',
 
-    '--radius-sm': radius(style.radius.sm),
-    '--radius-md': radius(style.radius.md),
-    '--radius-lg': radius(style.radius.lg),
+    '--radius-sm': DEFAULT_RADIUS.sm,
+    '--radius-md': DEFAULT_RADIUS.md,
+    '--radius-lg': DEFAULT_RADIUS.lg,
 
-    '--shadow-sm': shadow.sm ?? 'none',
-    '--shadow-md': shadow.md ?? 'none',
-    '--shadow-lg': shadow.lg ?? 'none',
+    '--shadow-sm': shadow.sm,
+    '--shadow-md': shadow.md,
+    '--shadow-lg': shadow.lg,
   };
 }

@@ -1,5 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Geist, Fraunces, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import {
+  Inter,
+  Geist,
+  Fraunces,
+  Instrument_Serif,
+  Space_Grotesk,
+  JetBrains_Mono,
+} from 'next/font/google';
 import './globals.css';
 
 // Inter and Space Grotesk are consumed by slide themes (themes/styles/*.ts),
@@ -7,6 +14,13 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
+const instrument = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument',
+  display: 'swap',
+});
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-space-grotesk',
@@ -120,7 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geist.variable} ${fraunces.variable} ${spaceGrotesk.variable} ${jetbrains.variable}`}
+      className={`${inter.variable} ${geist.variable} ${fraunces.variable} ${instrument.variable} ${spaceGrotesk.variable} ${jetbrains.variable}`}
     >
       <body>
         <script

@@ -9,12 +9,13 @@ import { planDeck } from '@/ir/plan';
 import { reorderSlide } from '@/ir/source-edit';
 import { lintColors } from '@/render/lint';
 import { resolveTheme } from '@/render/theme-resolver';
-import type { Brand, Deck, Density, Mode, ThemeRef } from '@/ir/schema';
+import type { Brand, Deck, Density, FontOverrides, Mode, ThemeRef } from '@/ir/schema';
 import { createAsset, assetSrc } from '@/storage/asset-store';
 import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
 import { DeckRenderer } from '@/render/DeckRenderer';
 import { ExportPdf } from '@/render/ExportPdf';
-import { allPalettes, allStyles, getPalette, getStyle } from '@/themes/registry';
+import { getPalette } from '@/themes/registry';
+import { DEFAULT_PRESET_ID, getPreset, PRESETS } from '@/app/presets/presets';
 
 import { AssetsDrawer } from './AssetsDrawer';
 import { InsertMenu } from './InsertMenu';
@@ -23,18 +24,20 @@ import { SourceEditor } from './SourceEditor';
 import { ThemeDrawer } from './ThemeDrawer';
 
 type EditorState = {
-  styleId: string;
+  presetId: string;
   paletteId: string;
   density: Density;
   mode: Mode;
+  fonts: FontOverrides;
   brand: Brand;
 };
 
 const DEFAULT_STATE: EditorState = {
-  styleId: allStyles[0].id,
-  paletteId: allPalettes[0].id,
-  density: 'comfortable',
-  mode: 'light',
+  presetId: DEFAULT_PRESET_ID,
+  paletteId: PRESETS[0].paletteId,
+  density: PRESETS[0].density,
+  mode: PRESETS[0].defaultMode,
+  fonts: {},
   brand: {},
 };
 
@@ -97,10 +100,11 @@ export function Editor({ deckId }: Props) {
       setStoredDeck(deck);
       setSource(deck.source);
       setState({
-        styleId: deck.theme.styleId,
+        presetId: deck.theme.presetId,
         paletteId: deck.theme.paletteId,
         density: deck.theme.density,
         mode: deck.theme.mode,
+        fonts: deck.theme.fonts ?? {},
         brand: deck.brand ?? {},
       });
       setSaveStatus('idle');
@@ -124,10 +128,11 @@ export function Editor({ deckId }: Props) {
         const next = await updateDeck(deckId, {
           source,
           theme: {
-            styleId: state.styleId,
+            presetId: state.presetId,
             paletteId: state.paletteId,
             density: state.density,
             mode: state.mode,
+            fonts: state.fonts,
           },
           brand: state.brand,
         });
@@ -144,24 +149,25 @@ export function Editor({ deckId }: Props) {
 
   const theme: ThemeRef = useMemo(
     () => ({
-      styleId: state.styleId,
+      presetId: state.presetId,
       paletteId: state.paletteId,
       density: state.density,
       mode: state.mode,
+      fonts: state.fonts,
     }),
-    [state.styleId, state.paletteId, state.density, state.mode],
+    [state.presetId, state.paletteId, state.density, state.mode, state.fonts],
   );
 
   const lintWarnings = useMemo(() => {
     try {
-      const style = getStyle(state.styleId);
+      const preset = getPreset(state.presetId);
       const palette = getPalette(state.paletteId);
-      const resolved = resolveTheme(theme, style, palette, state.brand);
+      const resolved = resolveTheme(theme, preset, palette, state.brand);
       return lintColors(resolved.colors);
     } catch {
       return [];
     }
-  }, [theme, state.styleId, state.paletteId, state.brand]);
+  }, [theme, state.presetId, state.paletteId, state.brand]);
 
   const result = useMemo(() => {
     try {
@@ -372,15 +378,16 @@ export function Editor({ deckId }: Props) {
 
         {drawerOpen ? (
           <ThemeDrawer
-            styleId={state.styleId}
+            presetId={state.presetId}
             paletteId={state.paletteId}
             density={state.density}
             mode={state.mode}
+            fonts={state.fonts}
             brand={state.brand}
-            onStyleChange={(styleId) => setState((s) => ({ ...s, styleId }))}
             onPaletteChange={(paletteId) => setState((s) => ({ ...s, paletteId }))}
             onDensityChange={(density) => setState((s) => ({ ...s, density }))}
             onModeChange={(mode) => setState((s) => ({ ...s, mode }))}
+            onFontsChange={(fonts) => setState((s) => ({ ...s, fonts }))}
             onBrandChange={updateBrand}
             onClose={() => setDrawerOpen(false)}
           />

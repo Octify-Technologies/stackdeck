@@ -1,3 +1,6 @@
+import { dossierCaseStudySeed } from './seeds/dossier-case-study';
+import { dossierKitchenSinkSeed } from './seeds/dossier-kitchen-sink';
+
 export type TemplateCategory = 'case-study' | 'pitch' | 'sales' | 'internal';
 
 /**
@@ -16,7 +19,26 @@ export type Template = {
   recommendedPresetId: string;
 };
 
-export const TEMPLATES: Template[] = [];
+export const TEMPLATES: Template[] = [
+  {
+    id: 'northwind-case-study',
+    name: 'Northwind, six-week engagement',
+    vibe: 'A premium client case study told as an editorial dossier.',
+    category: 'case-study',
+    seed: dossierCaseStudySeed,
+    slideCount: 8,
+    recommendedPresetId: 'dossier-noir',
+  },
+  {
+    id: 'dossier-kitchen-sink',
+    name: 'Dossier · kitchen sink',
+    vibe: 'Every directive in one deck. Use this to iterate on the Dossier preset.',
+    category: 'case-study',
+    seed: dossierKitchenSinkSeed,
+    slideCount: 38,
+    recommendedPresetId: 'dossier-noir',
+  },
+];
 
 export function getTemplate(id: string): Template | undefined {
   return TEMPLATES.find((t) => t.id === id);

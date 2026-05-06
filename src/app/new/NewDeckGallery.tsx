@@ -65,7 +65,7 @@ export function NewDeckGallery() {
       const deck = await createDeck({
         source: template?.seed ?? STARTER_MARKDOWN,
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode,
@@ -150,7 +150,7 @@ function TemplateCard({ template, onClick }: { template: Template; onClick: () =
     try {
       const parsed = parseDeck(template.seed, {
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode: preset.defaultMode,
@@ -264,7 +264,7 @@ function PresetChoiceCard({
     try {
       const parsed = parseDeck(seed, {
         theme: {
-          styleId: preset.styleId,
+          presetId: preset.id,
           paletteId: preset.paletteId,
           density: preset.density,
           mode: previewMode,
@@ -335,7 +335,7 @@ function PresetChoiceCard({
         </Heading>
         <Caption>{preset.vibe}</Caption>
         <div className="preset-card__tags">
-          <Label className="preset-card__tag">{preset.styleId}</Label>
+          <Label className="preset-card__tag">{preset.paletteId}</Label>
           <Label className="preset-card__tag">{previewMode}</Label>
         </div>
       </div>

@@ -32,10 +32,10 @@ import {
 } from './schema';
 
 const DEFAULT_THEME: ThemeRef = {
-  styleId: 'modern',
-  paletteId: 'electric',
-  density: 'comfortable',
-  mode: 'light',
+  presetId: 'dossier-noir',
+  paletteId: 'obsidian',
+  density: 'airy',
+  mode: 'dark',
 };
 
 const VOID_DIRECTIVES = new Set(['stat', 'slide', 'image']);

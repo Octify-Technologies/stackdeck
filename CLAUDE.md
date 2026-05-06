@@ -6,6 +6,8 @@ A **deck** is the final artifact: a stored slide deck the user edits, presents, 
 
 ### Preset = design
 
+When working on a preset, Claude has full freedom to apply changes at any level (style CSS, palette, typography, density, motion, scoped overrides, supporting theme files). Presets are the primary output of this tool, so think deeply before designing one: study existing presets, consider the visual system as a whole, and aim for a coherent, distinctive result rather than a surface-level tweak.
+
 A **Preset** is a visual design and nothing else. It owns:
 
 - `styleId` (typography system, radii, shadows, motion)
