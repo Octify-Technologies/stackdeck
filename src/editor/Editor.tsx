@@ -6,6 +6,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ParseError, parseDeck } from '@/ir/parse';
 import { planDeck } from '@/ir/plan';
+import { reorderSlide } from '@/ir/source-edit';
 import type { Brand, Deck, Density, Mode, ThemeRef } from '@/ir/schema';
 import { createAsset, assetSrc } from '@/storage/asset-store';
 import { getDeck, type StoredDeck, updateDeck } from '@/storage/deck-store';
@@ -164,6 +165,11 @@ export function Editor({ deckId }: Props) {
     setSelectedSlide(index);
   }, []);
 
+  const handleReorderSlide = useCallback((from: number, to: number) => {
+    setSource((s) => reorderSlide(s, from, to));
+    setSelectedSlide(to);
+  }, []);
+
   const handleInsert = useCallback((snippet: string) => {
     insertRef.current?.(snippet);
   }, []);
@@ -315,6 +321,7 @@ export function Editor({ deckId }: Props) {
               deck={result.deck}
               selectedSlide={selectedSlide}
               onSelectSlide={handleSelectSlide}
+              onReorderSlide={handleReorderSlide}
             />
           ) : (
             <div className="editor__error">
@@ -426,10 +433,12 @@ function PreviewStage({
   deck,
   selectedSlide,
   onSelectSlide,
+  onReorderSlide,
 }: {
   deck: Deck;
   selectedSlide: number;
   onSelectSlide: (i: number) => void;
+  onReorderSlide: (from: number, to: number) => void;
 }) {
   const total = deck.slides.length;
   const safeIndex = Math.min(Math.max(selectedSlide, 0), Math.max(total - 1, 0));
@@ -461,7 +470,12 @@ function PreviewStage({
           <DeckRenderer deck={visibleDeck} />
         </div>
       </div>
-      <ThumbStrip deck={deck} selectedIndex={safeIndex} onSelect={onSelectSlide} />
+      <ThumbStrip
+        deck={deck}
+        selectedIndex={safeIndex}
+        onSelect={onSelectSlide}
+        onReorder={onReorderSlide}
+      />
     </div>
   );
 }
@@ -470,13 +484,17 @@ function ThumbStrip({
   deck,
   selectedIndex,
   onSelect,
+  onReorder,
 }: {
   deck: Deck;
   selectedIndex: number;
   onSelect: (i: number) => void;
+  onReorder: (from: number, to: number) => void;
 }) {
   const total = deck.slides.length;
   const activeRef = useRef<HTMLButtonElement>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
 
   const singles = useMemo<Deck[]>(
     () => deck.slides.map((slide) => ({ ...deck, slides: [slide] })),
@@ -510,7 +528,26 @@ function ThumbStrip({
               index={i}
               single={singles[i]}
               active={active}
+              dragging={dragIndex === i}
+              over={overIndex === i && dragIndex !== null && dragIndex !== i}
               onSelect={onSelect}
+              onDragStart={() => setDragIndex(i)}
+              onDragEnter={() => {
+                if (dragIndex !== null) setOverIndex(i);
+              }}
+              onDragOver={(e) => {
+                if (dragIndex !== null) e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragIndex !== null && dragIndex !== i) onReorder(dragIndex, i);
+                setDragIndex(null);
+                setOverIndex(null);
+              }}
+              onDragEnd={() => {
+                setDragIndex(null);
+                setOverIndex(null);
+              }}
             />
           );
         })}
@@ -523,11 +560,39 @@ type ThumbProps = {
   index: number;
   single: Deck;
   active: boolean;
+  dragging?: boolean;
+  over?: boolean;
   onSelect: (i: number) => void;
+  onDragStart?: () => void;
+  onDragEnter?: () => void;
+  onDragOver?: (e: React.DragEvent<HTMLButtonElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLButtonElement>) => void;
+  onDragEnd?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-const Thumb = memo(function Thumb({ index, single, active, onSelect, ref }: ThumbProps) {
+const Thumb = memo(function Thumb({
+  index,
+  single,
+  active,
+  dragging,
+  over,
+  onSelect,
+  onDragStart,
+  onDragEnter,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  ref,
+}: ThumbProps) {
+  const cls = [
+    'thumb-strip__item',
+    active ? 'thumb-strip__item--active' : '',
+    dragging ? 'thumb-strip__item--dragging' : '',
+    over ? 'thumb-strip__item--over' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
   return (
     <button
       ref={ref}
@@ -535,8 +600,18 @@ const Thumb = memo(function Thumb({ index, single, active, onSelect, ref }: Thum
       role="tab"
       aria-selected={active}
       aria-label={`Slide ${index + 1}`}
-      className={`thumb-strip__item${active ? ' thumb-strip__item--active' : ''}`}
+      className={cls}
       onClick={() => onSelect(index)}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(index));
+        onDragStart?.();
+      }}
+      onDragEnter={onDragEnter}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
     >
       <span className="thumb-strip__num">{String(index + 1).padStart(2, '0')}</span>
       <div className="thumb-strip__frame">
