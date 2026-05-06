@@ -153,6 +153,57 @@ describe('schema validation', () => {
       });
       expect(r.ok).toBe(true);
     });
+
+    it('accepts a deck with brand override', () => {
+      const r = validateDeck({
+        version: IR_VERSION,
+        id: 'd1',
+        title: 'X',
+        aspectRatio: '16:9',
+        theme: { styleId: 'modern', paletteId: 'electric', density: 'comfortable', mode: 'light' },
+        brand: {
+          name: 'Acme',
+          logoUrl: 'https://cdn.example.com/logo.svg',
+          logoPosition: 'top-right',
+          brandColor: '#ff0066',
+          accentColor: '#a855f7',
+        },
+        slides: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      expect(r.ok).toBe(true);
+    });
+
+    it('rejects a brand with malformed logo URL', () => {
+      const r = validateDeck({
+        version: IR_VERSION,
+        id: 'd1',
+        title: 'X',
+        aspectRatio: '16:9',
+        theme: { styleId: 'modern', paletteId: 'electric', density: 'comfortable', mode: 'light' },
+        brand: { logoUrl: 'not a url' },
+        slides: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      expect(r.ok).toBe(false);
+    });
+
+    it('rejects a brand with malformed brandColor', () => {
+      const r = validateDeck({
+        version: IR_VERSION,
+        id: 'd1',
+        title: 'X',
+        aspectRatio: '16:9',
+        theme: { styleId: 'modern', paletteId: 'electric', density: 'comfortable', mode: 'light' },
+        brand: { brandColor: 'red' },
+        slides: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      expect(r.ok).toBe(false);
+    });
   });
 
   describe('slides', () => {

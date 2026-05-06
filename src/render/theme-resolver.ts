@@ -1,4 +1,4 @@
-import type { ColorTokens, Density, Mode, Palette, Style, ThemeRef } from '@/ir/schema';
+import type { Brand, ColorTokens, Density, Mode, Palette, Style, ThemeRef } from '@/ir/schema';
 
 const DENSITY_MULTIPLIER: Record<Density, number> = {
   dense: 0.75,
@@ -13,16 +13,25 @@ type ResolvedTheme = {
   cssVars: Record<string, string>;
 };
 
-export function resolveTheme(ref: ThemeRef, style: Style, palette: Palette): ResolvedTheme {
-  const colors = mergeColors(style.colors[ref.mode], palette);
+/**
+ * Compose a Style + Palette + Density + Mode (+ optional Brand overrides) into
+ * a flat token map ready to apply as CSS custom properties.
+ */
+export function resolveTheme(
+  ref: ThemeRef,
+  style: Style,
+  palette: Palette,
+  brand?: Brand,
+): ResolvedTheme {
+  const colors = mergeColors(style.colors[ref.mode], palette, brand);
   const cssVars = buildCssVars(colors, style, ref.density, ref.mode);
   return { ref, colors, cssVars };
 }
 
-function mergeColors(base: ColorTokens, palette: Palette): ColorTokens {
+function mergeColors(base: ColorTokens, palette: Palette, brand?: Brand): ColorTokens {
   return {
-    brand: palette.brand,
-    accent: palette.accent,
+    brand: brand?.brandColor ?? palette.brand,
+    accent: brand?.accentColor ?? palette.accent,
     surface: palette.surface ?? base.surface,
     surfaceMuted: palette.surfaceMuted ?? base.surfaceMuted,
     text: palette.text ?? base.text,
@@ -40,9 +49,9 @@ function buildCssVars(
   density: Density,
   mode: Mode,
 ): Record<string, string> {
-  const m = DENSITY_MULTIPLIER[density];
+  const multiplier = DENSITY_MULTIPLIER[density];
   const base = style.spacingBase;
-  const scale = (n: number) => `${n * base * m}px`;
+  const scale = (n: number) => `${n * base * multiplier}px`;
   const radius = (n: number) => `${n}px`;
 
   const shadow = style.shadow[mode];
@@ -69,14 +78,17 @@ function buildCssVars(
     '--leading-display': String(style.typography.display.leading ?? 1.1),
     '--leading-body': String(style.typography.body.leading ?? 1.5),
 
+    '--tracking-display': `${style.typography.display.tracking ?? 0}em`,
+
     '--space-xs': scale(0.25),
     '--space-sm': scale(0.5),
     '--space-md': scale(1),
     '--space-lg': scale(1.5),
     '--space-xl': scale(2.5),
     '--space-2xl': scale(4),
-    '--slide-padding': scale(4),
-    '--measure-max': '64ch',
+    '--space-3xl': scale(6),
+    '--slide-padding': scale(4.5),
+    '--measure-max': '60ch',
 
     '--radius-sm': radius(style.radius.sm),
     '--radius-md': radius(style.radius.md),
