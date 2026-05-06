@@ -42,15 +42,15 @@ export function DeckLibrary() {
             rel="noopener noreferrer"
             className="library__nav-link"
           >
-            GitHub ↗
+            GitHub
           </a>
         </div>
       </header>
 
       <main className="library__main">
         <section className="library__hero">
-          <div>
-            <p className="library__eyebrow">Your workspace</p>
+          <div className="library__hero-text">
+            <p className="library__eyebrow">Workspace</p>
             <h1 className="library__title">Decks</h1>
             <p className="library__subtitle">
               Markdown becomes presentations. One source of truth, every theme.
@@ -62,24 +62,32 @@ export function DeckLibrary() {
         </section>
 
         {decks === null ? (
-          <div className="library__loading">Loading…</div>
+          <div className="library__loading">Loading</div>
         ) : decks.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="library__grid">
-            <Link href="/new" className="library__new-card">
-              <div className="library__new-card-icon" aria-hidden>
-                +
-              </div>
-              <div className="library__new-card-text">
-                <span className="library__new-card-title">Start a new deck</span>
-                <span className="library__new-card-sub">Pick a template, write markdown</span>
-              </div>
-            </Link>
-            {decks.map((deck) => (
-              <DeckCard key={deck.id} deck={deck} onChange={refresh} />
-            ))}
-          </div>
+          <>
+            <div className="library__grid-header">
+              <span className="library__grid-label">All decks</span>
+              <span className="library__grid-count">
+                {String(decks.length).padStart(2, '0')} total
+              </span>
+            </div>
+            <div className="library__grid">
+              <Link href="/new" className="library__new-card">
+                <div className="library__new-card-icon" aria-hidden>
+                  +
+                </div>
+                <div className="library__new-card-text">
+                  <span className="library__new-card-title">Start a new deck</span>
+                  <span className="library__new-card-sub">Pick a template, write markdown</span>
+                </div>
+              </Link>
+              {decks.map((deck) => (
+                <DeckCard key={deck.id} deck={deck} onChange={refresh} />
+              ))}
+            </div>
+          </>
         )}
       </main>
     </div>
@@ -169,7 +177,18 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
           aria-label="Duplicate deck"
           title="Duplicate"
         >
-          ⧉
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect
+              x="3"
+              y="3"
+              width="7"
+              height="7"
+              rx="1.5"
+              stroke="currentColor"
+              strokeWidth="1.2"
+            />
+            <path d="M3 8.5V2.5C3 1.94772 3.44772 1.5 4 1.5H8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
         </button>
         <button
           type="button"
@@ -182,7 +201,14 @@ function DeckCard({ deck, onChange }: { deck: DeckSummary; onChange: () => Promi
           aria-label="Delete deck"
           title="Delete"
         >
-          ×
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path
+              d="M3 3L9 9M9 3L3 9"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+          </svg>
         </button>
       </div>
     </div>
@@ -193,11 +219,11 @@ function formatRelativeDate(iso: string): string {
   const then = new Date(iso).getTime();
   const diffMs = Date.now() - then;
   const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return 'now';
+  if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `${hours}h`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days < 7) return `${days}d`;
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }

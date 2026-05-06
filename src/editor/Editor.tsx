@@ -15,6 +15,7 @@ import { allPalettes, allStyles } from '@/themes/registry';
 import { InsertMenu } from './InsertMenu';
 import { SAMPLE_MARKDOWN } from './sample-deck';
 import { SlideThumbnailList } from './SlideThumbnailList';
+import { SourceEditor } from './SourceEditor';
 import { ThemeDrawer } from './ThemeDrawer';
 
 type EditorState = {
@@ -49,10 +50,9 @@ export function Editor({ deckId }: Props) {
   const [storedDeck, setStoredDeck] = useState<StoredDeck | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
-  const sourceRef = useRef<HTMLTextAreaElement>(null);
+  const insertRef = useRef<((s: string) => void) | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load deck from IndexedDB if a deckId is provided.
   useEffect(() => {
     if (!deckId) return;
     let cancelled = false;
@@ -78,7 +78,6 @@ export function Editor({ deckId }: Props) {
     };
   }, [deckId, router]);
 
-  // Debounced auto-save when source or state changes (only after loaded).
   useEffect(() => {
     if (!deckId || !loaded) return;
     setSaveStatus('saving');
@@ -134,49 +133,66 @@ export function Editor({ deckId }: Props) {
     if (frame) frame.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, []);
 
-  const handleInsert = useCallback(
-    (snippet: string) => {
-      const textarea = sourceRef.current;
-      if (!textarea) {
-        setSource((s) => s + snippet);
-        return;
-      }
-      const pos = textarea.selectionStart;
-      const before = source.slice(0, pos);
-      const after = source.slice(pos);
-      const next = before + snippet + after;
-      setSource(next);
-      setTimeout(() => {
-        if (sourceRef.current) {
-          const cursorPos = pos + snippet.length;
-          sourceRef.current.focus();
-          sourceRef.current.setSelectionRange(cursorPos, cursorPos);
-        }
-      }, 0);
-    },
-    [source],
-  );
+  const handleInsert = useCallback((snippet: string) => {
+    insertRef.current?.(snippet);
+  }, []);
+
+  const onEditorReady = useCallback((insert: (s: string) => void) => {
+    insertRef.current = insert;
+  }, []);
 
   const updateBrand = useCallback((brand: Brand) => setState((s) => ({ ...s, brand })), []);
 
   if (!loaded) {
-    return <div className="editor editor--loading">Loading…</div>;
+    return (
+      <div className="editor editor--loading">
+        <div className="editor__loading-mark" aria-hidden />
+        <span>Loading deck</span>
+      </div>
+    );
   }
 
   return (
     <div className="editor">
       <header className="editor__topbar no-print">
-        <div className="editor__brand">
-          <Link href="/" className="editor__back" title="Back to library">
-            ←
+        <div className="editor__topbar-left">
+          <Link href="/" className="editor__back" aria-label="Back to library">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M9 11L5 7L9 3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </Link>
-          <span className="editor__deck-title" title={storedDeck?.title ?? 'Untitled Deck'}>
-            {storedDeck?.title ?? 'Untitled Deck'}
-          </span>
-          <SaveIndicator status={saveStatus} />
+          <div className="editor__topbar-divider" aria-hidden />
+          <div className="editor__deck-title-group">
+            <span className="editor__deck-title">{storedDeck?.title ?? 'Untitled deck'}</span>
+            <SaveIndicator status={saveStatus} />
+          </div>
         </div>
 
-        <div className="editor__topbar-actions">
+        <div className="editor__topbar-center">
+          <span className="editor__crumb">
+            <span className="editor__crumb-label">Style</span>
+            <span className="editor__crumb-value">{state.styleId}</span>
+          </span>
+          <span className="editor__crumb-sep" aria-hidden>
+            ·
+          </span>
+          <span className="editor__crumb">
+            <span className="editor__crumb-label">Palette</span>
+            <span className="editor__crumb-value">{state.paletteId}</span>
+          </span>
+          <span className="editor__crumb-sep" aria-hidden>
+            ·
+          </span>
+          <span className="editor__crumb editor__crumb--mode">{state.mode}</span>
+        </div>
+
+        <div className="editor__topbar-right">
           <InsertMenu onInsert={handleInsert} />
           <Link href="/templates" className="editor__nav-link">
             Templates
@@ -207,14 +223,7 @@ export function Editor({ deckId }: Props) {
         )}
 
         <div className="editor__source-pane">
-          <textarea
-            ref={sourceRef}
-            className="editor__source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            spellCheck={false}
-            aria-label="Markdown source"
-          />
+          <SourceEditor value={source} onChange={setSource} onReady={onEditorReady} />
         </div>
 
         <div className="editor__preview-pane">
@@ -251,18 +260,18 @@ export function Editor({ deckId }: Props) {
 }
 
 function SaveIndicator({ status }: { status: SaveStatus }) {
-  const map: Record<SaveStatus, { dot: string; text: string }> = {
-    idle: { dot: '○', text: '' },
-    saving: { dot: '●', text: 'Saving…' },
-    saved: { dot: '●', text: 'Saved' },
-    error: { dot: '●', text: 'Save failed' },
+  const map: Record<SaveStatus, string> = {
+    idle: '',
+    saving: 'Saving',
+    saved: 'Saved',
+    error: 'Failed',
   };
-  const { dot, text } = map[status];
+  const text = map[status];
   if (!text) return null;
   return (
     <span className={`save-indicator save-indicator--${status}`} aria-live="polite">
-      <span className="save-indicator__dot">{dot}</span>
-      <span className="save-indicator__text">{text}</span>
+      <span className="save-indicator__dot" aria-hidden />
+      {text}
     </span>
   );
 }
