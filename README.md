@@ -121,7 +121,7 @@ The viewer injects a `<base href="/c/<slug>/">` tag when serving the slide so re
 | `/c/<slug>/slides/<file>` | Raw slide HTML, used as the iframe source         |
 | `/c/<slug>/assets/<path>` | Slide static assets                               |
 | `/api/revalidate`         | Sanity webhook receiver (no-op without Sanity)    |
-| `/studio`                 | Embedded Sanity Studio (requires Sanity env vars) |
+| `http://localhost:3333`   | Sanity Studio (standalone, run via `pnpm studio`) |
 
 ## Keyboard shortcuts
 
@@ -161,7 +161,7 @@ If you want non-developers to author decks, you can connect Sanity. Decks create
    SANITY_WEBHOOK_SECRET=<random string>
    ```
 3. Add CORS origins for `http://localhost:3000` and your production URL in the Sanity dashboard.
-4. Open `/studio` and create a `deck` document. Paste the slide HTML into each slide entry. Publish.
+4. Run `pnpm studio` to start the Sanity Studio at `http://localhost:3333`. Sign in, create a `deck` document, paste the slide HTML into each slide entry. Publish.
 5. Configure a webhook (Project → API → Webhooks) pointing at `<your-domain>/api/revalidate`:
    - Filter (GROQ): `_type == "deck"`
    - Projection: `{ "_type": _type, "slug": slug.current }`

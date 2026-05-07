@@ -6,6 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "studio": "cd studio && pnpm dlx sanity@latest dev",
+    "studio:deploy": "cd studio && pnpm dlx sanity@latest deploy",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

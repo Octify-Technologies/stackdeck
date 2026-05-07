@@ -10,7 +10,7 @@ The job of this app is narrow: list decks, render them as a slide deck (viewer +
 
 Both work simultaneously. The loader merges results, with Sanity winning on slug collisions.
 
-**Sanity (preferred for non-developers):** sign in at `/studio`, create a `deck` document, paste each slide's HTML, publish. The Sanity webhook hits `/api/revalidate` and the new deck is live in seconds with no deploy. Requires `NEXT_PUBLIC_SANITY_PROJECT_ID` env var; without it the app silently skips Sanity and serves filesystem decks only.
+**Sanity (preferred for non-developers):** run `pnpm studio` (starts Sanity Studio standalone), create a `deck` document, paste each slide's HTML, publish. The Sanity webhook hits `/api/revalidate` and the new deck is live in seconds with no deploy. Requires `NEXT_PUBLIC_SANITY_PROJECT_ID` env var; without it the app silently skips Sanity and serves filesystem decks only.
 
 **Filesystem (preferred for developers):** drop a folder into `slides/<slug>/` with a `meta.json` and one HTML file per slide. Commit, push, deploy. Same model the app shipped with originally; works without any external service.
 
@@ -39,7 +39,7 @@ Images and other assets are uploaded to Sanity directly and referenced by their 
 - [src/app/c/[slug]/slides/[file]/route.ts](src/app/c/[slug]/slides/[file]/route.ts), slide HTML serving (file = stringified slide index).
 - [src/app/c/[slug]/opengraph-image.tsx](src/app/c/[slug]/opengraph-image.tsx), per-deck social card.
 - [src/app/api/revalidate/route.ts](src/app/api/revalidate/route.ts), Sanity webhook receiver.
-- [src/app/studio/[[...tool]]/page.tsx](src/app/studio/[[...tool]]/page.tsx), embedded Sanity Studio.
+- [studio/sanity.cli.ts](studio/sanity.cli.ts), CLI config for `pnpm studio`.
 
 ## What this app must NOT grow into
 
