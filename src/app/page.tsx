@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { listCaseStudies, type CaseStudy } from '@/lib/case-studies';
+import { listDecks, type Deck } from '@/lib/decks';
 import { SlideFrame } from '@/components/SlideFrame';
 import { StackdeckMark } from '@/components/StackdeckMark';
 import '@/components/SlideFrame.css';
@@ -11,7 +11,7 @@ const OCTIFY_URL = 'https://octifytechnologies.com';
 const CONTACT_EMAIL = 'ankur@octifytechnologies.com';
 
 export default async function Home() {
-  const studies = await listCaseStudies();
+  const decks = await listDecks();
 
   return (
     <div className="home">
@@ -47,15 +47,15 @@ export default async function Home() {
       <main className="home-main">
         <section className="index">
           <h1 className="index-title">
-            Case studies<span className="index-title-dot">.</span>
+            Decks<span className="index-title-dot">.</span>
           </h1>
 
-          {studies.length === 0 ? (
+          {decks.length === 0 ? (
             <Empty />
           ) : (
             <ol className="entries">
-              {studies.map((s, i) => (
-                <Entry key={s.slug} study={s} index={i} />
+              {decks.map((d, i) => (
+                <Entry key={d.slug} deck={d} index={i} />
               ))}
             </ol>
           )}
@@ -102,35 +102,35 @@ function tagTone(tag: string): (typeof TAG_TONES)[number] {
   return TAG_TONES[h % TAG_TONES.length];
 }
 
-function Entry({ study, index }: { study: CaseStudy; index: number }) {
+function Entry({ deck, index }: { deck: Deck; index: number }) {
   const num = String(index + 1).padStart(2, '0');
-  const date = study.date ? formatDate(study.date) : null;
-  const tags = (study.tags ?? []).slice(0, 3);
+  const date = deck.date ? formatDate(deck.date) : null;
+  const tags = (deck.tags ?? []).slice(0, 3);
 
   return (
     <li className="entry" style={{ animationDelay: `${100 + index * 60}ms` }}>
-      <Link href={`/c/${study.slug}`} className="entry-link">
+      <Link href={`/c/${deck.slug}`} className="entry-link">
         <span className="entry-num" aria-hidden>
           {num}
         </span>
 
         <div className="entry-body">
           <div className="entry-meta">
-            {study.client ? <span className="entry-client">{study.client}</span> : null}
-            {study.industry ? (
+            {deck.client ? <span className="entry-client">{deck.client}</span> : null}
+            {deck.industry ? (
               <>
                 <span className="entry-meta-dot" aria-hidden>
                   ·
                 </span>
-                <span className="entry-industry">{study.industry}</span>
+                <span className="entry-industry">{deck.industry}</span>
               </>
             ) : null}
             {date ? <span className="entry-date">{date}</span> : null}
           </div>
 
-          <h2 className="entry-title">{study.title}</h2>
+          <h2 className="entry-title">{deck.title}</h2>
 
-          {study.summary ? <p className="entry-summary">{study.summary}</p> : null}
+          {deck.summary ? <p className="entry-summary">{deck.summary}</p> : null}
 
           <div className="entry-foot">
             {tags.length > 0 ? (
@@ -144,7 +144,7 @@ function Entry({ study, index }: { study: CaseStudy; index: number }) {
               </div>
             ) : null}
             <span className="entry-count">
-              {study.slides.length} {study.slides.length === 1 ? 'slide' : 'slides'}
+              {deck.slides.length} {deck.slides.length === 1 ? 'slide' : 'slides'}
             </span>
             <span className="entry-arrow" aria-hidden>
               <span className="entry-arrow-text">Read</span>
@@ -163,8 +163,8 @@ function Entry({ study, index }: { study: CaseStudy; index: number }) {
 
         <div className="entry-cover">
           <SlideFrame
-            src={`/c/${study.slug}/slides/${study.cover}`}
-            title={study.title}
+            src={`/c/${deck.slug}/slides/${deck.cover}`}
+            title={deck.title}
             lazy
             interactive={false}
           />
@@ -191,7 +191,7 @@ function Empty() {
           />
         </svg>
       </div>
-      <p className="empty-line">No case studies published yet.</p>
+      <p className="empty-line">No decks published yet.</p>
       <p className="empty-hint">Check back soon, or get in touch with Octify directly.</p>
     </div>
   );

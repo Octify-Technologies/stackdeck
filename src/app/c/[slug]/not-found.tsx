@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { StackdeckMark } from '@/components/StackdeckMark';
 import './not-found.css';
 
-export default function CaseStudyNotFound() {
+export default function DeckNotFound() {
   return (
     <div className="nf">
       <header className="nf-bar">
@@ -12,13 +12,13 @@ export default function CaseStudyNotFound() {
         </Link>
       </header>
       <main className="nf-main">
-        <span className="nf-eyebrow">404 — case study not found</span>
+        <span className="nf-eyebrow">404 — deck not found</span>
         <h1 className="nf-title">
           We could not find <span className="nf-title-accent">that deck.</span>
         </h1>
         <p className="nf-sub">
-          The case study you were looking for has been moved or never existed. Head back to the
-          index and pick another one.
+          The deck you were looking for has been moved or never existed. Head back to the index and
+          pick another one.
         </p>
         <Link href="/" className="nf-cta">
           <span>Back to all decks</span>

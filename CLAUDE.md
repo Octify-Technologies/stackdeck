@@ -2,51 +2,66 @@ Never run build or tests until I ask manually.
 
 ## What this app is
 
-Internal viewer for Octify case studies. **Bring your own HTML.** Each case study is a folder of hand-authored HTML files (one per slide) under `case-studies/<slug>/`. The app renders each slide inside a sandboxed iframe at a fixed 1920×1080 canvas, scaled to fit the viewport. There is no editor, no markdown, no theming, no presets.
+Internal viewer for Octify decks. **Bring your own HTML.** Each deck is either a Sanity document with a `slides[]` array, or a folder under `slides/<slug>/` with `meta.json` and `<n>.html` files. The app renders each slide inside a sandboxed iframe at a fixed 1920x1080 canvas, scaled to fit the viewport. There is no in-app editor, no markdown, no theming, no presets.
 
-The job of this app is narrow: discover case studies, list them, render them as a deck (viewer + present mode), serve their assets. Nothing else.
+The job of this app is narrow: list decks, render them as a slide deck (viewer + present mode), generate per-deck PDFs and OG images. Nothing else.
 
-## The mental model
+## The two authoring sources
 
-- **Author** designs slides as HTML somewhere (Astro, hand-coded, whatever). Each slide is a self-contained 1920×1080 document with inline CSS and system fonts.
-- **Drop** the folder into `case-studies/<slug>/` with a `meta.json`.
-- **Ship.** The app picks it up, no code change needed.
+Both work simultaneously. The loader merges results, with Sanity winning on slug collisions.
+
+**Sanity (preferred for non-developers):** run `pnpm studio` (starts Sanity Studio standalone), create a `deck` document, paste each slide's HTML, publish. The Sanity webhook hits `/api/revalidate` and the new deck is live in seconds with no deploy. Requires `NEXT_PUBLIC_SANITY_PROJECT_ID` env var; without it the app silently skips Sanity and serves filesystem decks only.
+
+**Filesystem (preferred for developers):** drop a folder into `slides/<slug>/` with a `meta.json` and one HTML file per slide. Commit, push, deploy. Same model the app shipped with originally; works without any external service.
 
 ## Authoring contract (the only real rule)
 
-Every slide HTML file must:
+Every slide HTML must:
 
 1. Be a complete `<!doctype html>` document.
-2. Render against a 1920×1080 canvas. `body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }`.
+2. Render against a 1920x1080 canvas. `body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }`.
 3. Inline its CSS. No external CSS, no Google Fonts, no external scripts, no fetches. System font stacks only.
 4. Have a `<title>` tag.
 
-Slide assets go under `case-studies/<slug>/assets/` and are referenced as `assets/<file>` (resolved at runtime by `/c/<slug>/assets/<path>`).
+Images and other assets are uploaded to Sanity directly and referenced by their `cdn.sanity.io` URL inside the slide HTML's `<img>` tags. The app does not proxy assets; it does not host any.
 
 ## File map
 
-- `case-studies/<slug>/meta.json`, deck metadata.
-- `case-studies/<slug>/*.html`, one file per slide.
-- `case-studies/<slug>/assets/*`, optional static assets.
-- [src/lib/case-studies.ts](src/lib/case-studies.ts), manifest loader, slide reader, asset reader. Server-only.
+- `studio/sanity.config.ts`, Sanity Studio configuration.
+- `studio/schemas/deck.ts`, Sanity schema for a deck (metadata + slides[]).
+- [src/lib/sanity.ts](src/lib/sanity.ts), Sanity client and cache-tag identifiers.
+- [src/lib/decks.ts](src/lib/decks.ts), GROQ-backed loader (`listDecks`, `getDeck`, `readSlide`).
 - [src/components/SlideFrame.tsx](src/components/SlideFrame.tsx), fixed-canvas iframe with CSS scaling.
 - [src/components/Viewer.tsx](src/components/Viewer.tsx), main viewer (chrome + stage + thumb strip).
 - [src/components/Present.tsx](src/components/Present.tsx), fullscreen present mode.
-- [src/app/page.tsx](src/app/page.tsx), index of case studies.
+- [src/app/page.tsx](src/app/page.tsx), index of decks.
 - [src/app/c/[slug]/page.tsx](src/app/c/[slug]/page.tsx), viewer route.
-- [src/app/c/[slug]/present/page.tsx](src/app/c/[slug]/present/page.tsx), present mode route.
-- [src/app/c/[slug]/slides/[file]/route.ts](src/app/c/[slug]/slides/[file]/route.ts), slide HTML serving.
-- [src/app/c/[slug]/assets/[...path]/route.ts](src/app/c/[slug]/assets/[...path]/route.ts), slide asset serving.
+- [src/app/c/[slug]/slides/[file]/route.ts](src/app/c/[slug]/slides/[file]/route.ts), slide HTML serving (file = stringified slide index).
+- [src/app/c/[slug]/opengraph-image.tsx](src/app/c/[slug]/opengraph-image.tsx), per-deck social card.
+- [src/app/api/revalidate/route.ts](src/app/api/revalidate/route.ts), Sanity webhook receiver.
+- [studio/sanity.cli.ts](studio/sanity.cli.ts), CLI config for `pnpm studio`.
 
 ## What this app must NOT grow into
 
-- No editor.
+- No in-app editor (use Sanity Studio).
 - No theming, no presets, no palettes.
 - No markdown, no IR, no block components.
 - No customization UI of any kind.
 - No "easier authoring" shortcuts that let slides skip the BYO HTML contract.
 
 If something needs to be different per deck, it lives in the deck's HTML. Not in the app.
+
+## Env vars (all optional)
+
+The app boots without any of these. Without them, only filesystem decks under `slides/` are served.
+
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`, the Sanity project ID. Setting this enables the Sanity loader path.
+- `NEXT_PUBLIC_SANITY_DATASET`, defaults to `production`.
+- `NEXT_PUBLIC_SANITY_API_VERSION`, ISO date, defaults to `2024-10-01`.
+- `SANITY_READ_TOKEN`, required only if previewing unpublished drafts.
+- `SANITY_WEBHOOK_SECRET`, required for the `/api/revalidate` webhook to verify signatures. Configure the same value in the Sanity webhook settings.
+
+See `.env.example`.
 
 ## Workflow rules
 
