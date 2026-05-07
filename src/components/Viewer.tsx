@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SlideFrame } from './SlideFrame';
 import { StackdeckMark } from './StackdeckMark';
 import { Present } from './Present';
@@ -10,6 +10,7 @@ import './SlideFrame.css';
 import './Viewer.css';
 
 const CONTACT_EMAIL = 'ankur@octifytechnologies.com';
+const SENDER_NAME = 'Ankur';
 
 type SlideRef = { file: string; title?: string };
 
@@ -24,16 +25,78 @@ export function Viewer({ slug, title, client, slides }: Props) {
   const [index, setIndex] = useState(0);
   const [presenting, setPresenting] = useState(false);
   const [pdfStatus, setPdfStatus] = useState<ProgressEvent | null>(null);
+  // Personalization, read from `?to=<company>` so links sent out can be
+  // tailored without changing app code or storing per-recipient state.
+  const [recipient, setRecipient] = useState<string | null>(null);
   const total = slides.length;
   const current = slides[index];
+
+  // Read `?to=` once on mount.
+  useEffect(() => {
+    const to = new URLSearchParams(window.location.search).get('to');
+    if (to && to.length <= 80) setRecipient(to);
+  }, []);
+
+  // URL hash <-> slide index. On mount we honor an incoming `#3`; on every
+  // subsequent navigation we write back via replaceState. The prevIndexRef
+  // skips the first commit so we never clobber the incoming hash.
+  const hashPrevIndex = useRef<number | null>(null);
+  useEffect(() => {
+    const m = window.location.hash.match(/^#(\d{1,3})$/);
+    if (m) {
+      const n = Math.max(1, Math.min(parseInt(m[1], 10), total)) - 1;
+      setIndex(n);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (hashPrevIndex.current === null) {
+      hashPrevIndex.current = index;
+      return;
+    }
+    if (hashPrevIndex.current === index) return;
+    hashPrevIndex.current = index;
+    const target = `#${index + 1}`;
+    if (window.location.hash !== target) {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}${target}`,
+      );
+    }
+  }, [index]);
+
+  const mailtoHref = useMemo(() => {
+    const subjectBits = ['Re:', title];
+    if (client) subjectBits.push(`(${client})`);
+    const subject = subjectBits.join(' ');
+    const greeting = `Hi ${SENDER_NAME},`;
+    const body = recipient
+      ? `${greeting}\n\nThanks for sending the ${title} deck. A few thoughts from ${recipient}:\n\n`
+      : `${greeting}\n\nThanks for sending the ${title} deck. A few thoughts:\n\n`;
+    return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }, [title, client, recipient]);
+
+  const pdfFilename = useMemo(() => {
+    const safe = title.replace(/[\\/:*?"<>|]+/g, '').trim();
+    return `Octify – ${safe}.pdf`;
+  }, [title]);
 
   const downloadPdf = useCallback(async () => {
     if (pdfStatus && pdfStatus.phase !== 'done') return;
     try {
       await generateDeckPdf({
         slug,
-        filename: `${slug}.pdf`,
+        filename: pdfFilename,
         slides,
+        contactCard: {
+          deckTitle: title,
+          client,
+          recipient,
+          senderName: SENDER_NAME,
+          contactEmail: CONTACT_EMAIL,
+        },
         onProgress: setPdfStatus,
       });
     } catch (err) {
@@ -42,9 +105,8 @@ export function Viewer({ slug, title, client, slides }: Props) {
       alert('Could not generate the PDF. Please try again.');
       return;
     }
-    // Reset to idle after a brief moment so the button can show "Done".
     setTimeout(() => setPdfStatus(null), 1200);
-  }, [slug, slides, pdfStatus]);
+  }, [slug, slides, pdfStatus, pdfFilename, title, client, recipient]);
 
   const pdfBusy = pdfStatus !== null && pdfStatus.phase !== 'done';
   const pdfLabel = (() => {
@@ -93,6 +155,9 @@ export function Viewer({ slug, title, client, slides }: Props) {
         setIndex(total - 1);
       } else if (e.key === 'f' || e.key === 'F') {
         enterPresent();
+      } else if (e.key >= '1' && e.key <= '9') {
+        const n = Number(e.key) - 1;
+        if (n < total) setIndex(n);
       }
     }
     window.addEventListener('keydown', onKey);
@@ -122,6 +187,12 @@ export function Viewer({ slug, title, client, slides }: Props) {
             {client ? <span className="vbar-crumb-client">{client}</span> : null}
             {client ? <ChevronRight muted /> : null}
             <span className="vbar-crumb-current">{title}</span>
+            {recipient ? (
+              <span className="vbar-recipient" title={`Personalized for ${recipient}`}>
+                <span className="vbar-recipient-dot" aria-hidden />
+                <span className="vbar-recipient-text">for {recipient}</span>
+              </span>
+            ) : null}
           </div>
         </div>
 
@@ -152,13 +223,24 @@ export function Viewer({ slug, title, client, slides }: Props) {
       </div>
 
       <main className="vstage">
-        <div className="vstage-frame">
+        <button
+          type="button"
+          className="vstage-frame"
+          onClick={() => {
+            if (window.matchMedia('(max-width: 900px)').matches) enterPresent();
+          }}
+          aria-label="Open slide fullscreen"
+        >
           <SlideFrame
             src={slideUrl(current.file)}
             title={current.title ?? `Slide ${index + 1}`}
             showLoader
           />
-        </div>
+          <span className="vstage-tap-hint">
+            <ExpandIcon />
+            <span>Tap to enlarge</span>
+          </span>
+        </button>
         <div className="vstage-caption">
           <div className="vstage-pager" role="group" aria-label="Slide navigation">
             <button
@@ -209,7 +291,7 @@ export function Viewer({ slug, title, client, slides }: Props) {
           {current.title ? <span className="vstage-caption-title">{current.title}</span> : null}
 
           {index === total - 1 ? (
-            <a href={`mailto:${CONTACT_EMAIL}`} className="vstage-cta">
+            <a href={mailtoHref} className="vstage-cta">
               <span>Like what you see?</span>
               <span className="vstage-cta-action">Get in touch</span>
               <svg width="12" height="10" viewBox="0 0 14 10" fill="none">
@@ -222,19 +304,30 @@ export function Viewer({ slug, title, client, slides }: Props) {
                 />
               </svg>
             </a>
-          ) : (
-            <span className="vstage-caption-hint">
-              <kbd>←</kbd>
-              <kbd>→</kbd>
-              <span>navigate</span>
-              <span className="vstage-caption-sep" aria-hidden>
-                ·
-              </span>
-              <kbd>F</kbd>
-              <span>present</span>
-            </span>
-          )}
+          ) : null}
         </div>
+
+        {/* Persistent corner CTA, visible on every slide so a prospect who
+            bails partway through always has a path back. Hidden on the last
+            slide where the inline caption CTA already covers it. */}
+        {index !== total - 1 ? (
+          <a
+            href={mailtoHref}
+            className="vstage-corner-cta"
+            title={`Email ${SENDER_NAME} at ${CONTACT_EMAIL}`}
+          >
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
+              <path
+                d="M2 4l5 4 5-4M2 4v6h10V4M2 4h10"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>Talk to {SENDER_NAME}</span>
+          </a>
+        ) : null}
       </main>
 
       <aside className="vstrip" aria-label="Slides">
@@ -349,6 +442,20 @@ function PlayingDot() {
       <span />
       <span />
     </span>
+  );
+}
+
+function ExpandIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path
+        d="M2 5.5V2h3.5M12 8.5V12H8.5M2 8.5V12h3.5M12 5.5V2H8.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

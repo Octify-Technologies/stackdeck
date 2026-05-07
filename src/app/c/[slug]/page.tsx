@@ -16,9 +16,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const study = await getCaseStudy(slug);
   if (!study) return {};
+  const titleSuffix = study.client ? `${study.client} · Octify Case Study` : 'Octify Case Study';
+  const description =
+    study.summary ?? `Octify case study${study.client ? ` for ${study.client}` : ''}.`;
   return {
-    title: study.title,
-    description: study.summary ?? `Octify case study, ${study.client ?? ''}`.trim(),
+    title: `${study.title} · ${titleSuffix}`,
+    description,
+    openGraph: {
+      title: `${study.title}${study.client ? ` — ${study.client}` : ''}`,
+      description,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: study.title,
+      description,
+    },
   };
 }
 
