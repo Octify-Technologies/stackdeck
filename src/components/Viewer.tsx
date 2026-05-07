@@ -5,10 +5,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { SlideFrame } from './SlideFrame';
 import { StackdeckMark } from './StackdeckMark';
 import { Present } from './Present';
+import { generateDeckPdf, type ProgressEvent } from '@/lib/generate-pdf';
 import './SlideFrame.css';
 import './Viewer.css';
 
-const CONTACT_EMAIL = 'hello@octifytechnologies.com';
+const CONTACT_EMAIL = 'ankur@octifytechnologies.com';
 
 type SlideRef = { file: string; title?: string };
 
@@ -22,8 +23,43 @@ type Props = {
 export function Viewer({ slug, title, client, slides }: Props) {
   const [index, setIndex] = useState(0);
   const [presenting, setPresenting] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState<ProgressEvent | null>(null);
   const total = slides.length;
   const current = slides[index];
+
+  const downloadPdf = useCallback(async () => {
+    if (pdfStatus && pdfStatus.phase !== 'done') return;
+    try {
+      await generateDeckPdf({
+        slug,
+        filename: `${slug}.pdf`,
+        slides,
+        onProgress: setPdfStatus,
+      });
+    } catch (err) {
+      console.error('PDF generation failed', err);
+      setPdfStatus(null);
+      alert('Could not generate the PDF. Please try again.');
+      return;
+    }
+    // Reset to idle after a brief moment so the button can show "Done".
+    setTimeout(() => setPdfStatus(null), 1200);
+  }, [slug, slides, pdfStatus]);
+
+  const pdfBusy = pdfStatus !== null && pdfStatus.phase !== 'done';
+  const pdfLabel = (() => {
+    if (!pdfStatus) return 'Download PDF';
+    switch (pdfStatus.phase) {
+      case 'preparing':
+        return 'Preparing…';
+      case 'rendering':
+        return `Rendering ${pdfStatus.current} / ${pdfStatus.total}`;
+      case 'composing':
+        return 'Composing PDF…';
+      case 'done':
+        return 'Saved';
+    }
+  })();
 
   const slideUrl = useCallback((file: string) => `/c/${slug}/slides/${file}`, [slug]);
 
@@ -32,6 +68,14 @@ export function Viewer({ slug, title, client, slides }: Props) {
 
   const enterPresent = useCallback(() => setPresenting(true), []);
   const exitPresent = useCallback(() => setPresenting(false), []);
+
+  // Keep the active sidebar thumb in view as the user navigates. block:
+  // 'nearest' = no-op when already visible, minimal scroll otherwise. The
+  // scroll-margin set in CSS leaves room for the sticky CONTENTS header.
+  useEffect(() => {
+    const active = document.querySelector('.vstrip [aria-current="true"]') as HTMLElement | null;
+    active?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [index]);
 
   useEffect(() => {
     if (presenting) return; // Present component owns its own keys
@@ -82,16 +126,18 @@ export function Viewer({ slug, title, client, slides }: Props) {
         </div>
 
         <div className="vbar-right">
-          <a
-            href={`/c/${slug}/print`}
-            target="_blank"
-            rel="noreferrer"
-            className="vbar-icon-btn"
-            title="Download PDF"
-            aria-label="Download as PDF"
+          <button
+            type="button"
+            onClick={downloadPdf}
+            disabled={pdfBusy}
+            className={`vbar-download ${pdfStatus ? 'vbar-download-active' : ''}`}
+            title={pdfLabel}
+            aria-label={pdfLabel}
+            aria-busy={pdfBusy}
           >
-            <DownloadIcon />
-          </a>
+            {pdfBusy ? <Spinner /> : <DownloadIcon />}
+            <span className="vbar-download-text">{pdfLabel}</span>
+          </button>
 
           <button type="button" onClick={enterPresent} className="vbar-cta" title="Present (F)">
             <PlayIcon />
@@ -303,5 +349,26 @@ function PlayingDot() {
       <span />
       <span />
     </span>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden
+      className="vbar-spinner"
+    >
+      <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.4" opacity="0.22" />
+      <path
+        d="M12.5 7a5.5 5.5 0 0 0-5.5-5.5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

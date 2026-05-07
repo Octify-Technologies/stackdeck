@@ -8,7 +8,7 @@ import './home.css';
 export const dynamic = 'force-static';
 
 const OCTIFY_URL = 'https://octifytechnologies.com';
-const CONTACT_EMAIL = 'hello@octifytechnologies.com';
+const CONTACT_EMAIL = 'ankur@octifytechnologies.com';
 
 export default async function Home() {
   const studies = await listCaseStudies();

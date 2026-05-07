@@ -5,6 +5,7 @@
   display: grid;
   place-items: center;
   cursor: default;
+  z-index: 1000;
 }
 
 .present-stage {
@@ -22,177 +23,93 @@
   background: transparent;
 }
 
-.present-chrome {
+/* Bottom pager wrap. Auto-hides after idle. */
+.present-pager-wrap {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
-  padding: 32px 28px 16px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
-  pointer-events: auto;
+  bottom: 28px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
   transition:
     opacity 0.3s var(--ease),
     transform 0.3s var(--ease);
   opacity: 1;
+  transform: translateY(0);
 }
 
-.present-chrome-hidden {
+.present-pager-wrap-hidden {
   opacity: 0;
   transform: translateY(8px);
-  pointer-events: none;
 }
 
-.present-chrome-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 14px;
-}
-
-.present-brand {
+/* Pager pill, mirrors the viewer's stage pager. */
+.present-pager {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 13px;
-  min-width: 0;
-}
-
-.present-brand-name {
-  font-weight: 600;
-  letter-spacing: -0.005em;
-}
-
-.present-sep {
-  color: rgba(255, 255, 255, 0.3);
-  flex-shrink: 0;
-}
-
-.present-title {
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 30vw;
-}
-
-.present-slide-title {
-  color: rgba(255, 255, 255, 0.95);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 30vw;
-}
-
-.present-counter {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-  font-feature-settings: 'tnum' on;
-  font-variant-numeric: tabular-nums;
-  padding: 4px 10px;
+  height: 44px;
+  padding: 4px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
-  letter-spacing: 0.02em;
-  font-weight: 500;
-  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
-.present-counter-current {
-  color: #fff;
-}
-
-.present-counter-divider {
-  margin: 0 4px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.present-counter-total {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.present-actions {
-  display: flex;
-  gap: 4px;
-}
-
-.present-btn {
+.present-pager-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   justify-content: center;
-  height: 32px;
-  min-width: 32px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: #fff;
-  border-radius: 6px;
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  cursor: pointer;
   transition:
-    background 0.15s var(--ease),
-    border-color 0.15s var(--ease);
+    background 0.12s var(--ease),
+    color 0.12s var(--ease);
 }
 
-.present-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.32);
+.present-pager-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
 
-.present-btn:disabled {
-  opacity: 0.25;
+.present-pager-btn:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.present-pager-btn:disabled {
+  opacity: 0.28;
   cursor: not-allowed;
 }
 
-.present-btn-text {
-  padding: 0 10px 0 12px;
-}
-
-.present-btn-text kbd {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.present-pager-counter {
   font-family: var(--mono);
-  font-size: 10px;
-  padding: 1px 5px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 3px;
-  letter-spacing: 0.04em;
-  font-weight: 500;
-  margin-left: 2px;
+  font-size: 14px;
+  font-feature-settings: 'tnum' on;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  padding: 0 14px;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
-.present-progress {
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  border-radius: 1px;
-  position: relative;
+.present-pager-counter-current {
+  color: #ffffff;
 }
 
-.present-progress-fill {
-  position: absolute;
-  inset: 0;
-  background: #ffffff;
-  transform-origin: left;
-  transition: transform 0.3s var(--ease);
+.present-pager-counter-sep {
+  margin: 0 5px;
+  color: rgba(255, 255, 255, 0.32);
 }
 
-@media (max-width: 700px) {
-  .present-title,
-  .present-slide-title {
-    max-width: 25vw;
-  }
-  .present-btn-text span {
-    display: none;
-  }
+.present-pager-counter-total {
+  color: rgba(255, 255, 255, 0.55);
 }

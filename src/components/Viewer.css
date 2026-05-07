@@ -24,12 +24,15 @@
   --vc-radius: 8px;
   --vc-radius-sm: 5px;
 
+  /* Single source of truth for the navbar height — also used by the
+     sidebar's sticky CONTENTS header so they line up perfectly. */
+  --vc-bar-h: 60px;
+
   display: grid;
   grid-template-columns: 1fr 340px;
-  grid-template-rows: 60px 2px 1fr;
+  grid-template-rows: var(--vc-bar-h) 1fr;
   grid-template-areas:
     'bar   strip'
-    'prog  strip'
     'stage strip';
   height: 100vh;
   background: var(--vc-bg);
@@ -140,28 +143,60 @@
   max-width: 380px;
 }
 
-/* Icon button (Download) */
-
-.vbar-icon-btn {
+/* Download button (was icon-only, now grows to fit progress label). */
+.vbar-download {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 34px;
+  gap: 8px;
   height: 34px;
+  padding: 0 12px;
   background: var(--vc-bg-soft);
   border: 1px solid var(--vc-line);
   border-radius: var(--vc-radius);
   color: var(--vc-fg-soft);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
   transition:
     background 0.12s var(--ease),
     border-color 0.12s var(--ease),
     color 0.12s var(--ease);
 }
 
-.vbar-icon-btn:hover {
+.vbar-download:hover:not(:disabled) {
   background: var(--vc-bg-elev);
   border-color: var(--vc-line-strong);
   color: var(--vc-fg);
+}
+
+.vbar-download:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.vbar-download-active {
+  border-color: var(--vc-accent-border);
+  background: var(--vc-accent-bg);
+  color: var(--vc-accent);
+}
+
+.vbar-download-text {
+  font-feature-settings: 'tnum' on;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.vbar-spinner {
+  animation: vbar-spin 0.8s linear infinite;
+  color: var(--vc-accent);
+}
+
+@keyframes vbar-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Primary CTA: indigo. */
@@ -214,14 +249,18 @@
   color: #ffffff;
 }
 
-/* Progress strip ────────────────────────────────────────────────── */
+/* Progress strip — spans the full width so it sits flush across both the
+   navbar and the sidebar header, giving a single continuous chrome edge. */
 
 .vprogress {
-  grid-area: prog;
+  position: absolute;
+  top: var(--vc-bar-h);
+  left: 0;
+  right: 0;
   height: 2px;
   background: var(--vc-bg-elev);
-  position: relative;
   overflow: hidden;
+  z-index: 4;
 }
 
 .vprogress-fill {
@@ -252,8 +291,8 @@
 .vstage-frame {
   position: relative;
   width: 100%;
-  max-width: calc((100vh - 60px - 2px - 32px - 28px - 64px) * (16 / 9));
-  max-height: calc(100vh - 60px - 2px - 32px - 28px - 64px);
+  max-width: calc((100vh - var(--vc-bar-h) - 2px - 32px - 28px - 64px) * (16 / 9));
+  max-height: calc(100vh - var(--vc-bar-h) - 2px - 32px - 28px - 64px);
   aspect-ratio: 16 / 9;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: #ffffff;
@@ -282,7 +321,7 @@
   color: rgba(255, 255, 255, 0.6);
   z-index: 1;
   width: 100%;
-  max-width: calc((100vh - 60px - 2px - 32px - 28px - 64px) * (16 / 9));
+  max-width: calc((100vh - var(--vc-bar-h) - 2px - 32px - 28px - 64px) * (16 / 9));
 }
 
 /* Pager pill */
@@ -450,10 +489,14 @@
 .vstrip-head {
   position: sticky;
   top: 0;
+  height: var(--vc-bar-h);
+  min-height: var(--vc-bar-h);
+  flex: 0 0 var(--vc-bar-h);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 18px 16px;
+  padding: 0 18px;
   background: var(--vc-bg);
   border-bottom: 1px solid var(--vc-line);
   z-index: 1;
@@ -481,78 +524,104 @@
 .vstrip-list {
   display: flex;
   flex-direction: column;
-  padding: 14px 14px 32px;
-  gap: 10px;
+  padding: 16px 18px 36px;
+  gap: 18px;
 }
 
-/* Thumb card: number is overlaid on the preview, title sits below. */
+/* Thumb card. The "card behind" effect is rendered entirely through
+   layered box-shadows, not a pseudo-element. Box-shadows paint with the
+   element so they cannot be lost to a stacking-context bug, and there is
+   no z-index involved at all on this layer. */
 .thumb {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   background: transparent;
   border: 0;
-  padding: 6px;
+  /* Reserve room for the ghost card to peek bottom-right without colliding
+     with siblings. */
+  padding: 0 10px 10px 0;
   border-radius: var(--vc-radius);
   text-align: left;
   position: relative;
-  transition: background 0.15s var(--ease);
   color: inherit;
   cursor: pointer;
-}
-
-.thumb:hover {
-  background: var(--vc-bg-soft);
-}
-
-.thumb-active {
-  background: var(--vc-accent-bg);
+  isolation: isolate;
+  /* Leave room for the sticky CONTENTS header + progress strip when this
+     thumb is auto-scrolled into view. */
+  scroll-margin-top: calc(var(--vc-bar-h) + 14px);
+  scroll-margin-bottom: 14px;
 }
 
 .thumb-frame {
   position: relative;
-  border: 1px solid var(--vc-line-strong);
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: var(--vc-radius-sm);
-  overflow: hidden;
-  background: var(--vc-stage-bg);
-  box-shadow: 0 1px 2px rgba(15, 15, 20, 0.04);
+  background: #ffffff;
+  /* Front-card hairline + ghost-card fill + ghost-card hairline.
+     First shadow paints on top, last paints furthest back. */
+  box-shadow:
+    0 0 0 1px var(--vc-line-strong),
+    7px 7px 0 0 var(--vc-bg-elev),
+    7px 7px 0 1px var(--vc-line-strong);
   transition:
-    border-color 0.15s var(--ease),
-    box-shadow 0.2s var(--ease),
-    transform 0.2s var(--ease);
+    box-shadow 0.22s var(--ease),
+    transform 0.22s var(--ease);
 }
 
 .thumb-frame .slide-wrap {
-  border-radius: 0;
-  background: var(--vc-stage-bg);
+  width: 100%;
+  height: 100%;
+  border-radius: var(--vc-radius-sm);
+  background: #ffffff;
+  overflow: hidden;
 }
 
-.thumb:hover .thumb-frame {
-  border-color: var(--vc-line-vivid);
+/* Hover: front card nudges up-left and the ghost offset grows, so the
+   visual gap between front and back widens. Adds a soft drop shadow for
+   actual lift, not just hue. */
+.thumb:hover:not(.thumb-active) .thumb-frame {
+  transform: translate(-2px, -2px);
   box-shadow:
-    0 1px 2px rgba(15, 15, 20, 0.06),
-    0 8px 20px -10px rgba(15, 15, 20, 0.18);
-  transform: translateY(-1px);
+    0 0 0 1px var(--vc-line-vivid),
+    11px 11px 0 0 var(--vc-bg-elev),
+    11px 11px 0 1px var(--vc-line-strong),
+    0 16px 30px -14px rgba(15, 15, 20, 0.22);
 }
 
+/* Active: indigo ring on the front, indigo-tinted ghost behind, and a
+   colored lift. Specificity beats :hover because the rule comes later
+   AND uses a more-specific selector below. */
 .thumb-active .thumb-frame {
-  border-color: var(--vc-accent);
   box-shadow:
-    0 0 0 1px var(--vc-accent),
-    0 8px 20px -10px rgba(79, 70, 229, 0.32);
+    0 0 0 2px var(--vc-accent),
+    8px 8px 0 0 var(--vc-accent-bg),
+    8px 8px 0 1px var(--vc-accent-border),
+    0 14px 32px -12px rgba(79, 70, 229, 0.34);
 }
 
+.thumb-active:hover .thumb-frame {
+  transform: translate(-2px, -2px);
+  box-shadow:
+    0 0 0 2px var(--vc-accent),
+    12px 12px 0 0 var(--vc-accent-bg),
+    12px 12px 0 1px var(--vc-accent-border),
+    0 18px 34px -12px rgba(79, 70, 229, 0.42);
+}
+
+/* Number pill, top-left of the front card. */
 .thumb-num {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 10px;
+  left: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 22px;
-  min-width: 28px;
-  padding: 0 8px;
-  background: rgba(255, 255, 255, 0.92);
+  height: 24px;
+  min-width: 32px;
+  padding: 0 9px;
+  background: rgba(255, 255, 255, 0.94);
   color: var(--vc-fg);
   border-radius: 999px;
   font-family: var(--mono);
@@ -561,9 +630,12 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   font-weight: 700;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.18);
+  z-index: 2;
   transition:
     background 0.15s var(--ease),
     color 0.15s var(--ease);
@@ -572,13 +644,16 @@
 .thumb-active .thumb-num {
   background: var(--vc-accent);
   color: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(79, 70, 229, 0.32),
+    0 4px 10px -2px rgba(79, 70, 229, 0.42);
 }
 
 .thumb-title {
   font-size: 13px;
   line-height: 1.4;
   color: var(--vc-fg-muted);
-  padding: 0 4px;
+  padding: 0 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -595,18 +670,22 @@
   color: var(--vc-fg-soft);
 }
 
+/* "Now playing" badge, top-right of the active front card. */
 .thumb-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   background: var(--vc-accent);
   border-radius: 999px;
-  box-shadow: 0 0 0 3px var(--vc-bg);
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 2px 6px rgba(79, 70, 229, 0.42);
+  z-index: 2;
 }
 
 .playing-dot {
@@ -662,10 +741,9 @@
 @media (max-width: 900px) {
   .viewer {
     grid-template-columns: 1fr;
-    grid-template-rows: 60px 2px 1fr 220px;
+    grid-template-rows: var(--vc-bar-h) 1fr 220px;
     grid-template-areas:
       'bar'
-      'prog'
       'stage'
       'strip';
   }
@@ -696,7 +774,8 @@
 
 @media (max-width: 600px) {
   .vbar-crumb-link span,
-  .vbar-cta span {
+  .vbar-cta span,
+  .vbar-download-text {
     display: none;
   }
   .vbar-crumb-link {
@@ -705,6 +784,11 @@
     justify-content: center;
   }
   .vbar-cta {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+  .vbar-download {
     width: 38px;
     padding: 0;
     justify-content: center;

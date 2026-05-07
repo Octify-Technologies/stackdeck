@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SlideFrame } from './SlideFrame';
-import { StackdeckMark } from './StackdeckMark';
 import './SlideFrame.css';
 import './Present.css';
 
@@ -17,7 +16,7 @@ type Props = {
   onExit: () => void;
 };
 
-export function Present({ slug, title, slides, initialIndex, onIndexChange, onExit }: Props) {
+export function Present({ slug, slides, initialIndex, onIndexChange, onExit }: Props) {
   const [index, setIndex] = useState(() => Math.max(0, Math.min(initialIndex, slides.length - 1)));
   const [chromeVisible, setChromeVisible] = useState(true);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -25,20 +24,28 @@ export function Present({ slug, title, slides, initialIndex, onIndexChange, onEx
 
   const updateIndex = useCallback(
     (next: number | ((i: number) => number)) => {
+      // Keep this reducer pure. Parent sync happens in the effect below so
+      // we never trigger a parent setState while React is mid-render.
       setIndex((prev) => {
         const n = typeof next === 'function' ? next(prev) : next;
-        const clamped = Math.max(0, Math.min(n, total - 1));
-        onIndexChange?.(clamped);
-        return clamped;
+        return Math.max(0, Math.min(n, total - 1));
       });
     },
-    [total, onIndexChange],
+    [total],
   );
+
+  // Sync back to the parent after every committed index change.
+  useEffect(() => {
+    onIndexChange?.(index);
+  }, [index, onIndexChange]);
 
   const next = useCallback(() => updateIndex((i) => i + 1), [updateIndex]);
   const prev = useCallback(() => updateIndex((i) => i - 1), [updateIndex]);
 
+  const exitedRef = useRef(false);
   const exit = useCallback(() => {
+    if (exitedRef.current) return;
+    exitedRef.current = true;
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
     }
@@ -58,6 +65,9 @@ export function Present({ slug, title, slides, initialIndex, onIndexChange, onEx
       } else if (e.key === 'End') {
         updateIndex(total - 1);
       } else if (e.key === 'Escape') {
+        // Fallback path: browsers swallow Escape inside fullscreen and never
+        // deliver it to the page, so this handler primarily covers the case
+        // where the fullscreen request was denied/blocked.
         e.preventDefault();
         exit();
       } else if (e.key >= '1' && e.key <= '9') {
@@ -69,7 +79,7 @@ export function Present({ slug, title, slides, initialIndex, onIndexChange, onEx
     return () => window.removeEventListener('keydown', onKey);
   }, [next, prev, total, exit, updateIndex]);
 
-  // Auto-hide chrome after idle
+  // Auto-hide the bottom pager after idle.
   useEffect(() => {
     function bump() {
       setChromeVisible(true);
@@ -86,107 +96,105 @@ export function Present({ slug, title, slides, initialIndex, onIndexChange, onEx
     };
   }, []);
 
-  // Try to enter fullscreen on mount.
+  // Enter fullscreen on mount, lock body scroll, and bridge the
+  // browser-native Escape (which never reaches keydown) back to onExit by
+  // listening for fullscreenchange.
   useEffect(() => {
     const el = document.documentElement;
+    let enteredFullscreen = false;
+
     if (!document.fullscreenElement && el.requestFullscreen) {
-      el.requestFullscreen().catch(() => {});
+      el.requestFullscreen()
+        .then(() => {
+          enteredFullscreen = true;
+        })
+        .catch(() => {
+          // Denied or blocked: keydown handler still covers Escape.
+        });
+    } else if (document.fullscreenElement) {
+      enteredFullscreen = true;
     }
-    // Lock body scroll while presenting
+
+    function onFullscreenChange() {
+      if (document.fullscreenElement) {
+        enteredFullscreen = true;
+        return;
+      }
+      // Fullscreen just left. If we ever entered it, the user pressed
+      // Escape (or otherwise exited) and expects to leave present mode.
+      if (enteredFullscreen) exit();
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+
     return () => {
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
       document.body.style.overflow = prevOverflow;
     };
-  }, []);
+  }, [exit]);
 
   const current = slides[index];
-  const progress = ((index + 1) / total) * 100;
-  const slug_ = slug;
 
   return (
-    <div className="present" role="dialog" aria-modal="true" aria-label={`Presenting ${title}`}>
+    <div className="present" role="dialog" aria-modal="true">
       <div className="present-stage">
         <SlideFrame
-          src={`/c/${slug_}/slides/${current.file}`}
+          src={`/c/${slug}/slides/${current.file}`}
           title={current.title ?? `Slide ${index + 1}`}
           showLoader
         />
       </div>
 
-      <div className={`present-chrome ${chromeVisible ? '' : 'present-chrome-hidden'}`}>
-        <div className="present-chrome-bar">
-          <div className="present-brand">
-            <StackdeckMark size={18} />
-            <span className="present-brand-name">stackdeck</span>
-            <span className="present-sep">/</span>
-            <span className="present-title">{title}</span>
-            {current.title ? (
-              <>
-                <span className="present-sep">·</span>
-                <span className="present-slide-title">{current.title}</span>
-              </>
-            ) : null}
-          </div>
-          <div className="present-counter">
-            <span className="present-counter-current">{String(index + 1).padStart(2, '0')}</span>
-            <span className="present-counter-divider">/</span>
-            <span className="present-counter-total">{String(total).padStart(2, '0')}</span>
-          </div>
-          <div className="present-actions">
-            <button
-              type="button"
-              className="present-btn"
-              onClick={prev}
-              disabled={index === 0}
-              aria-label="Previous slide"
-              title="Previous (←)"
-            >
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <path
-                  d="M8 2L4 6l4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="present-btn"
-              onClick={next}
-              disabled={index === total - 1}
-              aria-label="Next slide"
-              title="Next (→)"
-            >
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <path
-                  d="M4 2l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="present-btn present-btn-text"
-              onClick={exit}
-              aria-label="Exit present mode"
-              title="Exit (Esc)"
-            >
-              <span>Exit</span>
-              <kbd>Esc</kbd>
-            </button>
-          </div>
-        </div>
-        <div className="present-progress">
-          <div
-            className="present-progress-fill"
-            style={{ transform: `scaleX(${progress / 100})` }}
-          />
+      <div
+        className={`present-pager-wrap ${chromeVisible ? '' : 'present-pager-wrap-hidden'}`}
+        aria-hidden={!chromeVisible}
+      >
+        <div className="present-pager" role="group" aria-label="Slide navigation">
+          <button
+            type="button"
+            className="present-pager-btn"
+            onClick={prev}
+            disabled={index === 0}
+            aria-label="Previous slide"
+            title="Previous (←)"
+          >
+            <svg width="16" height="16" viewBox="0 0 12 12" fill="none">
+              <path
+                d="M8 2L4 6l4 4"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <span className="present-pager-counter">
+            <span className="present-pager-counter-current">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <span className="present-pager-counter-sep">/</span>
+            <span className="present-pager-counter-total">{String(total).padStart(2, '0')}</span>
+          </span>
+          <button
+            type="button"
+            className="present-pager-btn"
+            onClick={next}
+            disabled={index === total - 1}
+            aria-label="Next slide"
+            title="Next (→)"
+          >
+            <svg width="16" height="16" viewBox="0 0 12 12" fill="none">
+              <path
+                d="M4 2l4 4-4 4"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
