@@ -1,13 +1,27 @@
-import type { Brand, ColorTokens, Density, Mode, Palette, Style, ThemeRef } from '@/ir/schema';
+import type { Brand, ColorTokens, Palette, ThemeRef } from '@/ir/schema';
+import type { Preset } from '@/app/presets/presets';
+import { getFont } from '@/themes/fonts';
 
 import { ensureContrast } from './contrast';
 
-const DENSITY_MULTIPLIER: Record<Density, number> = {
-  dense: 0.75,
-  comfortable: 1.0,
-  airy: 1.35,
-  spacious: 1.7,
+/**
+ * The deck design owns spacing, radius, shadows, and the mono font as
+ * fixed system constants. Only color tokens and the display+body font
+ * vary per deck (palette + fontId). Density was removed: one airy scale
+ * for everyone keeps the editorial signature consistent.
+ */
+const SPACING_BASE = 8;
+const SPACING_MULTIPLIER = 1.35;
+
+const DEFAULT_RADIUS = { sm: '4px', md: '8px', lg: '16px' };
+
+const DEFAULT_SHADOW = {
+  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.5)',
+  md: '0 8px 24px -4px rgba(0, 0, 0, 0.6)',
+  lg: '0 24px 48px -12px rgba(0, 0, 0, 0.8)',
 };
+
+const MONO_FAMILY = 'var(--font-jetbrains), JetBrains Mono, ui-monospace, monospace';
 
 type ResolvedTheme = {
   ref: ThemeRef;
@@ -16,50 +30,66 @@ type ResolvedTheme = {
 };
 
 /**
- * Compose a Style + Palette + Density + Mode (+ optional Brand overrides) into
- * a flat token map ready to apply as CSS custom properties.
+ * Neutral fallback tokens used when no palette is registered. Dark surface,
+ * neutral text. Lets the app render without crashing while the registries
+ * are empty.
+ */
+const FALLBACK_TOKENS: ColorTokens = {
+  brand: '#fafafa',
+  accent: '#a3a3a3',
+  surface: '#0a0a0a',
+  surfaceMuted: '#171717',
+  text: '#fafafa',
+  textMuted: '#a1a1aa',
+  border: '#27272a',
+  success: '#22c55e',
+  warn: '#f59e0b',
+  danger: '#ef4444',
+};
+
+/**
+ * Compose a Preset + Palette (+ optional Brand overrides) into a flat
+ * token map ready to apply as CSS custom properties. Either side may be
+ * undefined when the registry is empty.
  */
 export function resolveTheme(
   ref: ThemeRef,
-  style: Style,
-  palette: Palette,
+  preset: Preset | undefined,
+  palette: Palette | undefined,
   brand?: Brand,
 ): ResolvedTheme {
-  const colors = mergeColors(style.colors[ref.mode], palette, brand);
-  const cssVars = buildCssVars(colors, style, ref.density, ref.mode);
+  const baseTokens = palette?.tokens ?? FALLBACK_TOKENS;
+  const colors = mergeColors(baseTokens, brand);
+  const fontFamily = resolveFontFamily(preset, ref);
+  const cssVars = buildCssVars(colors, fontFamily);
   return { ref, colors, cssVars };
 }
 
-function mergeColors(base: ColorTokens, palette: Palette, brand?: Brand): ColorTokens {
-  const surface = palette.surface ?? base.surface;
-  const requestedText = palette.text ?? base.text;
-  const requestedTextMuted = palette.textMuted ?? base.textMuted;
+function resolveFontFamily(preset: Preset | undefined, ref: ThemeRef): string {
+  const overrideId = ref.fontId;
+  const override = overrideId ? getFont(overrideId) : undefined;
+  const fallback = getFont(preset?.fontId) ?? getFont('geist');
+  return (override ?? fallback)?.family ?? 'system-ui, sans-serif';
+}
+
+function mergeColors(base: ColorTokens, brand?: Brand): ColorTokens {
+  const surface = base.surface;
   return {
-    brand: brand?.brandColor ?? palette.brand,
-    accent: brand?.accentColor ?? palette.accent,
+    brand: brand?.brandColor ?? base.brand,
+    accent: brand?.accentColor ?? base.accent,
     surface,
-    surfaceMuted: palette.surfaceMuted ?? base.surfaceMuted,
-    text: ensureContrast(requestedText, surface, 'strong'),
-    textMuted: ensureContrast(requestedTextMuted, surface, 'muted', 3.0),
-    border: palette.border ?? base.border,
+    surfaceMuted: base.surfaceMuted,
+    text: ensureContrast(base.text, surface, 'strong'),
+    textMuted: ensureContrast(base.textMuted, surface, 'muted', 3.0),
+    border: base.border,
     success: base.success,
     warn: base.warn,
     danger: base.danger,
   };
 }
 
-function buildCssVars(
-  c: ColorTokens,
-  style: Style,
-  density: Density,
-  mode: Mode,
-): Record<string, string> {
-  const multiplier = DENSITY_MULTIPLIER[density];
-  const base = style.spacingBase;
-  const scale = (n: number) => `${n * base * multiplier}px`;
-  const radius = (n: number) => `${n}px`;
-
-  const shadow = style.shadow[mode];
+function buildCssVars(c: ColorTokens, fontFamily: string): Record<string, string> {
+  const scale = (n: number) => `${n * SPACING_BASE * SPACING_MULTIPLIER}px`;
 
   return {
     '--color-brand': c.brand,
@@ -73,17 +103,9 @@ function buildCssVars(
     '--color-warn': c.warn,
     '--color-danger': c.danger,
 
-    '--font-display': style.typography.display.family,
-    '--font-body': style.typography.body.family,
-    '--font-mono': style.typography.mono?.family ?? 'ui-monospace, monospace',
-
-    '--weight-display': String(style.typography.display.weight),
-    '--weight-body': String(style.typography.body.weight),
-
-    '--leading-display': String(style.typography.display.leading ?? 1.1),
-    '--leading-body': String(style.typography.body.leading ?? 1.5),
-
-    '--tracking-display': `${style.typography.display.tracking ?? 0}em`,
+    '--font-display': fontFamily,
+    '--font-body': fontFamily,
+    '--font-mono': MONO_FAMILY,
 
     '--space-xs': scale(0.25),
     '--space-sm': scale(0.5),
@@ -95,12 +117,12 @@ function buildCssVars(
     '--slide-padding': scale(4.5),
     '--measure-max': '60ch',
 
-    '--radius-sm': radius(style.radius.sm),
-    '--radius-md': radius(style.radius.md),
-    '--radius-lg': radius(style.radius.lg),
+    '--radius-sm': DEFAULT_RADIUS.sm,
+    '--radius-md': DEFAULT_RADIUS.md,
+    '--radius-lg': DEFAULT_RADIUS.lg,
 
-    '--shadow-sm': shadow.sm ?? 'none',
-    '--shadow-md': shadow.md ?? 'none',
-    '--shadow-lg': shadow.lg ?? 'none',
+    '--shadow-sm': DEFAULT_SHADOW.sm,
+    '--shadow-md': DEFAULT_SHADOW.md,
+    '--shadow-lg': DEFAULT_SHADOW.lg,
   };
 }

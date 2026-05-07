@@ -1226,6 +1226,76 @@
   color: var(--text);
 }
 
+/* Font buttons
+   --------------------------------------------------------------------------*/
+
+.font-button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.font-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+
+.font-button:hover {
+  border-color: var(--text-2);
+  background: var(--bg-2);
+}
+
+.font-button--selected {
+  border-color: var(--text);
+  background: var(--bg-2);
+  box-shadow: 0 0 0 1px var(--text);
+}
+
+.font-button__sample {
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.font-button__label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.font-button--selected .font-button__label {
+  color: var(--text);
+}
+
+.font-preview {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--text);
+  background: var(--bg-2);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+}
+
 /* Palette swatches
    --------------------------------------------------------------------------*/
 

@@ -18,12 +18,8 @@ export const LAYOUT_IDS = [
   'fullBleed',
 ] as const;
 
-export const DENSITIES = ['dense', 'comfortable', 'airy', 'spacious'] as const;
-export const MODES = ['light', 'dark'] as const;
 const ASPECT_RATIOS = ['16:9'] as const;
 
-export type Density = (typeof DENSITIES)[number];
-export type Mode = (typeof MODES)[number];
 type AspectRatio = (typeof ASPECT_RATIOS)[number];
 export type LayoutId = (typeof LAYOUT_IDS)[number];
 export type Tone = (typeof TONES)[number];
@@ -365,98 +361,39 @@ const ColorTokensSchema: z.ZodType<ColorTokens> = z.object({
   danger: HexColorSchema,
 });
 
-type TypographyScale = {
-  family: string;
-  weight: number;
-  scaleStep: number;
-  tracking?: number;
-  leading?: number;
-};
-
-const TypographyScaleSchema: z.ZodType<TypographyScale> = z.object({
-  family: z.string().min(1),
-  weight: z.number().int().min(100).max(900),
-  scaleStep: z.number(),
-  tracking: z.number().optional(),
-  leading: z.number().optional(),
-});
-
-export type Style = {
-  id: string;
-  name: string;
-  description?: string;
-  typography: {
-    display: TypographyScale;
-    body: TypographyScale;
-    mono?: TypographyScale;
-  };
-  colors: { light: ColorTokens; dark: ColorTokens };
-  radius: { sm: number; md: number; lg: number };
-  shadow: { light: Record<string, string>; dark: Record<string, string> };
-  motion: { duration: Record<string, number>; easing: Record<string, string> };
-  spacingBase: number;
-  printSafe: boolean;
-};
-
-const StyleSchema: z.ZodType<Style> = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  typography: z.object({
-    display: TypographyScaleSchema,
-    body: TypographyScaleSchema,
-    mono: TypographyScaleSchema.optional(),
-  }),
-  colors: z.object({ light: ColorTokensSchema, dark: ColorTokensSchema }),
-  radius: z.object({ sm: z.number(), md: z.number(), lg: z.number() }),
-  shadow: z.object({
-    light: z.record(z.string(), z.string()),
-    dark: z.record(z.string(), z.string()),
-  }),
-  motion: z.object({
-    duration: z.record(z.string(), z.number()),
-    easing: z.record(z.string(), z.string()),
-  }),
-  spacingBase: z.number().positive(),
-  printSafe: z.boolean(),
-});
-
+/**
+ * A Palette is the color theme. The product is dark-only by design, so each
+ * palette ships a single set of color tokens, no mode split.
+ */
 export type Palette = {
   id: string;
   name: string;
-  brand: string;
-  accent: string;
-  surface?: string;
-  surfaceMuted?: string;
-  text?: string;
-  textMuted?: string;
-  border?: string;
+  tokens: ColorTokens;
 };
 
 const PaletteSchema: z.ZodType<Palette> = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  brand: HexColorSchema,
-  accent: HexColorSchema,
-  surface: HexColorSchema.optional(),
-  surfaceMuted: HexColorSchema.optional(),
-  text: HexColorSchema.optional(),
-  textMuted: HexColorSchema.optional(),
-  border: HexColorSchema.optional(),
+  tokens: ColorTokensSchema,
 });
 
+/**
+ * A deck's design choices. The visual design itself is locked: only the
+ * palette (colors) and font are user-controllable. `presetId` names the
+ * starting combination from the gallery; `paletteId` and `fontId` are user
+ * overrides on top of it. When omitted, they fall back to the preset's
+ * defaults at resolve time.
+ */
 export type ThemeRef = {
-  styleId: string;
-  paletteId: string;
-  density: Density;
-  mode: Mode;
+  presetId: string;
+  paletteId?: string;
+  fontId?: string;
 };
 
 const ThemeRefSchema: z.ZodType<ThemeRef> = z.object({
-  styleId: z.string().min(1),
-  paletteId: z.string().min(1),
-  density: z.enum(DENSITIES),
-  mode: z.enum(MODES),
+  presetId: z.string().min(1),
+  paletteId: z.string().min(1).optional(),
+  fontId: z.string().min(1).optional(),
 });
 
 export const LOGO_POSITIONS = [
@@ -530,5 +467,4 @@ function validate<T>(schema: z.ZodType<T>, input: unknown): ValidationResult<T> 
 export const validateDeck = (input: unknown) => validate(DeckSchema, input);
 export const validateSlide = (input: unknown) => validate(SlideSchema, input);
 export const validateBlock = (input: unknown) => validate(BlockSchema, input);
-export const validateStyle = (input: unknown) => validate(StyleSchema, input);
 export const validatePalette = (input: unknown) => validate(PaletteSchema, input);

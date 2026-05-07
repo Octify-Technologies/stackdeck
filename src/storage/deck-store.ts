@@ -3,8 +3,32 @@
 import { ulid } from 'ulid';
 
 import type { Brand, ThemeRef } from '@/ir/schema';
+import { DEFAULT_PRESET_ID } from '@/app/presets/presets';
 
 import { dbDelete, dbGet, dbGetAll, dbPut, STORE_DECKS } from './db';
+
+/**
+ * Migrate legacy deck records onto the current ThemeRef shape. Older records
+ * may carry `styleId`, `density`, or a `fonts.font` triple; today's ThemeRef
+ * is just `{ presetId, paletteId?, fontId? }`. Unknown ids fall back at
+ * render time via `getPreset` / `getPalette`.
+ */
+function migrateTheme(theme: unknown): ThemeRef {
+  const t = (theme ?? {}) as Partial<ThemeRef> & {
+    styleId?: string;
+    density?: string;
+    fonts?: { font?: string };
+  };
+  return {
+    presetId: t.presetId ?? DEFAULT_PRESET_ID,
+    paletteId: t.paletteId,
+    fontId: t.fontId ?? t.fonts?.font,
+  };
+}
+
+function migrateDeck<T extends { theme: ThemeRef }>(deck: T): T {
+  return { ...deck, theme: migrateTheme(deck.theme) };
+}
 
 /**
  * A persisted deck record. We store the markdown source plus the theme + brand
@@ -29,6 +53,7 @@ export type DeckSummary = Pick<
 export async function listDecks(): Promise<DeckSummary[]> {
   const all = await dbGetAll<StoredDeck>(STORE_DECKS);
   return all
+    .map(migrateDeck)
     .map(({ source: _source, ...summary }) => {
       void _source;
       return summary;
@@ -37,7 +62,8 @@ export async function listDecks(): Promise<DeckSummary[]> {
 }
 
 export async function getDeck(id: string): Promise<StoredDeck | undefined> {
-  return dbGet<StoredDeck>(STORE_DECKS, id);
+  const deck = await dbGet<StoredDeck>(STORE_DECKS, id);
+  return deck ? migrateDeck(deck) : undefined;
 }
 
 type CreateInput = {

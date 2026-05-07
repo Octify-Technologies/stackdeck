@@ -1,6 +1,6 @@
 /* ==========================================================================
    app topbar
-   Single source of truth for the global top bar shared by /, /templates,
+   Single source of truth for the global top bar shared by /, /presets,
    and /new. Inner rail and bar shape live in layout/page.css; nav buttons
    come from primitives/button.css. Only chrome and brand mark live here.
    ========================================================================== */

@@ -1,75 +1,65 @@
 'use client';
 
-import { createContext, useContext, type ReactNode } from 'react';
-
 import type { Block } from '@/ir/schema';
 
 import { resolveBlockComponent } from './registry';
 
-const StyleIdContext = createContext<string>('modern');
-
-export function StyleIdProvider({ styleId, children }: { styleId: string; children: ReactNode }) {
-  return <StyleIdContext.Provider value={styleId}>{children}</StyleIdContext.Provider>;
-}
-
 /**
- * Dispatches an IR Block to the right atomic component, looking up per-Style
- * overrides via the registry. The renderer never sees pattern directives, and
- * never branches on Style; it asks the registry what to render.
+ * Dispatches an IR Block to the right atomic component. The renderer never
+ * sees pattern directives or preset ids; it just looks up a component.
  */
 export function BlockRenderer({ block }: { block: Block }) {
-  const styleId = useContext(StyleIdContext);
   switch (block.type) {
     case 'heading': {
-      const Comp = resolveBlockComponent('heading', styleId);
+      const Comp = resolveBlockComponent('heading');
       return <Comp block={block} />;
     }
     case 'text': {
-      const Comp = resolveBlockComponent('text', styleId);
+      const Comp = resolveBlockComponent('text');
       return <Comp block={block} />;
     }
     case 'list': {
-      const Comp = resolveBlockComponent('list', styleId);
+      const Comp = resolveBlockComponent('list');
       return <Comp block={block} />;
     }
     case 'quote': {
-      const Comp = resolveBlockComponent('quote', styleId);
+      const Comp = resolveBlockComponent('quote');
       return <Comp block={block} />;
     }
     case 'stat': {
-      const Comp = resolveBlockComponent('stat', styleId);
+      const Comp = resolveBlockComponent('stat');
       return <Comp block={block} />;
     }
     case 'code': {
-      const Comp = resolveBlockComponent('code', styleId);
+      const Comp = resolveBlockComponent('code');
       return <Comp block={block} />;
     }
     case 'chart': {
-      const Comp = resolveBlockComponent('chart', styleId);
+      const Comp = resolveBlockComponent('chart');
       return <Comp block={block} />;
     }
     case 'table': {
-      const Comp = resolveBlockComponent('table', styleId);
+      const Comp = resolveBlockComponent('table');
       return <Comp block={block} />;
     }
     case 'box': {
-      const Comp = resolveBlockComponent('box', styleId);
+      const Comp = resolveBlockComponent('box');
       return <Comp block={block} />;
     }
     case 'columns': {
-      const Comp = resolveBlockComponent('columns', styleId);
+      const Comp = resolveBlockComponent('columns');
       return <Comp block={block} />;
     }
     case 'grid': {
-      const Comp = resolveBlockComponent('grid', styleId);
+      const Comp = resolveBlockComponent('grid');
       return <Comp block={block} />;
     }
     case 'cell': {
-      const Comp = resolveBlockComponent('cell', styleId);
+      const Comp = resolveBlockComponent('cell');
       return <Comp block={block} />;
     }
     case 'image': {
-      const Comp = resolveBlockComponent('image', styleId);
+      const Comp = resolveBlockComponent('image');
       return <Comp block={block} />;
     }
     default: {

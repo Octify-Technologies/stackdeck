@@ -9,6 +9,7 @@ import './AppTopbar.css';
 
 const NAV_ITEMS: ReadonlyArray<{ href: string; label: string; match: (p: string) => boolean }> = [
   { href: '/', label: 'Library', match: (p) => p === '/' },
+  { href: '/presets', label: 'Presets', match: (p) => p.startsWith('/presets') },
   { href: '/templates', label: 'Templates', match: (p) => p.startsWith('/templates') },
 ];
 

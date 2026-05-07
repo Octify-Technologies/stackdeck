@@ -2,33 +2,23 @@
 
 import { useState } from 'react';
 
-import {
-  type Brand,
-  DENSITIES,
-  type Density,
-  LOGO_POSITIONS,
-  MODES,
-  type Mode,
-  type Palette,
-  type Style,
-} from '@/ir/schema';
+import { type Brand, LOGO_POSITIONS, type Palette } from '@/ir/schema';
 import { deriveAccent, isValidHex } from '@/lib/color';
-import { allPalettes, allStyles, getPalette } from '@/themes/registry';
+import { allPalettes, getPalette } from '@/themes/registry';
+import { FONTS, getFont } from '@/themes/fonts';
+import { getPreset } from '@/app/presets/presets';
 
 import { ColorPicker } from './ColorPicker';
 
 type Section = 'theme' | 'brand';
 
 type Props = {
-  styleId: string;
+  presetId: string;
   paletteId: string;
-  density: Density;
-  mode: Mode;
+  fontId?: string;
   brand: Brand;
-  onStyleChange: (id: string) => void;
   onPaletteChange: (id: string) => void;
-  onDensityChange: (d: Density) => void;
-  onModeChange: (m: Mode) => void;
+  onFontChange: (id: string | undefined) => void;
   onBrandChange: (b: Brand) => void;
   onClose: () => void;
 };
@@ -37,7 +27,7 @@ export function ThemeDrawer(props: Props) {
   const [section, setSection] = useState<Section>('theme');
 
   const palette = getPalette(props.paletteId);
-  const surfaceForContrast = palette.surface ?? (props.mode === 'dark' ? '#0a0a0a' : '#ffffff');
+  const surfaceForContrast = palette?.tokens.surface ?? '#0a0a0a';
 
   return (
     <aside className="drawer" aria-label="Design system">
@@ -84,14 +74,11 @@ export function ThemeDrawer(props: Props) {
       <div className="drawer__body">
         {section === 'theme' ? (
           <ThemeSection
-            styleId={props.styleId}
+            presetId={props.presetId}
             paletteId={props.paletteId}
-            density={props.density}
-            mode={props.mode}
-            onStyleChange={props.onStyleChange}
+            fontId={props.fontId}
             onPaletteChange={props.onPaletteChange}
-            onDensityChange={props.onDensityChange}
-            onModeChange={props.onModeChange}
+            onFontChange={props.onFontChange}
           />
         ) : (
           <BrandSection
@@ -106,37 +93,45 @@ export function ThemeDrawer(props: Props) {
 }
 
 function ThemeSection({
-  styleId,
+  presetId,
   paletteId,
-  density,
-  mode,
-  onStyleChange,
+  fontId,
   onPaletteChange,
-  onDensityChange,
-  onModeChange,
+  onFontChange,
 }: {
-  styleId: string;
+  presetId: string;
   paletteId: string;
-  density: Density;
-  mode: Mode;
-  onStyleChange: (id: string) => void;
+  fontId?: string;
   onPaletteChange: (id: string) => void;
-  onDensityChange: (d: Density) => void;
-  onModeChange: (m: Mode) => void;
+  onFontChange: (id: string | undefined) => void;
 }) {
+  const preset = getPreset(presetId);
+  const presetFontId = preset?.fontId ?? 'geist';
+  const presetFont = getFont(presetFontId);
+  const activeId = fontId ?? presetFontId;
+  const activeFamily = getFont(activeId)?.family ?? presetFont?.family ?? 'system-ui';
+
   return (
     <div className="drawer__section">
-      <Field label="Style">
-        <div className="card-grid">
-          {allStyles.map((style) => (
-            <StyleCard
-              key={style.id}
-              style={style}
-              selected={style.id === styleId}
-              onClick={() => onStyleChange(style.id)}
+      <Field label="Font">
+        <div className="font-button-grid">
+          {FONTS.map((f) => (
+            <FontButton
+              key={f.id}
+              label={f.name}
+              family={f.family}
+              selected={f.id === activeId}
+              onClick={() => onFontChange(f.id === presetFontId ? undefined : f.id)}
             />
           ))}
         </div>
+        <p
+          className="font-preview"
+          style={{ fontFamily: activeFamily }}
+          aria-label="Active font preview"
+        >
+          The quick brown fox.
+        </p>
       </Field>
 
       <Field label="Palette">
@@ -151,37 +146,36 @@ function ThemeSection({
           ))}
         </div>
       </Field>
-
-      <Field label="Density">
-        <div className="segmented">
-          {DENSITIES.map((d) => (
-            <button
-              key={d}
-              type="button"
-              className={`segmented__option ${d === density ? 'segmented__option--active' : ''}`}
-              onClick={() => onDensityChange(d)}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-      </Field>
-
-      <Field label="Mode">
-        <div className="segmented">
-          {MODES.map((m) => (
-            <button
-              key={m}
-              type="button"
-              className={`segmented__option ${m === mode ? 'segmented__option--active' : ''}`}
-              onClick={() => onModeChange(m)}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-      </Field>
     </div>
+  );
+}
+
+function FontButton({
+  label,
+  family,
+  selected,
+  onClick,
+}: {
+  label: string;
+  family: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`font-button ${selected ? 'font-button--selected' : ''}`}
+      aria-pressed={selected}
+      title={label}
+    >
+      <span className="font-button__sample" style={{ fontFamily: family }} aria-hidden>
+        Aa
+      </span>
+      <span className="font-button__label" style={{ fontFamily: family }}>
+        {label}
+      </span>
+    </button>
   );
 }
 
@@ -219,16 +213,6 @@ function BrandSection({
         <p className="field__hint">SVG or PNG, hosted publicly. Loaded from URL at render time.</p>
       </Field>
 
-      <Field label="Logo URL (dark mode)">
-        <input
-          type="url"
-          value={brand.logoDarkUrl ?? ''}
-          onChange={(e) => update({ logoDarkUrl: e.target.value || undefined })}
-          placeholder="Optional inverted variant"
-          className="text-input"
-        />
-      </Field>
-
       <Field label="Logo position">
         <div className="segmented segmented--small">
           {LOGO_POSITIONS.map((pos) => (
@@ -249,7 +233,7 @@ function BrandSection({
       <Field label="Brand color override">
         <ColorPicker
           label=""
-          value={brand.brandColor ?? '#2563eb'}
+          value={brand.brandColor ?? '#c9a878'}
           onChange={(hex) => update({ brandColor: hex })}
           contrastAgainst={surfaceForContrast}
         />
@@ -269,7 +253,7 @@ function BrandSection({
       <Field label="Accent color override">
         <ColorPicker
           label=""
-          value={brand.accentColor ?? '#a855f7'}
+          value={brand.accentColor ?? '#c9a878'}
           onChange={(hex) => update({ accentColor: hex })}
           contrastAgainst={surfaceForContrast}
         />
@@ -283,30 +267,6 @@ function BrandSection({
         Reset brand
       </button>
     </div>
-  );
-}
-
-function StyleCard({
-  style,
-  selected,
-  onClick,
-}: {
-  style: Style;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`style-card ${selected ? 'style-card--selected' : ''}`}
-      aria-pressed={selected}
-    >
-      <span className="style-card__name" style={{ fontFamily: style.typography.display.family }}>
-        Aa
-      </span>
-      <span className="style-card__label">{style.name}</span>
-    </button>
   );
 }
 
@@ -328,8 +288,8 @@ function PaletteSwatch({
       aria-label={palette.name}
       title={palette.name}
     >
-      <span style={{ background: palette.brand }} className="palette-swatch__half" />
-      <span style={{ background: palette.accent }} className="palette-swatch__half" />
+      <span style={{ background: palette.tokens.surface }} className="palette-swatch__half" />
+      <span style={{ background: palette.tokens.accent }} className="palette-swatch__half" />
     </button>
   );
 }

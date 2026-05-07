@@ -32,10 +32,7 @@ import {
 } from './schema';
 
 const DEFAULT_THEME: ThemeRef = {
-  styleId: 'modern',
-  paletteId: 'electric',
-  density: 'comfortable',
-  mode: 'light',
+  presetId: '',
 };
 
 const VOID_DIRECTIVES = new Set(['stat', 'slide', 'image']);
@@ -423,11 +420,6 @@ function expandBlockDirective(
     return children;
   }
 
-  if (name === 'timeline') {
-    const children = parseChildren(tokens, cursor, true);
-    return children;
-  }
-
   if (name === 'chart') {
     const lines = collectRawLines(tokens, cursor);
     const chart = parseChartContent(name, options, lines);
@@ -548,17 +540,121 @@ function expandBlockDirective(
   }
 
   if (name === 'tear-sheet') {
-    parseChildren(tokens, cursor, true);
+    const inner = parseChildren(tokens, cursor, true);
     const cell = (label: string, value: string): Block[] => [
       { type: 'text', text: label, emphasis: 'caption' } satisfies Text,
       { type: 'text', text: value, emphasis: 'normal' } satisfies Text,
     ];
     const items: Block[] = [];
     if (options.client) items.push(...cell('Client', options.client));
+    if (options.industry) items.push(...cell('Industry', options.industry));
     if (options.engagement) items.push(...cell('Engagement', options.engagement));
-    if (options.outcome) items.push(...cell('Outcome', options.outcome));
+    if (options.duration) items.push(...cell('Duration', options.duration));
+    if (options.team) items.push(...cell('Team', options.team));
     if (options.date) items.push(...cell('Date', options.date));
-    return [{ type: 'grid', cols: 2, rows: 2, children: items }];
+    if (options.outcome) items.push(...cell('Outcome', options.outcome));
+    const grid: Grid = { type: 'grid', cols: 2, rows: 2, children: items };
+    const out: Block[] = [grid];
+    // Inner content (e.g. a `::lead` outcome statement) survives and is
+    // rendered alongside the field grid. Presets can render it as the
+    // hero outcome on the slide.
+    const innerLead = inner.find((b): b is Text => b.type === 'text' && b.emphasis === 'lead');
+    if (innerLead) out.push(innerLead);
+    return out;
+  }
+
+  if (name === 'timeline') {
+    const children = parseChildren(tokens, cursor, true);
+    const list = children.find((b): b is List => b.type === 'list');
+    const items = list?.items ?? [];
+    const cells: Block[] = items.map((it) => {
+      const raw = it.text;
+      const idx = raw.indexOf(':');
+      const head = idx >= 0 ? raw.slice(0, idx).trim() : raw.trim();
+      const body = idx >= 0 ? raw.slice(idx + 1).trim() : '';
+      const inner: Block[] = [{ type: 'text', text: head, emphasis: 'caption' } satisfies Text];
+      if (body) inner.push({ type: 'text', text: body, emphasis: 'normal' } satisfies Text);
+      return { type: 'box', tone: 'neutral', children: inner } satisfies Box;
+    });
+    if (cells.length === 0) return [];
+    const cols = pickGridCols('timeline', cells.length);
+    const rows = pickGridRows('timeline', cells.length, cols);
+    return [{ type: 'grid', cols, rows, children: cells } satisfies Grid];
+  }
+
+  if (name === 'process-steps') {
+    const children = parseChildren(tokens, cursor, true);
+    const list = children.find((b): b is List => b.type === 'list');
+    const items = list?.items ?? [];
+    const cells: Block[] = [];
+    items.forEach((it, i) => {
+      const raw = it.text;
+      const sepIdx = raw.indexOf('::');
+      const head = sepIdx >= 0 ? raw.slice(0, sepIdx).trim() : raw.trim();
+      const body = sepIdx >= 0 ? raw.slice(sepIdx + 2).trim() : '';
+      const num = String(i + 1).padStart(2, '0');
+      const inner: Block[] = [
+        { type: 'text', text: num, emphasis: 'caption' } satisfies Text,
+        { type: 'heading', level: 3, text: head } satisfies Heading,
+      ];
+      if (body) inner.push({ type: 'text', text: body, emphasis: 'normal' } satisfies Text);
+      cells.push({ type: 'box', tone: 'neutral', children: inner } satisfies Box);
+    });
+    if (cells.length === 0) return [];
+    const cols = pickGridCols('steps', cells.length);
+    const rows = pickGridRows('steps', cells.length, cols);
+    return [{ type: 'grid', cols, rows, children: cells } satisfies Grid];
+  }
+
+  if (name === 'deliverables') {
+    const children = parseChildren(tokens, cursor, true);
+    const groups: { title?: string; items: ListItem[] }[] = [];
+    let current: { title?: string; items: ListItem[] } | null = null;
+    for (const block of children) {
+      if (block.type === 'heading') {
+        if (current) groups.push(current);
+        current = { title: block.text, items: [] };
+      } else if (block.type === 'list') {
+        if (!current) current = { items: [] };
+        current.items.push(...block.items);
+      }
+    }
+    if (current) groups.push(current);
+    if (groups.length === 0) return [];
+    const cols: Block[][] = groups.map((g) => {
+      const inner: Block[] = [];
+      if (g.title) {
+        inner.push({ type: 'heading', level: 4, text: g.title } satisfies Heading);
+      }
+      for (const it of g.items) {
+        inner.push({ type: 'text', text: `✓ ${it.text}`, emphasis: 'normal' } satisfies Text);
+      }
+      return [{ type: 'box', tone: 'neutral', children: inner } satisfies Box];
+    });
+    const count = Math.min(Math.max(cols.length, 2), 3);
+    while (cols.length < count) cols.push([]);
+    return [{ type: 'columns', count: count as 2 | 3, columns: cols.slice(0, count) }];
+  }
+
+  if (name === 'logo-strip') {
+    parseChildren(tokens, cursor, true);
+    const raw = options.logos ?? '';
+    const logos = raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (logos.length === 0) return [];
+    const cells: Block[] = logos.map(
+      (logo) =>
+        ({
+          type: 'box',
+          tone: 'neutral',
+          children: [{ type: 'text', text: logo, emphasis: 'caption' } satisfies Text],
+        }) satisfies Box,
+    );
+    const cols = pickGridCols('logos', cells.length);
+    const rows = pickGridRows('logos', cells.length, cols);
+    return [{ type: 'grid', cols, rows, children: cells } satisfies Grid];
   }
 
   if (name === 'contact') {

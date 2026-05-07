@@ -1,1 +1,1 @@
-export { BlockRenderer, StyleIdProvider } from './BlockRenderer';
+export { BlockRenderer } from './BlockRenderer';

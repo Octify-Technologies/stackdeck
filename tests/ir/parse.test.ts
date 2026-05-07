@@ -566,4 +566,79 @@ Tall.
     expect(grid.cols).toBe(3);
     expect(grid.rows).toBe(2);
   });
+
+  describe('case-study custom blocks (timeline, process-steps, deliverables, logo-strip)', () => {
+    it('::timeline desugars bulleted phases into a grid of boxes', () => {
+      const md = `::timeline
+- Weeks 1–2: Discovery work
+- Weeks 3–5: Build phase
+- Weeks 6–10: Launch
+- Weeks 11–12: Retro
+::`;
+      const deck = parseDeck(md);
+      const grid = deck.slides[0].blocks[0] as Grid;
+      expect(grid.type).toBe('grid');
+      expect(grid.children).toHaveLength(4);
+      const first = grid.children[0] as Box;
+      expect(first.type).toBe('box');
+      const caption = first.children[0] as Text;
+      expect(caption.text).toBe('Weeks 1–2');
+      expect(caption.emphasis).toBe('caption');
+      const body = first.children[1] as Text;
+      expect(body.text).toBe('Discovery work');
+    });
+
+    it('::process-steps numbers each step from 01', () => {
+      const md = `::process-steps
+- Discover :: shadow recruiters and count handoffs
+- Design :: collapse the chain to one record
+- Build :: thin orchestration layer
+- Launch :: phased rollout by region
+::`;
+      const deck = parseDeck(md);
+      const grid = deck.slides[0].blocks[0] as Grid;
+      expect(grid.type).toBe('grid');
+      expect(grid.children).toHaveLength(4);
+      const step1 = grid.children[0] as Box;
+      const num = step1.children[0] as Text;
+      const head = step1.children[1] as Heading;
+      expect(num.text).toBe('01');
+      expect(head.type).toBe('heading');
+      expect(head.text).toBe('Discover');
+    });
+
+    it('::deliverables groups items under workstream headings into columns', () => {
+      const md = `::deliverables
+## Recruiter
+- One-page hire record
+- Auto-routed approvals
+
+## Candidate
+- Branded portal
+- Pre-day-one provisioning
+::`;
+      const deck = parseDeck(md);
+      const cols = deck.slides[0].blocks[0] as Columns;
+      expect(cols.type).toBe('columns');
+      expect(cols.count).toBe(2);
+      const colA = cols.columns[0][0] as Box;
+      const heading = colA.children[0] as Heading;
+      expect(heading.text).toBe('Recruiter');
+      const firstItem = colA.children[1] as Text;
+      expect(firstItem.text.startsWith('✓ ')).toBe(true);
+    });
+
+    it('::logo-strip splits the logos attribute into a grid of boxes', () => {
+      const md = `::logo-strip{logos="Acme, Globex, Initech, Umbra"}
+::`;
+      const deck = parseDeck(md);
+      const grid = deck.slides[0].blocks[0] as Grid;
+      expect(grid.type).toBe('grid');
+      expect(grid.children).toHaveLength(4);
+      const first = grid.children[0] as Box;
+      const text = first.children[0] as Text;
+      expect(text.text).toBe('Acme');
+      expect(text.emphasis).toBe('caption');
+    });
+  });
 });

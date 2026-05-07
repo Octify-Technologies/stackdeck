@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 import { NewDeckGallery } from './NewDeckGallery';
-import '@/app/templates/templates.css';
+import '@/app/presets/presets.css';
 
 export const metadata: Metadata = {
-  title: 'New deck, pick a template',
+  title: 'New deck, pick a preset',
   description:
-    'Start a new slide deck from a curated template. Pitch decks, editorials, brutalist manifestos, and more.',
+    'Start a new slide deck from a curated preset. Pitch decks, editorials, brutalist manifestos, and more.',
   alternates: { canonical: '/new' },
 };
 

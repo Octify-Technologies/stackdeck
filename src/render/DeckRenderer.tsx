@@ -1,7 +1,9 @@
 'use client';
 
 import type { Deck, Heading, Slide } from '@/ir/schema';
-import { getPalette, getStyle } from '@/themes/registry';
+import { getPalette } from '@/themes/registry';
+import { getPreset } from '@/app/presets/presets';
+import { getPresetComposer } from '@/presets/registry';
 
 import { SlideRenderer } from './SlideRenderer';
 import { ThemeProvider } from './ThemeProvider';
@@ -28,26 +30,37 @@ function computeSectionContext(slides: Slide[]): (string | undefined)[] {
 }
 
 export function DeckRenderer({ deck, className }: Props) {
-  const style = getStyle(deck.theme.styleId);
-  const palette = getPalette(deck.theme.paletteId);
+  const preset = getPreset(deck.theme.presetId);
+  const palette = getPalette(deck.theme.paletteId ?? preset?.paletteId ?? '');
   const sectionContext = computeSectionContext(deck.slides);
+  const composer = getPresetComposer(preset?.id);
 
   return (
-    <ThemeProvider theme={deck.theme} style={style} palette={palette} brand={deck.brand}>
+    <ThemeProvider theme={deck.theme} preset={preset} palette={palette} brand={deck.brand}>
       <div className={['deck', className].filter(Boolean).join(' ')}>
-        {deck.slides.map((slide, i) => (
-          <div key={slide.id} className="slide-frame" data-aspect={deck.aspectRatio}>
-            <SlideRenderer
-              slide={slide}
-              index={i}
-              totalSlides={deck.slides.length}
-              brand={deck.brand}
-              mode={deck.theme.mode}
-              footer={deck.footer}
-              section={sectionContext[i]}
-            />
-          </div>
-        ))}
+        {deck.slides.map((slide, i) => {
+          const composed = composer
+            ? composer(slide, {
+                deck,
+                index: i,
+                total: deck.slides.length,
+                section: sectionContext[i],
+              })
+            : null;
+          return (
+            <div key={slide.id} className="slide-frame" data-aspect={deck.aspectRatio}>
+              <SlideRenderer
+                slide={slide}
+                index={i}
+                totalSlides={deck.slides.length}
+                brand={deck.brand}
+                footer={deck.footer}
+                section={sectionContext[i]}
+                composed={composed}
+              />
+            </div>
+          );
+        })}
       </div>
     </ThemeProvider>
   );
