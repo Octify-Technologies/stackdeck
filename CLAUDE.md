@@ -8,6 +8,10 @@ The bar is the same as the bar for a designer-built deck delivered to a client. 
 
 The reason this app exists is reuse: design a deck once, render it as many times as needed for as many clients as needed by swapping the markdown content. The design quality is fixed at preset-design time. The content is fluid.
 
+## The product
+
+The user experience is: pick a preset, drop your content in, it looks great, done. No customization panel, no grid editor, no layout options. The design quality is the product. The target user is content-rich and time-poor: consultants, agencies, founders. They should never have to make a visual decision. If you find yourself suggesting a customization option or a user-facing setting, stop. The preset should make that decision for them.
+
 Every preset is its own different design. A future "Bauhaus" preset is not Dossier with different colors. It is its own designed deck with its own grammar, its own type personality, its own decorative atoms, its own bespoke compositions. Two completely different decks that both happen to consume the same markdown directive vocabulary.
 
 ## What a great preset must deliver
@@ -106,11 +110,22 @@ The author writes markdown. The directive vocabulary is small and stable across 
 
 If you find yourself trying to make a generic block render a hero-stat by tweaking CSS, stop. Build a bespoke component for the hero stat instead. Generic abstraction at the block level cannot win Tier 1.
 
+### Layered JSX pattern for Tier 1 components
+
+Every Tier 1 component has three layers:
+
+1. **Background layer**: full bleed, decorative atoms, color fills, SVG shapes. This is where the preset's visual personality lives.
+2. **Layout shell**: fixed insets from all four sides, baked into the component as design decisions, not exposed as props or configuration.
+3. **Content layer**: the variable markdown content positioned within the shell.
+
+The insets are part of the design. A cover slide for a given preset has specific padding because the designer chose it. That number does not change per deck and is not user-configurable.
+
 ## Anti-patterns to avoid
 
 - Treating a Preset as a CSS skin over one generic template. It isn't. A preset is a designed deck.
-- Trying to deliver Tier 1 with generic CSS. It will look templated. Use bespoke JSX.
+- Trying to deliver Tier 1 with generic CSS. It will look templated. Use bespoke JSX. This has been tried and failed: CSS over shared generic components always produces generic-looking output regardless of how much the CSS is tuned. Bespoke JSX per slide type per preset is not optional for Tier 1.
 - Adding "more flexible directives" or "more configuration" to compensate for design that is missing. Configuration cannot capture composition. Hand-design the composition instead.
+- Assembling Tier 1 slides from shared component libraries. This produces UI-kit output, not editorial output. A hero stat component shared across presets will look identical across presets with just color and font differences. That is a failure.
 - Bundling content (`seed`) on `Preset` or design (`paletteId` / `fontId`) on `Template`. The split is intentional and load-bearing.
 - Calling the directive vocabulary "templates" in code or copy. Templates use directives; they aren't directives.
 - Combining `Template` and `Preset` into one type. They are different axes (content vs design).
@@ -150,7 +165,8 @@ If you find yourself trying to make a generic block render a hero-stat by tweaki
 
 ## Workflow rules
 
-- Brainstorm before building. For non-trivial preset work, propose the design direction and the slide-by-slide plan before writing code. Wait for sign-off.
+- Brainstorm before building. For Tier 1 work this is non-negotiable: you must have a slide-by-slide visual description signed off before writing any JSX. Not vague ("clean", "editorial") but specific: exact type sizes, what decorative atoms appear, how space is used, what the slide does NOT include. If you do not have this, stop and ask. Writing Tier 1 code without a concrete design brief always produces generic output.
+- One genuinely great preset is worth more than five mediocre ones. Do not register a preset until all 9 Tier 1 slides are solid. A weak cover or a generic hero stat means the preset is not ready to ship.
 - Never auto-commit or auto-push. A prior "go ahead" does not carry over.
 - Commit messages: one line, under 72 characters, imperative voice. No body. No `Co-Authored-By: Claude`.
 - Never use an em dash in any output (sentences, lists, headers, code comments). Use a comma, colon, or rephrase instead.
