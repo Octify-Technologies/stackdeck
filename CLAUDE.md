@@ -2,15 +2,17 @@ Never run build or tests until I ask manually.
 
 ## What this app is
 
-Internal viewer for Octify case studies. **Bring your own HTML.** Each case study is a Sanity document with a `slides[]` array, where each slide stores a complete hand-authored HTML document. The app renders each slide inside a sandboxed iframe at a fixed 1920x1080 canvas, scaled to fit the viewport. There is no editor in the app, no markdown, no theming, no presets. Authoring happens in Sanity Studio at `/studio`.
+Internal viewer for Octify case studies. **Bring your own HTML.** Each case study is either a Sanity document with a `slides[]` array, or a folder under `case-studies/<slug>/` with `meta.json` and `<n>.html` files. The app renders each slide inside a sandboxed iframe at a fixed 1920x1080 canvas, scaled to fit the viewport. There is no in-app editor, no markdown, no theming, no presets.
 
 The job of this app is narrow: list case studies, render them as a deck (viewer + present mode), generate per-deck PDFs and OG images. Nothing else.
 
-## The mental model
+## The two authoring sources
 
-- **Author** designs each slide as HTML somewhere (Astro, hand-coded, whatever). Each slide is a self-contained 1920x1080 document with inline CSS and system fonts.
-- **Paste** the slide HTML into a `caseStudy` document in Sanity Studio (`/studio`).
-- **Publish.** Sanity webhook hits `/api/revalidate` and the deck appears in seconds. No deploy.
+Both work simultaneously. The loader merges results, with Sanity winning on slug collisions.
+
+**Sanity (preferred for non-developers):** sign in at `/studio`, create a `caseStudy`, paste each slide's HTML, publish. The Sanity webhook hits `/api/revalidate` and the new deck is live in seconds with no deploy. Requires `NEXT_PUBLIC_SANITY_PROJECT_ID` env var; without it the app silently skips Sanity and serves filesystem decks only.
+
+**Filesystem (preferred for developers):** drop a folder into `case-studies/<slug>/` with a `meta.json` and one HTML file per slide. Commit, push, deploy. Same model the app shipped with originally; works without any external service.
 
 ## Authoring contract (the only real rule)
 
@@ -49,12 +51,14 @@ Images and other assets are uploaded to Sanity directly and referenced by their 
 
 If something needs to be different per deck, it lives in the deck's HTML. Not in the app.
 
-## Required env vars
+## Env vars (all optional)
 
-- `NEXT_PUBLIC_SANITY_PROJECT_ID`, the Sanity project ID.
+The app boots without any of these. Without them, only filesystem decks under `case-studies/` are served.
+
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`, the Sanity project ID. Setting this enables the Sanity loader path.
 - `NEXT_PUBLIC_SANITY_DATASET`, defaults to `production`.
 - `NEXT_PUBLIC_SANITY_API_VERSION`, ISO date, defaults to `2024-10-01`.
-- `SANITY_READ_TOKEN`, optional, required only if previewing unpublished drafts.
+- `SANITY_READ_TOKEN`, required only if previewing unpublished drafts.
 - `SANITY_WEBHOOK_SECRET`, required for the `/api/revalidate` webhook to verify signatures. Configure the same value in the Sanity webhook settings.
 
 See `.env.example`.

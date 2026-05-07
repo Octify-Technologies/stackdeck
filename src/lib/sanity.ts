@@ -1,33 +1,33 @@
 import 'server-only';
-import { createClient } from '@sanity/client';
+import { createClient, type SanityClient } from '@sanity/client';
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-10-01';
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim() || '';
+const dataset = (process.env.NEXT_PUBLIC_SANITY_DATASET || 'production').trim();
+const apiVersion = (process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-10-01').trim();
 const readToken = process.env.SANITY_READ_TOKEN; // optional, only needed for drafts
 
-if (!projectId) {
-  // Surface this at startup, not at first request.
-  throw new Error(
-    'NEXT_PUBLIC_SANITY_PROJECT_ID is not set. Add it to .env.local (and your Vercel project).',
-  );
-}
+/**
+ * True when Sanity env vars are configured. When false, callers should fall
+ * through to the filesystem-backed loader so the app works without a CMS.
+ */
+export const sanityEnabled = projectId.length > 0;
 
 /**
- * Server-side Sanity client. CDN reads are public and fast; perViewLatency is
- * mitigated by Next.js fetch cache + tag-based revalidation in the queries
- * below.
+ * Server-side Sanity client. `null` when env vars aren't set, so the app
+ * still boots and the filesystem loader serves decks. CDN reads are public
+ * and fast; per-request latency is mitigated by Next.js fetch cache + tag-
+ * based revalidation in the queries.
  */
-export const sanity = createClient({
-  projectId,
-  dataset,
-  apiVersion,
-  // Use the CDN for published content; the read token (if set) lets us bypass
-  // it when previewing drafts.
-  useCdn: !readToken,
-  token: readToken,
-  perspective: readToken ? 'previewDrafts' : 'published',
-});
+export const sanity: SanityClient | null = sanityEnabled
+  ? createClient({
+      projectId,
+      dataset,
+      apiVersion,
+      useCdn: !readToken,
+      token: readToken,
+      perspective: readToken ? 'previewDrafts' : 'published',
+    })
+  : null;
 
 /**
  * Cache-tag identifiers used both at fetch time (next.tags) and from the
