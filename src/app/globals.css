@@ -1,8 +1,122 @@
-@import '../styles/app-shell.css';
-@import '../styles/blocks.css';
-@import '../styles/layouts.css';
-@import '../styles/deck.css';
-@import '../styles/dossier.css';
+:root {
+  /* Surface elevations, light editorial scale.
+     bg     = page canvas
+     soft   = recessed panels (footer, secondary regions)
+     elev   = raised cards on hover, chip fills, subtle insets
+     elev-2 = pressed / deeper inset
+     chip   = neutral chip background */
+  --bg: #ffffff;
+  --bg-soft: #fafafa;
+  --bg-elev: #f4f4f5;
+  --bg-elev-2: #e8e8eb;
+  --bg-chip: #f4f4f5;
+
+  /* Stage = dark recess where the white slide canvas lives. */
+  --stage-bg: #171717;
+  --stage-bg-soft: #1f1f1f;
+  --stage-line: #2a2a2a;
+
+  /* Ink, near-black to soft gray. */
+  --fg: #0a0a0a;
+  --fg-soft: #2a2a2a;
+  --fg-muted: #595959;
+  --fg-dim: #8a8a8a;
+  --fg-faint: #c4c4c4;
+
+  /* Lines. */
+  --line: #ececec;
+  --line-strong: #d4d4d4;
+  --line-vivid: #a3a3a3;
+
+  /* Primary brand accent: deep indigo. Used for the active selection,
+     primary CTAs in the viewer, focus rings, and the editorial dot on
+     the index title. Never used as decoration on neutral surfaces. */
+  --accent: #4f46e5;
+  --accent-soft: #6366f1;
+  --accent-strong: #4338ca;
+  --accent-bg: rgba(79, 70, 229, 0.06);
+  --accent-bg-strong: rgba(79, 70, 229, 0.1);
+  --accent-border: rgba(79, 70, 229, 0.32);
+
+  /* Editorial dot color: warm amber. */
+  --mark: #f59e0b;
+
+  /* Soft tag palette, used on chips. Low saturation so the page stays
+     calm but gains a little warmth. */
+  --tag-sky-fg: #1d4ed8;
+  --tag-sky-bg: #eff6ff;
+  --tag-sky-border: #bfdbfe;
+  --tag-sky-dot: #3b82f6;
+
+  --tag-amber-fg: #b45309;
+  --tag-amber-bg: #fffbeb;
+  --tag-amber-border: #fde68a;
+  --tag-amber-dot: #f59e0b;
+
+  --tag-rose-fg: #be123c;
+  --tag-rose-bg: #fff1f2;
+  --tag-rose-border: #fecdd3;
+  --tag-rose-dot: #f43f5e;
+
+  --tag-emerald-fg: #047857;
+  --tag-emerald-bg: #ecfdf5;
+  --tag-emerald-border: #a7f3d0;
+  --tag-emerald-dot: #10b981;
+
+  --tag-violet-fg: #6d28d9;
+  --tag-violet-bg: #f5f3ff;
+  --tag-violet-border: #ddd6fe;
+  --tag-violet-dot: #8b5cf6;
+
+  /* Status colors, used on chips, dots, badges. */
+  --status-ok: #15803d;
+  --status-ok-bg: #ecfdf5;
+  --status-ok-border: #bbf7d0;
+
+  --status-warn: #b45309;
+  --status-warn-bg: #fffbeb;
+  --status-warn-border: #fde68a;
+
+  --status-danger: #b91c1c;
+  --status-danger-bg: #fef2f2;
+  --status-danger-border: #fecaca;
+
+  --status-info: #1d4ed8;
+  --status-info-bg: #eff6ff;
+  --status-info-border: #bfdbfe;
+
+  --status-live: #16a34a;
+
+  /* Type. */
+  --sans: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --mono: var(--font-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Scale. Bumped one notch across the board for a more confident read. */
+  --t-micro: 12px;
+  --t-mono: 13px;
+  --t-small: 14px;
+  --t-body: 16px;
+  --t-large: 19px;
+  --t-h2: 32px;
+
+  /* Radius. */
+  --rad-sm: 4px;
+  --rad: 8px;
+  --rad-lg: 12px;
+
+  /* Elevation. */
+  --shadow-sm: 0 1px 2px rgba(15, 15, 20, 0.04);
+  --shadow: 0 1px 2px rgba(15, 15, 20, 0.04), 0 8px 24px -12px rgba(15, 15, 20, 0.08);
+  --shadow-lg: 0 1px 2px rgba(15, 15, 20, 0.04), 0 24px 60px -20px rgba(15, 15, 20, 0.18);
+
+  /* Motion. */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Layout. */
+  --nav-h: 68px;
+
+  color-scheme: light;
+}
 
 * {
   box-sizing: border-box;
@@ -13,9 +127,94 @@ body {
   margin: 0;
   padding: 0;
   background: var(--bg);
-  color: var(--text);
-  font-family: var(--ui);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: var(--t-body);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--rad-sm);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg-dim);
+  background-clip: content-box;
+  border: 2px solid transparent;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

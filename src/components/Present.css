@@ -1,0 +1,115 @@
+.present {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  cursor: default;
+  z-index: 1000;
+}
+
+.present-stage {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  animation: fade 0.3s var(--ease) both;
+}
+
+.present-stage .slide-wrap {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Bottom pager wrap. Auto-hides after idle. */
+.present-pager-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 28px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease),
+    transform 0.3s var(--ease);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.present-pager-wrap-hidden {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Pager pill, mirrors the viewer's stage pager. */
+.present-pager {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+.present-pager-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.12s var(--ease),
+    color 0.12s var(--ease);
+}
+
+.present-pager-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.present-pager-btn:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.present-pager-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+.present-pager-counter {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-feature-settings: 'tnum' on;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  padding: 0 14px;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.present-pager-counter-current {
+  color: #ffffff;
+}
+
+.present-pager-counter-sep {
+  margin: 0 5px;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.present-pager-counter-total {
+  color: rgba(255, 255, 255, 0.55);
+}

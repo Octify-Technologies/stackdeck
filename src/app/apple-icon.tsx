@@ -9,17 +9,17 @@ export default function AppleIcon() {
       style={{
         width: '100%',
         height: '100%',
-        background: '#0b0b0f',
+        background: '#0a0a0a',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 36,
       }}
     >
-      <svg width="132" height="132" viewBox="0 0 22 22" fill="none">
-        <rect x="1.8" y="6.9" width="12" height="12" rx="2" fill="#6366f1" />
-        <rect x="5" y="5" width="12" height="12" rx="2" fill="#ec4899" />
-        <rect x="8.2" y="3.1" width="12" height="12" rx="2" fill="#f59e0b" />
+      <svg width="124" height="124" viewBox="0 0 22 22" fill="none">
+        <rect x="1.8" y="6.9" width="12" height="12" rx="2.6" fill="#3f3f46" />
+        <rect x="5" y="5" width="12" height="12" rx="2.6" fill="#a1a1aa" />
+        <rect x="8.2" y="3.1" width="12" height="12" rx="2.6" fill="#fafafa" />
       </svg>
     </div>,
     { ...size },
