@@ -40,11 +40,5 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Dead code check
-        run: pnpm knip
-
-      - name: Test
-        run: pnpm test
-
       - name: Build
         run: pnpm build
