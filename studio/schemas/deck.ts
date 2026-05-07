@@ -1,8 +1,8 @@
 import { defineField, defineType } from 'sanity';
 
-export const caseStudy = defineType({
-  name: 'caseStudy',
-  title: 'Case Study',
+export const deck = defineType({
+  name: 'deck',
+  title: 'Deck',
   type: 'document',
   fieldsets: [
     { name: 'meta', title: 'Metadata', options: { collapsible: true, collapsed: false } },

@@ -8,8 +8,8 @@ import { sanity, sanityEnabled, CACHE_TAGS } from './sanity';
 /**
  * The loader is hybrid by design. Sanity is the recommended authoring source
  * but optional. When Sanity env vars aren't set, or when a Sanity request
- * fails, we fall through to the local `case-studies/<slug>/` filesystem
- * format so the app keeps working with hand-dropped decks.
+ * fails, we fall through to the local `slides/<slug>/` filesystem format so
+ * the app keeps working with hand-dropped decks.
  *
  * Slide identifiers differ between sources:
  *   - Sanity decks expose `file` as a stringified array index ("0", "1", ...)
@@ -20,7 +20,7 @@ import { sanity, sanityEnabled, CACHE_TAGS } from './sanity';
 
 export type SlideEntry = { file: string; title?: string };
 
-export type CaseStudy = {
+export type Deck = {
   slug: string;
   title: string;
   client?: string;
@@ -34,16 +34,16 @@ export type CaseStudy = {
 };
 
 const REVALIDATE_SECONDS = 60;
-const FS_ROOT = path.join(process.cwd(), 'case-studies');
+const FS_ROOT = path.join(process.cwd(), 'slides');
 
 // ─── Public API ────────────────────────────────────────────────────────────
 
-export async function listCaseStudies(): Promise<CaseStudy[]> {
+export async function listDecks(): Promise<Deck[]> {
   const [fromSanity, fromDisk] = await Promise.all([listFromSanity(), listFromDisk()]);
   // De-duplicate by slug; Sanity wins on collision so editing in the CMS
   // overrides any stale on-disk copy.
   const seen = new Set<string>();
-  const merged: CaseStudy[] = [];
+  const merged: Deck[] = [];
   for (const d of [...fromSanity, ...fromDisk]) {
     if (seen.has(d.slug)) continue;
     seen.add(d.slug);
@@ -52,7 +52,7 @@ export async function listCaseStudies(): Promise<CaseStudy[]> {
   return merged.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
 }
 
-export async function getCaseStudy(slug: string): Promise<CaseStudy | null> {
+export async function getDeck(slug: string): Promise<Deck | null> {
   if (!isSlug(slug)) return null;
   const sanityDoc = await getFromSanity(slug);
   if (sanityDoc) return sanityDoc;
@@ -111,7 +111,7 @@ export async function readAsset(
 
 // ─── Sanity source ─────────────────────────────────────────────────────────
 
-type SanityCaseStudyDoc = {
+type SanityDeckDoc = {
   slug: string;
   title: string;
   client?: string;
@@ -138,41 +138,41 @@ const META_FIELDS = `
 `;
 
 const LIST_QUERY = groq`
-  *[_type == "caseStudy" && (visibility == "public" || !defined(visibility))]
+  *[_type == "deck" && (visibility == "public" || !defined(visibility))]
     | order(coalesce(date, _createdAt) desc) {
       ${META_FIELDS}
     }
 `;
 
 const ONE_QUERY = groq`
-  *[_type == "caseStudy" && slug.current == $slug][0] {
+  *[_type == "deck" && slug.current == $slug][0] {
     ${META_FIELDS}
   }
 `;
 
 const SLIDE_HTML_QUERY = groq`
-  *[_type == "caseStudy" && slug.current == $slug][0].slides[$index].html
+  *[_type == "deck" && slug.current == $slug][0].slides[$index].html
 `;
 
-async function listFromSanity(): Promise<CaseStudy[]> {
+async function listFromSanity(): Promise<Deck[]> {
   if (!sanityEnabled || !sanity) return [];
   try {
-    const docs = await sanity.fetch<SanityCaseStudyDoc[]>(
+    const docs = await sanity.fetch<SanityDeckDoc[]>(
       LIST_QUERY,
       {},
       { next: { tags: [CACHE_TAGS.list], revalidate: REVALIDATE_SECONDS } },
     );
-    return (docs ?? []).filter((d) => d.slides && d.slides.length > 0).map(sanityToCaseStudy);
+    return (docs ?? []).filter((d) => d.slides && d.slides.length > 0).map(sanityToDeck);
   } catch (err) {
-    console.warn('[case-studies] Sanity list failed; using filesystem only.', err);
+    console.warn('[decks] Sanity list failed; using filesystem only.', err);
     return [];
   }
 }
 
-async function getFromSanity(slug: string): Promise<CaseStudy | null> {
+async function getFromSanity(slug: string): Promise<Deck | null> {
   if (!sanityEnabled || !sanity) return null;
   try {
-    const doc = await sanity.fetch<SanityCaseStudyDoc | null>(
+    const doc = await sanity.fetch<SanityDeckDoc | null>(
       ONE_QUERY,
       { slug },
       {
@@ -183,9 +183,9 @@ async function getFromSanity(slug: string): Promise<CaseStudy | null> {
       },
     );
     if (!doc || !doc.slides || doc.slides.length === 0) return null;
-    return sanityToCaseStudy(doc);
+    return sanityToDeck(doc);
   } catch (err) {
-    console.warn(`[case-studies] Sanity get(${slug}) failed; trying filesystem.`, err);
+    console.warn(`[decks] Sanity get(${slug}) failed; trying filesystem.`, err);
     return null;
   }
 }
@@ -201,12 +201,12 @@ async function readSlideFromSanity(slug: string, index: number): Promise<string 
     );
     return typeof html === 'string' ? html : null;
   } catch (err) {
-    console.warn(`[case-studies] Sanity slide(${slug}, ${index}) failed.`, err);
+    console.warn(`[decks] Sanity slide(${slug}, ${index}) failed.`, err);
     return null;
   }
 }
 
-function sanityToCaseStudy(doc: SanityCaseStudyDoc): CaseStudy {
+function sanityToDeck(doc: SanityDeckDoc): Deck {
   const slides: SlideEntry[] = (doc.slides ?? []).map((s, i) => ({
     file: String(i),
     title: s.title?.trim() || undefined,
@@ -247,7 +247,7 @@ const MetaSchema = z.object({
   summary: z.string().optional(),
 });
 
-async function listFromDisk(): Promise<CaseStudy[]> {
+async function listFromDisk(): Promise<Deck[]> {
   let entries: string[];
   try {
     entries = await fs.readdir(FS_ROOT);
@@ -259,10 +259,10 @@ async function listFromDisk(): Promise<CaseStudy[]> {
       .filter((e) => !e.startsWith('.') && !e.startsWith('_'))
       .map((slug) => getFromDisk(slug)),
   );
-  return studies.filter((s): s is CaseStudy => s !== null && s.visibility !== 'private');
+  return studies.filter((s): s is Deck => s !== null && s.visibility !== 'private');
 }
 
-async function getFromDisk(slug: string): Promise<CaseStudy | null> {
+async function getFromDisk(slug: string): Promise<Deck | null> {
   if (!isSlug(slug)) return null;
   const dir = path.join(FS_ROOT, slug);
   let stat;

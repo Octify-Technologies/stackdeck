@@ -6,10 +6,10 @@ import { CACHE_TAGS } from '@/lib/sanity';
 /**
  * Sanity webhook receiver. Configure in Sanity dashboard:
  *   - URL: https://<your-domain>/api/revalidate
- *   - Trigger: on create / update / delete of caseStudy
+ *   - Trigger: on create / update / delete of deck
  *   - HTTP method: POST
  *   - Secret: shared with SANITY_WEBHOOK_SECRET
- *   - Filter (GROQ): _type == "caseStudy"
+ *   - Filter (GROQ): _type == "deck"
  *   - Projection: { "_type": _type, "slug": slug.current }
  *
  * Validates the HMAC signature, then revalidates the affected cache tags so
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   if (!isValidSignature) {
     return NextResponse.json({ ok: false, error: 'Invalid signature.' }, { status: 401 });
   }
-  if (!body || body._type !== 'caseStudy') {
+  if (!body || body._type !== 'deck') {
     return NextResponse.json({ ok: false, error: 'Unsupported document type.' }, { status: 400 });
   }
 

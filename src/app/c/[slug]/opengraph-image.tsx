@@ -1,16 +1,16 @@
 import { ImageResponse } from 'next/og';
-import { getCaseStudy } from '@/lib/case-studies';
+import { getDeck } from '@/lib/decks';
 
-export const alt = 'Octify case study';
+export const alt = 'Octify deck';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default async function CaseStudyOG({ params }: { params: Promise<{ slug: string }> }) {
+export default async function DeckOG({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const study = await getCaseStudy(slug);
-  const title = study?.title ?? 'Octify case study';
-  const client = study?.client;
-  const summary = study?.summary;
+  const deck = await getDeck(slug);
+  const title = deck?.title ?? 'Octify deck';
+  const client = deck?.client;
+  const summary = deck?.summary;
 
   return new ImageResponse(
     <div
@@ -33,9 +33,7 @@ export default async function CaseStudyOG({ params }: { params: Promise<{ slug: 
           <rect x="8.2" y="3.1" width="12" height="12" rx="2.6" fill="#fafafa" />
         </svg>
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-          <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: -0.4 }}>
-            Octify Case Study
-          </div>
+          <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: -0.4 }}>Octify Deck</div>
           <div
             style={{
               fontSize: 14,

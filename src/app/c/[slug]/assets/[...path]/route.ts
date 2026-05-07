@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { readAsset } from '@/lib/case-studies';
+import { readAsset } from '@/lib/decks';
 
 /**
  * Serves static assets that live alongside filesystem-authored decks under
- * `case-studies/<slug>/assets/...`. Sanity decks reference Sanity-hosted CDN
- * URLs directly inside slide HTML and never hit this route.
+ * `slides/<slug>/assets/...`. Sanity decks reference Sanity-hosted CDN URLs
+ * directly inside slide HTML and never hit this route.
  */
 export async function GET(
   _req: Request,

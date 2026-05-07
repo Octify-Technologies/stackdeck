@@ -1,3 +1,3 @@
-import { caseStudy } from './caseStudy';
+import { deck } from './deck';
 
-export const schemaTypes = [caseStudy];
+export const schemaTypes = [deck];

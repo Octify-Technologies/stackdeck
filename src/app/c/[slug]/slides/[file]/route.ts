@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { readSlide } from '@/lib/case-studies';
+import { readSlide } from '@/lib/decks';
 
 export async function GET(
   _req: Request,

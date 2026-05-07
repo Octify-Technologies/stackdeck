@@ -34,6 +34,6 @@ export const sanity: SanityClient | null = sanityEnabled
  * webhook handler when content changes in Sanity.
  */
 export const CACHE_TAGS = {
-  list: 'caseStudies',
-  one: (slug: string) => `caseStudy:${slug}`,
+  list: 'decks',
+  one: (slug: string) => `deck:${slug}`,
 } as const;
