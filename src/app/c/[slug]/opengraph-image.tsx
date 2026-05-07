@@ -54,6 +54,7 @@ export default async function CaseStudyOG({ params }: { params: Promise<{ slug: 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div
           style={{
+            display: 'flex',
             fontSize: title.length > 40 ? 88 : 112,
             fontWeight: 500,
             lineHeight: 0.98,
