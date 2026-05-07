@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, Geist, Inter, JetBrains_Mono, Manrope, Space_Grotesk } from 'next/font/google';
+import {
+  DM_Sans,
+  Fraunces,
+  Geist,
+  Inter,
+  Inter_Tight,
+  JetBrains_Mono,
+  Manrope,
+  Space_Grotesk,
+} from 'next/font/google';
 import './globals.css';
 
-// Five user-pickable modern sans faces plus the project's mono. Every
-// entry must have a matching definition in `src/themes/fonts.ts` for the
-// font picker to surface it.
+// User-pickable faces plus the project's mono. Every entry must have a
+// matching definition in `src/themes/fonts.ts` for the font picker to
+// surface it. Fraunces + Inter Tight are the Dossier preset's display+body
+// pair; the others are the original sans catalog.
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({
@@ -14,6 +24,18 @@ const spaceGrotesk = Space_Grotesk({
 });
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  style: ['normal', 'italic'],
+  display: 'swap',
+  axes: ['SOFT', 'WONK', 'opsz'],
+});
+const interTight = Inter_Tight({
+  subsets: ['latin'],
+  variable: '--font-inter-tight',
+  display: 'swap',
+});
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains',
@@ -122,7 +144,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${inter.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${manrope.variable} ${jetbrains.variable}`}
+      className={`${geist.variable} ${inter.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${manrope.variable} ${fraunces.variable} ${interTight.variable} ${jetbrains.variable}`}
     >
       <body>
         <script

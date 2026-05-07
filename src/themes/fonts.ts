@@ -42,6 +42,16 @@ export const FONTS: FontDef[] = [
     name: 'Manrope',
     family: 'var(--font-manrope), Manrope, system-ui, sans-serif',
   },
+  {
+    id: 'fraunces',
+    name: 'Fraunces',
+    family: 'var(--font-fraunces), Fraunces, "Times New Roman", serif',
+  },
+  {
+    id: 'inter-tight',
+    name: 'Inter Tight',
+    family: 'var(--font-inter-tight), "Inter Tight", system-ui, sans-serif',
+  },
 ];
 
 const byId: Record<string, FontDef> = Object.fromEntries(FONTS.map((f) => [f.id, f]));

@@ -540,17 +540,27 @@ function expandBlockDirective(
   }
 
   if (name === 'tear-sheet') {
-    parseChildren(tokens, cursor, true);
+    const inner = parseChildren(tokens, cursor, true);
     const cell = (label: string, value: string): Block[] => [
       { type: 'text', text: label, emphasis: 'caption' } satisfies Text,
       { type: 'text', text: value, emphasis: 'normal' } satisfies Text,
     ];
     const items: Block[] = [];
     if (options.client) items.push(...cell('Client', options.client));
+    if (options.industry) items.push(...cell('Industry', options.industry));
     if (options.engagement) items.push(...cell('Engagement', options.engagement));
-    if (options.outcome) items.push(...cell('Outcome', options.outcome));
+    if (options.duration) items.push(...cell('Duration', options.duration));
+    if (options.team) items.push(...cell('Team', options.team));
     if (options.date) items.push(...cell('Date', options.date));
-    return [{ type: 'grid', cols: 2, rows: 2, children: items }];
+    if (options.outcome) items.push(...cell('Outcome', options.outcome));
+    const grid: Grid = { type: 'grid', cols: 2, rows: 2, children: items };
+    const out: Block[] = [grid];
+    // Inner content (e.g. a `::lead` outcome statement) survives and is
+    // rendered alongside the field grid. Presets can render it as the
+    // hero outcome on the slide.
+    const innerLead = inner.find((b): b is Text => b.type === 'text' && b.emphasis === 'lead');
+    if (innerLead) out.push(innerLead);
+    return out;
   }
 
   if (name === 'timeline') {

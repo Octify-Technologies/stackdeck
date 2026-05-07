@@ -36,6 +36,7 @@ export function ThemeProvider({ theme, preset, palette, brand, children, classNa
       className={['deck-root', className].filter(Boolean).join(' ')}
       style={styleObject}
       data-palette={theme.paletteId ?? preset?.paletteId ?? ''}
+      data-preset={preset?.id ?? ''}
     >
       {children}
     </div>
