@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Linen, redrawn. Three principles</title>
+<style>
+  :root {
+    --paper: #f5f1ea;
+    --ink: #15140f;
+    --oxblood: #8a2a3a;
+    --hair: #cfc8b7;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+    --serif: 'Iowan Old Style', Palatino, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    position: relative;
+  }
+  .runhead {
+    position: absolute;
+    top: 80px;
+    left: 120px;
+    right: 120px;
+    display: flex;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .runhead .label { white-space: nowrap; }
+  .runhead .slash { color: var(--hair); margin: 0 14px; }
+  .runhead::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--hair);
+    margin-left: 24px;
+  }
+  .deck-title {
+    position: absolute;
+    top: 130px;
+    left: 120px;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    font-style: italic;
+    font-family: var(--serif);
+  }
+  .cols {
+    position: absolute;
+    top: 260px;
+    left: 120px;
+    right: 120px;
+    bottom: 120px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .col {
+    position: relative;
+    padding: 0 56px;
+  }
+  .col:first-child { padding-left: 0; }
+  .col:last-child { padding-right: 0; }
+  .col + .col::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--hair);
+  }
+  .roman {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 28px;
+    color: var(--oxblood);
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+  .head {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 1.18;
+    color: var(--ink);
+    margin: 0 0 28px 0;
+    max-width: 14ch;
+  }
+  .body {
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink);
+    max-width: 28ch;
+    margin: 0;
+  }
+  .rule-mark {
+    width: 36px;
+    height: 1px;
+    background: var(--ink);
+    margin-bottom: 36px;
+  }
+  .folio {
+    position: absolute;
+    right: 120px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--hair);
+    text-transform: uppercase;
+  }
+  .section-num {
+    position: absolute;
+    left: 120px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+  <div class="runhead">
+    <span class="label">THE SYSTEM<span class="slash">/</span>III PRINCIPLES</span>
+  </div>
+  <div class="deck-title">A small set of rules, held to without exception.</div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="rule-mark"></div>
+      <div class="roman">I.</div>
+      <h2 class="head">Restraint over expression.</h2>
+      <p class="body">Every choice subtracts before it adds. If a mark, a colour, or a flourish is not earning its place on the page, it is removed. The brand is what is left when nothing else is.</p>
+    </div>
+    <div class="col">
+      <div class="rule-mark"></div>
+      <div class="roman">II.</div>
+      <h2 class="head">One typeface, two weights.</h2>
+      <p class="body">A single serif carries the system, set at regular and at italic. No display cuts, no second family for headings. Hierarchy is built from size and space, not from variety.</p>
+    </div>
+    <div class="col">
+      <div class="rule-mark"></div>
+      <div class="roman">III.</div>
+      <h2 class="head">Asymmetry as honesty.</h2>
+      <p class="body">Centred composition flatters the page; asymmetry tells the truth about what matters. The system favours generous left margins, ragged right edges, and breath where most brands would push a logo.</p>
+    </div>
+  </div>
+
+  <div class="section-num">04 / 06</div>
+  <div class="folio">iv</div>
+</body>
+</html>

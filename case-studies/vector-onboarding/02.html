@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vector / Tear sheet</title>
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --fg: #ededed;
+    --cyan: #5cf2c8;
+    --hair: #2a2a2a;
+    --grotesk: 'Helvetica Neue', 'Arial', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--grotesk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .ident {
+    position: absolute;
+    top: 64px;
+    left: 96px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+  }
+  .pageno {
+    position: absolute;
+    top: 64px;
+    right: 96px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #6a6a6a;
+    letter-spacing: 0.2em;
+  }
+  h2 {
+    position: absolute;
+    top: 116px;
+    left: 96px;
+    margin: 0;
+    font-size: 56px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-weight: 600;
+  }
+  .sub {
+    position: absolute;
+    top: 184px;
+    left: 96px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #8a8a8a;
+    letter-spacing: 0.08em;
+  }
+  .grid {
+    position: absolute;
+    top: 260px;
+    left: 96px;
+    width: 1728px;
+    height: 720px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    border-top: 1px solid var(--hair);
+    border-left: 1px solid var(--hair);
+  }
+  .cell {
+    position: relative;
+    padding: 28px 28px 24px 28px;
+    border-right: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    overflow: hidden;
+  }
+  .cell .lab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: #6a6a6a;
+    text-transform: uppercase;
+  }
+  .cell .val {
+    margin-top: 64px;
+    font-family: var(--grotesk);
+    font-size: 54px;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--fg);
+  }
+  .cell .val.small { font-size: 38px; }
+  .cell .val .accent { color: var(--cyan); }
+  .cell .foot {
+    position: absolute;
+    left: 28px;
+    bottom: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: #5a5a5a;
+  }
+  .cell .corner {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #3a3a3a;
+    letter-spacing: 0.12em;
+  }
+  .footer {
+    position: absolute;
+    bottom: 36px;
+    left: 96px;
+    right: 96px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #5a5a5a;
+    letter-spacing: 0.18em;
+  }
+</style>
+</head>
+<body>
+  <div class="ident">[ CASE &bull; 022 / 02 ]</div>
+  <div class="pageno">02 / 06</div>
+  <h2>Tear sheet.</h2>
+  <div class="sub">readout &bull; instrument panel</div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="lab">Client</div>
+      <div class="corner">01</div>
+      <div class="val">Vector</div>
+      <div class="foot">vector.dev</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Industry</div>
+      <div class="corner">02</div>
+      <div class="val small">Developer tools</div>
+      <div class="foot">infra / CLI</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Engagement</div>
+      <div class="corner">03</div>
+      <div class="val small">Onboarding rebuild</div>
+      <div class="foot">scope, design, ship</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Timeline</div>
+      <div class="corner">04</div>
+      <div class="val">11 wks</div>
+      <div class="foot">2026.01.20, 2026.04.06</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Stack</div>
+      <div class="corner">05</div>
+      <div class="val small">Next.js, tRPC, Postgres</div>
+      <div class="foot">+ Segment, PostHog</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Team</div>
+      <div class="corner">06</div>
+      <div class="val">04</div>
+      <div class="foot">PM, design, 2 eng</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Blocker</div>
+      <div class="corner">07</div>
+      <div class="val small">9-step signup, no SSO</div>
+      <div class="foot">drop-off at step 4</div>
+    </div>
+    <div class="cell">
+      <div class="lab">Outcome</div>
+      <div class="corner">08</div>
+      <div class="val"><span class="accent">2.4&times;</span></div>
+      <div class="foot">activation, 12.3%, 30.1%</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>VECTOR / Q1, Q2 2026</span>
+    <span>TEAR SHEET</span>
+    <span>OCTIFY TECHNOLOGIES</span>
+  </div>
+</body>
+</html>

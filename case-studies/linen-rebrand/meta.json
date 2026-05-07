@@ -1,0 +1,17 @@
+{
+  "slug": "linen-rebrand",
+  "title": "linen, redrawn.",
+  "client": "Linen Hospitality",
+  "industry": "Hospitality",
+  "date": "2026-02-04",
+  "summary": "A year-long rebrand grounded in restraint, asymmetry, and a single typeface in two weights.",
+  "tags": ["brand", "editorial", "hospitality"],
+  "slides": [
+    { "file": "01.html", "title": "Cover" },
+    { "file": "02.html", "title": "The brief" },
+    { "file": "03.html", "title": "Voice of the client" },
+    { "file": "04.html", "title": "Three principles" },
+    { "file": "05.html", "title": "Before / After" },
+    { "file": "06.html", "title": "Colophon" }
+  ]
+}

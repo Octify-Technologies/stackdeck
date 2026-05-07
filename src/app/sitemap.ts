@@ -1,13 +1,17 @@
 import type { MetadataRoute } from 'next';
+import { listCaseStudies } from '@/lib/case-studies';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = 'https://stackdeck.octifytechnologies.com';
   const lastModified = new Date();
-
+  const studies = await listCaseStudies();
   return [
     { url: `${base}/`, lastModified, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${base}/new`, lastModified, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/presets`, lastModified, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${base}/templates`, lastModified, changeFrequency: 'weekly', priority: 0.9 },
+    ...studies.map((s) => ({
+      url: `${base}/c/${s.slug}`,
+      lastModified: s.date ? new Date(s.date) : lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
   ];
 }

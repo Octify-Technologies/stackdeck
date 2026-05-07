@@ -6,18 +6,7 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    ignores: [
-      '.next/**',
-      'node_modules/**',
-      'coverage/**',
-      'next-env.d.ts',
-      'src/lib/**',
-      'src/templates/**',
-      'src/components/**',
-      'src/primitives/**',
-      'src/hooks/**',
-      'src/data/**',
-    ],
+    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'case-studies/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -58,12 +47,6 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-    },
-  },
-  {
-    files: ['tests/**/*.ts'],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   prettier,

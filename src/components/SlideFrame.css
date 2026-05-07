@@ -1,0 +1,55 @@
+.slide-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg, #fff);
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.slide-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  pointer-events: auto;
+}
+
+/* When a wrapper opts out of clicks, descendants must too — iframes default
+   to pointer-events: auto so the parent rule alone is not enough. */
+.slide-wrap-passive,
+.slide-wrap-passive .slide-canvas,
+.slide-wrap-passive iframe {
+  pointer-events: none;
+}
+
+.slide-canvas iframe {
+  display: block;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* Subtle indeterminate progress bar while a slide loads. */
+.slide-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 2px;
+  background: rgba(10, 10, 10, 0.45);
+  animation: slide-loader 1.1s ease-in-out infinite;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 0 1px 1px 0;
+}
+
+@keyframes slide-loader {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(450%);
+  }
+}

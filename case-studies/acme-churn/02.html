@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tear sheet</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --ink: #f4f4f5;
+    --muted: #a1a1aa;
+    --accent: #e8b04b;
+    --rule: #27272a;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+  .slide { position: relative; width: 1920px; height: 1080px; }
+
+  .topbar { position: absolute; top: 72px; left: 96px; right: 96px; display: flex; justify-content: space-between; align-items: center; }
+  .topbar .left { display: flex; align-items: center; gap: 14px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .brand { font-family: var(--sans); font-size: 14px; color: var(--ink); }
+  .topbar .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+
+  .section-tag { position: absolute; top: 168px; left: 96px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); }
+  .section-title { position: absolute; top: 200px; left: 96px; font-family: var(--serif); font-size: 56px; letter-spacing: -0.02em; color: var(--ink); font-weight: 400; }
+
+  .grid { position: absolute; top: 320px; left: 96px; right: 96px; bottom: 110px; display: grid; grid-template-columns: 720px 1fr; gap: 120px; }
+
+  .meta { display: flex; flex-direction: column; }
+  .row { display: grid; grid-template-columns: 180px 1fr; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--rule); }
+  .row:first-child { border-top: 1px solid var(--rule); }
+  .row .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--muted); }
+  .row .v { font-family: var(--serif); font-size: 36px; letter-spacing: -0.01em; color: var(--ink); }
+  .row .v.accent { color: var(--accent); font-style: italic; }
+
+  .brief { position: relative; max-width: 60ch; }
+  .brief .lead { font-family: var(--serif); font-style: italic; font-size: 28px; line-height: 1.35; color: var(--ink); margin: 0 0 24px 0; letter-spacing: -0.005em; }
+  .brief p { font-family: var(--sans); font-size: 18px; line-height: 1.7; color: #d4d4d8; margin: 0; font-weight: 300; }
+  .brief .caption { margin-top: 36px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #71717a; }
+
+  .footnote { position: absolute; left: 96px; right: 96px; bottom: 64px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #52525b; }
+  .rule-bottom { position: absolute; left: 96px; right: 96px; bottom: 96px; height: 1px; background: var(--rule); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="topbar">
+      <div class="left"><span class="dot"></span><span class="brand">Octify</span></div>
+      <div class="label">Case Study No. 014 / 02</div>
+    </div>
+
+    <div class="section-tag">Tear sheet</div>
+    <h2 class="section-title">The engagement at a glance.</h2>
+
+    <div class="grid">
+      <div class="meta">
+        <div class="row"><div class="k">Client</div><div class="v">Acme Corp</div></div>
+        <div class="row"><div class="k">Industry</div><div class="v">B2B SaaS, mid-market</div></div>
+        <div class="row"><div class="k">Engagement</div><div class="v">Retention overhaul</div></div>
+        <div class="row"><div class="k">Duration</div><div class="v">Q4 2025 to Q1 2026</div></div>
+        <div class="row"><div class="k">Team</div><div class="v">3 strategists, 2 engineers</div></div>
+        <div class="row"><div class="k">Outcome</div><div class="v accent">Churn down 38%</div></div>
+      </div>
+
+      <div class="brief">
+        <p class="lead">Acme was bleeding revenue at the edges of its lifecycle, with annual gross churn pushing 23% and a save flow that converted barely one in eight cancellations.</p>
+        <p>Over two quarters we re-architected the customer lifecycle, rebuilt the in-product save flow against fresh qualitative work, and stood up a dormant-account win-back program. By the close of Q1, gross churn sat at 14.3%, net revenue retention had crossed 118%, and the save rate climbed from 12% to 41%. The work is documented here, slide by slide, with the numbers that closed it out.</p>
+        <div class="caption">Prepared for the Acme board, March 2026</div>
+      </div>
+    </div>
+
+    <div class="rule-bottom"></div>
+    <div class="footnote">
+      <span>Octify Technologies / Confidential</span>
+      <span>02 / 07</span>
+    </div>
+  </div>
+</body>
+</html>

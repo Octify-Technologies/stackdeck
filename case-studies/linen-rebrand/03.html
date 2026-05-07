@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Linen, redrawn. Pull quote</title>
+<style>
+  :root {
+    --paper: #f5f1ea;
+    --ink: #15140f;
+    --oxblood: #8a2a3a;
+    --hair: #cfc8b7;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+    --serif: 'Iowan Old Style', Palatino, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    position: relative;
+  }
+  .glyph {
+    position: absolute;
+    top: 60px;
+    left: 70px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 320px;
+    line-height: 1;
+    color: var(--oxblood);
+    user-select: none;
+  }
+  .stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1280px;
+    text-align: center;
+  }
+  .top-rule, .bot-rule {
+    width: 320px;
+    height: 1px;
+    background: var(--hair);
+    margin: 0 auto;
+  }
+  .quote {
+    margin: 64px auto;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 88px;
+    line-height: 1.12;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    max-width: 65ch;
+  }
+  .attr {
+    margin-top: 64px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .attr .dot {
+    color: var(--oxblood);
+    margin: 0 14px;
+    font-size: 16px;
+    vertical-align: middle;
+  }
+  .runhead {
+    position: absolute;
+    top: 56px;
+    right: 120px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--hair);
+  }
+  .folio {
+    position: absolute;
+    right: 120px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--hair);
+    text-transform: uppercase;
+  }
+  .section-num {
+    position: absolute;
+    left: 120px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+  <div class="glyph">&ldquo;</div>
+  <div class="runhead">III / VOICE</div>
+
+  <div class="stage">
+    <div class="top-rule"></div>
+    <p class="quote">We had spent a decade adding. They taught us, with great patience, the discipline of taking away.</p>
+    <div class="bot-rule"></div>
+    <div class="attr">Marta Vieira<span class="dot">&middot;</span>Founder<span class="dot">&middot;</span>Linen Hospitality</div>
+  </div>
+
+  <div class="section-num">03 / 06</div>
+  <div class="folio">iii</div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Linen, redrawn. Tear sheet</title>
+<style>
+  :root {
+    --paper: #f5f1ea;
+    --ink: #15140f;
+    --oxblood: #8a2a3a;
+    --hair: #cfc8b7;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+    --serif: 'Iowan Old Style', Palatino, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    position: relative;
+  }
+  .runhead {
+    position: absolute;
+    top: 64px;
+    left: 120px;
+    right: 120px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .runhead::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--hair);
+    margin-left: 18px;
+  }
+  .label-pre { display: inline-block; }
+  .grid {
+    position: absolute;
+    top: 160px;
+    left: 120px;
+    right: 120px;
+    bottom: 100px;
+    display: grid;
+    grid-template-columns: 660px 1fr;
+    column-gap: 96px;
+  }
+  .col-rule {
+    position: absolute;
+    top: 160px;
+    bottom: 100px;
+    left: 828px;
+    width: 1px;
+    background: var(--hair);
+  }
+  .dl {
+    margin: 0;
+  }
+  .dl .row {
+    display: flex;
+    align-items: baseline;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--hair);
+    font-size: 22px;
+  }
+  .dl .row:first-child { border-top: 1px solid var(--ink); }
+  .dl dt {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink);
+    width: 200px;
+    flex-shrink: 0;
+  }
+  .dl .leader {
+    flex: 1;
+    margin: 0 14px;
+    border-bottom: 1px dotted #b6ad96;
+    transform: translateY(-4px);
+  }
+  .dl dd {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--ink);
+    text-align: right;
+    max-width: 300px;
+  }
+  .right {
+    position: relative;
+  }
+  .brief {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.6;
+    color: var(--ink);
+    text-align: justify;
+    hyphens: auto;
+    margin: 0;
+    max-width: 640px;
+  }
+  .dropcap {
+    float: left;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 96px;
+    line-height: 0.85;
+    color: var(--oxblood);
+    padding: 6px 12px 0 0;
+    margin-top: 4px;
+  }
+  .marginalia {
+    position: absolute;
+    right: -110px;
+    top: 240px;
+    width: 100px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.45;
+    color: #6b6557;
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+  .marginalia::before {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 1px;
+    background: var(--oxblood);
+    margin-bottom: 8px;
+  }
+  .folio {
+    position: absolute;
+    right: 120px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--hair);
+    text-transform: uppercase;
+  }
+  .section-num {
+    position: absolute;
+    left: 120px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+  <div class="runhead"><span class="label-pre">II<span style="color:var(--hair); margin:0 14px;">/</span>TEAR SHEET<span style="color:var(--hair); margin:0 14px;">/</span>THE FACTS</span></div>
+
+  <div class="col-rule"></div>
+
+  <div class="grid">
+    <dl class="dl">
+      <div class="row"><dt>Client</dt><span class="leader"></span><dd>Linen Hospitality, Lda.</dd></div>
+      <div class="row"><dt>Sector</dt><span class="leader"></span><dd>Independent hotels, six properties</dd></div>
+      <div class="row"><dt>Engagement</dt><span class="leader"></span><dd>Identity, voice, and print system</dd></div>
+      <div class="row"><dt>Timeline</dt><span class="leader"></span><dd>March 2025 to February 2026</dd></div>
+      <div class="row"><dt>Team</dt><span class="leader"></span><dd>Two designers, one writer</dd></div>
+      <div class="row"><dt>Outcome</dt><span class="leader"></span><dd>One typeface. Two weights. Six properties.</dd></div>
+    </dl>
+
+    <div class="right">
+      <p class="brief">
+        <span class="dropcap">L</span>inen arrived loud. Eleven typefaces across the printed collateral, four logo lockups in active use, and a colour palette that had been added to, never edited from. The brief was deceptively simple: make it quiet again. Restore the authority the founder had built in the first two years and lost in the next ten. Strip the visual identity back to its load bearing components, define a system small enough to be remembered without a manual, and let the photography of the properties do the talking they had always been able to do. We agreed on three principles before drawing a single line.
+      </p>
+      <div class="marginalia">a deliberate constraint, see principle II overleaf</div>
+    </div>
+  </div>
+
+  <div class="section-num">02 / 06</div>
+  <div class="folio">ii</div>
+</body>
+</html>

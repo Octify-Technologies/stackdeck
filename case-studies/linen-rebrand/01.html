@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Linen, redrawn. Cover</title>
+<style>
+  :root {
+    --paper: #f5f1ea;
+    --ink: #15140f;
+    --oxblood: #8a2a3a;
+    --hair: #cfc8b7;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+    --serif: 'Iowan Old Style', Palatino, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    position: relative;
+  }
+  .frame {
+    position: absolute;
+    top: 88px;
+    left: 120px;
+    right: 120px;
+    bottom: 88px;
+  }
+  .runhead {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .runhead .slash { color: var(--hair); margin: 0 14px; }
+  .top-rule {
+    margin-top: 18px;
+    height: 1px;
+    background: var(--hair);
+    width: 100%;
+  }
+  .title {
+    position: absolute;
+    left: 0;
+    top: 360px;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 220px;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    text-transform: lowercase;
+    margin: 0;
+  }
+  .standfirst {
+    position: absolute;
+    right: 0;
+    top: 410px;
+    width: 540px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.55;
+    color: var(--ink);
+    max-width: 50ch;
+  }
+  .standfirst::before {
+    content: '';
+    display: block;
+    width: 64px;
+    height: 1px;
+    background: var(--ink);
+    margin-bottom: 18px;
+  }
+  .stroke {
+    position: absolute;
+    left: 0;
+    bottom: 64px;
+    width: 240px;
+    height: 2px;
+    background: var(--oxblood);
+  }
+  .date {
+    position: absolute;
+    left: 0;
+    bottom: 28px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.28em;
+    text-transform: lowercase;
+    color: var(--ink);
+  }
+  .folio {
+    position: absolute;
+    right: 0;
+    bottom: 28px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.28em;
+    color: var(--hair);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="runhead">OCTIFY MONOGRAPHS<span class="slash">/</span>NO. 09<span class="slash">/</span>CASE STUDY</div>
+    <div class="top-rule"></div>
+
+    <h1 class="title">linen,<br/>redrawn.</h1>
+
+    <p class="standfirst">
+      Notes on a year of rebuilding a hospitality brand from the ground type up. A study in restraint, in the discipline of subtraction, and in the quiet authority of a single well set page.
+    </p>
+
+    <div class="stroke"></div>
+    <div class="date">april mmxxvi</div>
+    <div class="folio">i</div>
+  </div>
+</body>
+</html>

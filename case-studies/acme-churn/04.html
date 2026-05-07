@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What we did</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --ink: #f4f4f5;
+    --muted: #a1a1aa;
+    --accent: #e8b04b;
+    --rule: #27272a;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+  .slide { position: relative; width: 1920px; height: 1080px; }
+
+  .topbar { position: absolute; top: 72px; left: 96px; right: 96px; display: flex; justify-content: space-between; align-items: center; }
+  .topbar .left { display: flex; align-items: center; gap: 14px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .brand { font-family: var(--sans); font-size: 14px; color: var(--ink); }
+  .topbar .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+
+  .section-tag { position: absolute; top: 168px; left: 96px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); }
+  .section-title { position: absolute; top: 200px; left: 96px; font-family: var(--serif); font-size: 64px; letter-spacing: -0.02em; color: var(--ink); font-weight: 400; }
+  .section-sub { position: absolute; top: 296px; left: 96px; max-width: 720px; font-family: var(--sans); font-size: 17px; line-height: 1.6; color: var(--muted); font-weight: 300; }
+
+  .columns { position: absolute; top: 440px; left: 96px; right: 96px; bottom: 140px; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .col { padding: 0 40px; position: relative; }
+  .col + .col { border-left: 1px solid var(--rule); }
+  .col .num { font-family: var(--serif); font-style: italic; font-size: 64px; color: var(--accent); line-height: 1; letter-spacing: -0.02em; margin-bottom: 36px; }
+  .col h3 { font-family: var(--sans); font-size: 22px; font-weight: 600; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 18px 0; line-height: 1.2; }
+  .col p { font-family: var(--sans); font-size: 14px; line-height: 1.6; color: #a1a1aa; margin: 0; font-weight: 300; }
+  .col .tag { position: absolute; bottom: 0; left: 40px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: #52525b; }
+
+  .footnote { position: absolute; left: 96px; right: 96px; bottom: 64px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #52525b; }
+  .rule-bottom { position: absolute; left: 96px; right: 96px; bottom: 96px; height: 1px; background: var(--rule); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="topbar">
+      <div class="left"><span class="dot"></span><span class="brand">Octify</span></div>
+      <div class="label">Case Study No. 014 / 04</div>
+    </div>
+
+    <div class="section-tag">What we did</div>
+    <h2 class="section-title">Four moves, in sequence.</h2>
+    <div class="section-sub">No single intervention would have shifted the number. The work was a chain: a clean diagnosis fed a lifecycle redesign, which fed a new save flow, which fed a smarter win-back.</div>
+
+    <div class="columns">
+      <div class="col">
+        <div class="num">01</div>
+        <h3>Diagnosis</h3>
+        <p>Cohort decomposition across 14 months of billing data. Twelve customer interviews. We isolated three churn modes that accounted for 71% of all losses.</p>
+        <div class="tag">Weeks 1 to 3</div>
+      </div>
+      <div class="col">
+        <div class="num">02</div>
+        <h3>Lifecycle re-architecture</h3>
+        <p>Replaced a single onboarding flow with three role-tuned tracks. Activation milestones tied to billing events, with health scoring rebuilt against actual usage signals.</p>
+        <div class="tag">Weeks 4 to 9</div>
+      </div>
+      <div class="col">
+        <div class="num">03</div>
+        <h3>Save-flow rebuild</h3>
+        <p>Replaced a static cancel page with a dynamic offer engine. Five branches keyed off the cancel reason, with offers calibrated to LTV not gut feel.</p>
+        <div class="tag">Weeks 10 to 16</div>
+      </div>
+      <div class="col">
+        <div class="num">04</div>
+        <h3>Win-back sequencing</h3>
+        <p>A six-touch program reaching dormant accounts at 30, 60, and 90 days post-cancel. Two reactivation offers, both tied to specific product changes shipped after their exit.</p>
+        <div class="tag">Weeks 17 to 24</div>
+      </div>
+    </div>
+
+    <div class="rule-bottom"></div>
+    <div class="footnote">
+      <span>Octify Technologies / Confidential</span>
+      <span>04 / 07</span>
+    </div>
+  </div>
+</body>
+</html>

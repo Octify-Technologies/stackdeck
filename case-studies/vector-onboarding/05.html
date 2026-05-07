@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vector / The result</title>
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --fg: #ededed;
+    --cyan: #5cf2c8;
+    --hair: #2a2a2a;
+    --grotesk: 'Helvetica Neue', 'Arial', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--grotesk);
+    -webkit-font-smoothing: antialiased;
+  }
+  .ident {
+    position: absolute;
+    top: 64px;
+    left: 96px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+  }
+  .pageno {
+    position: absolute;
+    top: 64px;
+    right: 96px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #6a6a6a;
+    letter-spacing: 0.2em;
+  }
+  h2 {
+    position: absolute;
+    top: 130px;
+    left: 96px;
+    margin: 0;
+    font-size: 56px;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .sub {
+    position: absolute;
+    top: 200px;
+    left: 96px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: #8a8a8a;
+  }
+  .row {
+    position: absolute;
+    top: 320px;
+    left: 96px;
+    width: 1728px;
+    height: 580px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .col {
+    position: relative;
+    padding: 12px 56px 0 56px;
+    border-left: 1px solid var(--hair);
+  }
+  .col:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .col:last-child {
+    padding-right: 0;
+  }
+  .lab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: #6a6a6a;
+    text-transform: uppercase;
+  }
+  .num {
+    margin-top: 56px;
+    font-family: var(--grotesk);
+    font-size: 168px;
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .num .u { font-size: 80px; vertical-align: 50px; letter-spacing: -0.02em; color: #b8b8b8; }
+  .delta {
+    margin-top: 28px;
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tri {
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 9px solid var(--cyan);
+    display: inline-block;
+  }
+  .tri.down {
+    border-bottom: 0;
+    border-top: 9px solid var(--cyan);
+  }
+  .delta .from {
+    color: #6a6a6a;
+    margin-left: 6px;
+  }
+  .spark {
+    margin-top: 36px;
+    width: 100%;
+    height: 90px;
+  }
+  .baseline {
+    margin-top: 28px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: #5a5a5a;
+    text-transform: uppercase;
+  }
+  .footer {
+    position: absolute;
+    bottom: 36px;
+    left: 96px;
+    right: 96px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #5a5a5a;
+    letter-spacing: 0.18em;
+  }
+</style>
+</head>
+<body>
+  <div class="ident">[ CASE &bull; 022 / 05 ]</div>
+  <div class="pageno">05 / 06</div>
+
+  <h2>The result.</h2>
+  <div class="sub">measured 30 days post-launch &bull; n=24,118</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="lab">01 / Activation rate</div>
+      <div class="num">30.1<span class="u">%</span></div>
+      <div class="delta">
+        <span class="tri"></span>
+        <span>+17.8 pts</span>
+        <span class="from">/ from 12.3%</span>
+      </div>
+      <svg class="spark" viewBox="0 0 540 90" preserveAspectRatio="none">
+        <line x1="0" y1="89" x2="540" y2="89" stroke="#2a2a2a" stroke-width="1"/>
+        <polyline fill="none" stroke="#5cf2c8" stroke-width="1.5"
+          points="0,72 60,68 120,66 180,58 240,52 300,40 360,32 420,22 480,16 540,10"/>
+        <circle cx="540" cy="10" r="3" fill="#5cf2c8"/>
+      </svg>
+      <div class="baseline">baseline / Q4 2025</div>
+    </div>
+
+    <div class="col">
+      <div class="lab">02 / Time to first value</div>
+      <div class="num">4m<span class="u">&nbsp;12s</span></div>
+      <div class="delta">
+        <span class="tri down"></span>
+        <span>-77%</span>
+        <span class="from">/ from 18m 40s</span>
+      </div>
+      <svg class="spark" viewBox="0 0 540 90" preserveAspectRatio="none">
+        <line x1="0" y1="89" x2="540" y2="89" stroke="#2a2a2a" stroke-width="1"/>
+        <polyline fill="none" stroke="#5cf2c8" stroke-width="1.5"
+          points="0,18 60,22 120,28 180,38 240,46 300,52 360,60 420,68 480,74 540,80"/>
+        <circle cx="540" cy="80" r="3" fill="#5cf2c8"/>
+      </svg>
+      <div class="baseline">median, signed-in users</div>
+    </div>
+
+    <div class="col">
+      <div class="lab">03 / 30-day retention</div>
+      <div class="num">64<span class="u">%</span></div>
+      <div class="delta">
+        <span class="tri"></span>
+        <span>+33 pts</span>
+        <span class="from">/ from 31%</span>
+      </div>
+      <svg class="spark" viewBox="0 0 540 90" preserveAspectRatio="none">
+        <line x1="0" y1="89" x2="540" y2="89" stroke="#2a2a2a" stroke-width="1"/>
+        <polyline fill="none" stroke="#5cf2c8" stroke-width="1.5"
+          points="0,68 60,62 120,58 180,52 240,42 300,38 360,30 420,24 480,18 540,12"/>
+        <circle cx="540" cy="12" r="3" fill="#5cf2c8"/>
+      </svg>
+      <div class="baseline">cohort 2026w14</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>VECTOR / Q1, Q2 2026</span>
+    <span>THE RESULT</span>
+    <span>OCTIFY TECHNOLOGIES</span>
+  </div>
+</body>
+</html>

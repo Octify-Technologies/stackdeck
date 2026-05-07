@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cover</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --ink: #f4f4f5;
+    --muted: #a1a1aa;
+    --accent: #e8b04b;
+    --rule: #27272a;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+  .slide { position: relative; width: 1920px; height: 1080px; }
+
+  .monogram { position: absolute; top: 72px; left: 96px; display: flex; align-items: center; gap: 14px; }
+  .monogram .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .monogram .name { font-family: var(--sans); font-size: 16px; letter-spacing: 0.02em; color: var(--ink); font-weight: 500; }
+
+  .label { position: absolute; top: 76px; right: 96px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--muted); }
+
+  .title { position: absolute; left: 96px; top: 320px; right: 200px; font-family: var(--serif); font-size: 140px; line-height: 0.95; letter-spacing: -0.03em; color: var(--ink); font-weight: 400; }
+  .title em { font-style: italic; color: var(--accent); font-weight: 400; }
+
+  .micro { position: absolute; left: 96px; top: 820px; display: flex; gap: 56px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .micro .item { display: flex; flex-direction: column; gap: 8px; }
+  .micro .k { color: #71717a; font-size: 10px; letter-spacing: 0.28em; }
+  .micro .v { color: var(--ink); font-size: 13px; letter-spacing: 0.08em; }
+
+  .numeral { position: absolute; right: 96px; bottom: 110px; font-family: var(--serif); font-style: italic; font-size: 220px; line-height: 1; color: rgba(232, 176, 75, 0.18); letter-spacing: -0.04em; }
+
+  .rule { position: absolute; left: 96px; right: 96px; bottom: 96px; height: 1px; background: var(--rule); }
+
+  .footnote { position: absolute; left: 96px; bottom: 64px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #52525b; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="monogram"><span class="dot"></span><span class="name">Octify</span></div>
+    <div class="label">Case Study No. 014</div>
+
+    <h1 class="title">How Acme cut <em>churn</em> by 38% in two quarters.</h1>
+
+    <div class="micro">
+      <div class="item"><span class="k">Client</span><span class="v">Acme Corp</span></div>
+      <div class="item"><span class="k">Date</span><span class="v">March 2026</span></div>
+      <div class="item"><span class="k">Author</span><span class="v">Octify Technologies</span></div>
+      <div class="item"><span class="k">Engagement</span><span class="v">Q4 2025 to Q1 2026</span></div>
+    </div>
+
+    <div class="numeral">01</div>
+    <div class="rule"></div>
+    <div class="footnote">Octify Technologies / Confidential</div>
+  </div>
+</body>
+</html>

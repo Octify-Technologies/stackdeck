@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The problem</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --ink: #f4f4f5;
+    --muted: #a1a1aa;
+    --accent: #e8b04b;
+    --rule: #27272a;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+  .slide { position: relative; width: 1920px; height: 1080px; }
+
+  .topbar { position: absolute; top: 72px; left: 96px; right: 96px; display: flex; justify-content: space-between; align-items: center; }
+  .topbar .left { display: flex; align-items: center; gap: 14px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .brand { font-family: var(--sans); font-size: 14px; color: var(--ink); }
+  .topbar .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+
+  .section-tag { position: absolute; top: 168px; left: 96px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); }
+
+  .stat { position: absolute; left: 80px; top: 200px; font-family: var(--serif); font-size: 480px; line-height: 0.85; letter-spacing: -0.05em; color: var(--accent); font-weight: 400; }
+
+  .context { position: absolute; right: 96px; top: 320px; width: 560px; }
+  .context .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+  .context h2 { font-family: var(--serif); font-size: 48px; line-height: 1.1; letter-spacing: -0.02em; color: var(--ink); margin: 0 0 24px 0; font-weight: 400; }
+  .context p { font-family: var(--sans); font-size: 17px; line-height: 1.65; color: #d4d4d8; margin: 0 0 32px 0; font-weight: 300; }
+
+  .spark { width: 480px; height: 90px; display: block; }
+  .spark-caption { margin-top: 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #71717a; }
+
+  .footnote { position: absolute; left: 96px; right: 96px; bottom: 64px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #52525b; }
+  .rule-bottom { position: absolute; left: 96px; right: 96px; bottom: 96px; height: 1px; background: var(--rule); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="topbar">
+      <div class="left"><span class="dot"></span><span class="brand">Octify</span></div>
+      <div class="label">Case Study No. 014 / 03</div>
+    </div>
+
+    <div class="section-tag">The problem</div>
+
+    <div class="stat">23%</div>
+
+    <div class="context">
+      <div class="kicker">Diagnosis, October 2025</div>
+      <h2>Annual gross churn at the close of FY24.</h2>
+      <p>Roughly one in four customers leaving every year, the save flow converting at 12%, and a CAC payback period stretching past 19 months. The math no longer worked.</p>
+      <svg class="spark" viewBox="0 0 480 90" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="g3" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#e8b04b" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#e8b04b" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0 22 L40 28 L80 26 L120 34 L160 32 L200 42 L240 48 L280 56 L320 62 L360 70 L400 74 L440 80 L480 84 L480 90 L0 90 Z" fill="url(#g3)"/>
+        <path d="M0 22 L40 28 L80 26 L120 34 L160 32 L200 42 L240 48 L280 56 L320 62 L360 70 L400 74 L440 80 L480 84" fill="none" stroke="#e8b04b" stroke-width="1.5"/>
+        <circle cx="480" cy="84" r="3" fill="#e8b04b"/>
+      </svg>
+      <div class="spark-caption">Quarterly gross churn, FY23 to FY24</div>
+    </div>
+
+    <div class="rule-bottom"></div>
+    <div class="footnote">
+      <span>Source: Acme RevOps, Q4 2025</span>
+      <span>03 / 07</span>
+    </div>
+  </div>
+</body>
+</html>
