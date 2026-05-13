@@ -36,7 +36,14 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    noimageindex: true,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export const viewport: Viewport = {
