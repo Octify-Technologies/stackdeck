@@ -90,13 +90,6 @@ export function Viewer({ slug, title, client, slides }: Props) {
         slug,
         filename: pdfFilename,
         slides,
-        contactCard: {
-          deckTitle: title,
-          client,
-          recipient,
-          senderName: SENDER_NAME,
-          contactEmail: CONTACT_EMAIL,
-        },
         onProgress: setPdfStatus,
       });
     } catch (err) {
@@ -106,7 +99,7 @@ export function Viewer({ slug, title, client, slides }: Props) {
       return;
     }
     setTimeout(() => setPdfStatus(null), 1200);
-  }, [slug, slides, pdfStatus, pdfFilename, title, client, recipient]);
+  }, [slug, slides, pdfStatus, pdfFilename]);
 
   const pdfBusy = pdfStatus !== null && pdfStatus.phase !== 'done';
   const pdfLabel = (() => {
