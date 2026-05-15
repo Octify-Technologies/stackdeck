@@ -80,7 +80,7 @@ export function Viewer({ slug, title, client, slides }: Props) {
 
   const pdfFilename = useMemo(() => {
     const safe = title.replace(/[\\/:*?"<>|]+/g, '').trim();
-    return `Octify – ${safe}.pdf`;
+    return `${safe}.pdf`;
   }, [title]);
 
   const downloadPdf = useCallback(async () => {
