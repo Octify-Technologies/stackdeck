@@ -15,4 +15,5 @@ coverage
 .temp
 .vercel
 .claude
+slides
 .env*.local
