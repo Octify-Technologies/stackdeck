@@ -20,11 +20,12 @@ function base64UrlEncode(bytes: ArrayBuffer): string {
   return btoa(bin).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-function base64UrlDecode(str: string): Uint8Array {
+function base64UrlDecode(str: string): Uint8Array<ArrayBuffer> {
   const pad = str.length % 4 ? '='.repeat(4 - (str.length % 4)) : '';
   const b64 = (str + pad).replace(/-/g, '+').replace(/_/g, '/');
   const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
+  const buf = new ArrayBuffer(bin.length);
+  const bytes = new Uint8Array(buf);
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
   return bytes;
 }
